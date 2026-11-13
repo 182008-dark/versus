@@ -5,6 +5,44 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+Étape 2 : design system et gabarit global (`v0.2.0` à la fusion).
+
+### Ajouté
+
+- Design system en trois couches dans `globals.css` (primitives, rôles, pont `@theme inline`),
+  points de rupture mobile d'abord (641, 901, 1025, 1240 px), palette Tailwind par défaut retirée,
+  utilitaires `wrap`, `section`, `eyebrow`, `text-display-*`, `prose-info`, anneau de focus de
+  2 px et variantes `state-hover`, `state-focus`, `state-active` (ADR 002).
+- Accent VERSUS vert `#00805A` (décision D1) : contrastes mesurés par `src/lib/color/contrast.ts`
+  (WCAG 2.2, testé) et affichés dans `/styleguide`.
+- `src/styles/animations.css` (état par défaut visible, animations sous
+  `prefers-reduced-motion: no-preference`) et `src/lib/brand-themes.ts` (thèmes de marque,
+  dégradés du hero, couleurs du SVG de secours).
+- Composants `ui/` : `Button`, `TextLink`, `Arrow`, `IconButton`, `CountBadge`, `Icon`, `Badge`,
+  `NewBadge`, `Eyebrow`, `Dialog` (`<dialog>` natif, focus piégé), `VisuallyHidden`.
+- Gabarit : `AnnouncementBar` (ancien `FictiveNotice`), `Logo` (monogramme « V/S »),
+  `SiteHeader`, `MainNav`, `NavLink`, `MobileMenu` (≤ 900 px), `SiteFooter`, `PaymentBadges`,
+  pilotés par `src/config/site.ts` (liens non livrés absents du DOM).
+- Pages `/confidentialite`, `/cgv`, `/livraison` et `/garantie` (contenu pédagogique), `error.tsx`
+  (racine et `(site)`), `global-error.tsx`, page 404 dans le gabarit.
+- `/styleguide` : couleurs, contrastes mesurés, typographie, tous les états des boutons et des
+  liens, badges, logo, focus, thèmes ; 404 en production (`VERCEL_ENV`, pas `NODE_ENV`).
+- Tests : contraste, parité tokens CSS/TS et thèmes de marque, règle du styleguide, focus piégé,
+  `Dialog`, `Button`, `IconButton`, pages d'erreur ; e2e `gabarit.spec.ts` (landmarks, menu
+  mobile au clavier, pas de défilement horizontal à 375 px, axe) ; `liens.spec` et
+  `accueil.spec` étendus aux nouvelles pages.
+- `npm run capture:gabarit` et captures de l'implémentation (`docs/maquette/implementation/`).
+- Documentation : `docs/design-system.md`, `docs/ecarts-maquette.md` (v1), ADR 002.
+
+### Modifié
+
+- `src/config/site.ts` : routes de l'étape 2 livrées, navigation, icônes, colonnes du pied de
+  page et liens légaux.
+- Mentions légales et crédits passent au gabarit `InfoPage` ; l'accueil provisoire n'a plus sa
+  propre liste de liens (elle est dans le pied de page).
+- Polices déclarées dans `src/app/fonts.ts` (partagé avec `global-error.tsx`).
+- `vitest.setup.ts` : nettoyage de Testing Library entre les tests et `showModal()` pour jsdom.
+
 ## [0.1.0] : étape 1, socle (2026-11-13)
 
 ### Ajouté
