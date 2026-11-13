@@ -34,9 +34,16 @@ sombre, orange `#BF4800` pour « Nouveau ». Il faut :
   `@theme` **non** inline (`--breakpoint-sm: 641px`…).
 - `--color-*: initial` retire la palette par défaut de Tailwind : `bg-blue-500` n'existe pas, seuls
   les rôles VERSUS sont disponibles. C'est une barrière en plus de `check:forbidden`.
-- `src/data/design-tokens.ts` garde une copie des primitives pour `/styleguide` (nuancier et
-  calcul des contrastes). `design-tokens.test.ts` lit `globals.css` et échoue si les deux
-  divergent : `globals.css` reste la source de vérité.
+- `src/data/design-tokens.ts` garde une copie des primitives et des rôles pour `/styleguide`
+  (nuancier et calcul des contrastes). `design-tokens.test.ts` lit `globals.css` et vérifie la
+  parité **dans les deux sens** : chaque entrée de `design-tokens.ts` existe dans le premier
+  `:root` avec la même valeur, et chaque token de ce `:root` qui se résout en couleur opaque
+  existe dans `design-tokens.ts` (primitive s'il est littéral, rôle s'il pointe vers une
+  primitive). Les tokens translucides ou non colorés (`--line-strong`, `--header-bg-translucent`,
+  `--header-line`, `--icon-hover`, `--header-height`, `--text-*`) sont exemptés par une liste
+  explicite : un nouveau token doit donc être classé. Le test vérifie enfin que chaque
+  `--color-*` de `@theme inline` renvoie à un rôle connu, jamais à une primitive.
+  `globals.css` reste la source de vérité.
 
 ### 2. Accent VERSUS vert (décision D1)
 
@@ -90,7 +97,10 @@ dégradés du hero (injectés en variables inline) et les couleurs du SVG de sec
 Trois variantes Tailwind (`@custom-variant`) : `state-hover`, `state-focus`, `state-active`. Elles
 appliquent le style au vrai `:hover` / `:focus-visible` / `:active` **ou** à
 `[data-state~="hover|focus|active"]`. `/styleguide` montre ainsi tous les états des boutons et des
-liens sans interaction, avec les mêmes classes que le site.
+liens sans interaction, avec les mêmes classes que le site. Comme la variante `hover:` de
+Tailwind v4, le vrai survol de `state-hover` est placé sous `@media (hover: hover)` : sur un écran
+tactile, le style de survol ne reste pas collé après un appui ; l'état forcé
+`data-state="hover"` reste actif partout.
 
 ### 6. Mouvement
 
@@ -112,10 +122,54 @@ Tout est fait avec ce qui était installé à l'étape 1 (Tailwind, `clsx`, Test
 `@testing-library/user-event`, Playwright, axe). `<dialog>` natif plutôt qu'une bibliothèque de
 modales ; calcul de contraste écrit à la main (30 lignes testées) plutôt qu'un paquet de couleurs.
 
+### 9. Primitives livrées avec leur premier usage (écart au plan)
+
+L'objectif de l'étape 2 (§6) annonce « toutes les primitives » et le §3.1 liste 25 composants
+`ui/`. L'étape 2 livre ceux dont le gabarit, le styleguide et les critères de l'étape ont besoin :
+`Button`, `TextLink`, `Arrow`, `IconButton`, `CountBadge`, `Icon`, `Badge`, `NewBadge`,
+`Eyebrow`, `Dialog`, `VisuallyHidden`, `SkipLink`, et `ScrollRegion` (tableau défilant
+atteignable au clavier, ajouté à la relecture). Tous les **tokens** sont livrés (couleurs,
+rayons, ombres, courbes, typographie, keyframes et classes `reveal`/`zoom`/`rise`).
+
+Les autres primitives sont **reportées** à l'étape qui en a le premier usage, et rattachées à
+ses livrables dans le plan (révision 3) :
+
+| Primitive            | Étape | Premier usage                                                      |
+| -------------------- | ----- | ------------------------------------------------------------------ |
+| `Pill`, `PillGroup`  | 3     | filtre de la section « Nouveautés » de l'accueil                   |
+| `Price`              | 3     | `ProductCard`, fiche minimale (« À partir de », `formatFCFA`)      |
+| `SectionHeader`      | 3     | en-têtes des sections de l'accueil (surtitre, titre, lien fléché)  |
+| `Reveal`             | 3     | apparitions au défilement de l'accueil (classes déjà dans le CSS)  |
+| `Skeleton`           | 4     | `loading.tsx` de la fiche, grille de `/boutique` sous `<Suspense>` |
+| `Select`             | 4     | `SortSelect` (tri de `/boutique`)                                  |
+| `Checkbox`           | 4     | filtre « en stock » de `/boutique` ; case obligatoire à l'étape 6  |
+| `EmptyState`         | 4     | `/recherche` sans résultat, `/boutique` filtrée vide               |
+| `Drawer`             | 5     | `CartDrawer` (`<dialog>` natif, sur la base de `Dialog`)           |
+| `Toaster`            | 5     | toast du comparateur qui nomme le produit retiré                   |
+| `Spinner`            | 5     | `AddToCartButton` et `priceCart` en attente                        |
+| `Field`, `RadioCard` | 6     | `CheckoutForm` (coordonnées, zone de livraison, moyen de paiement) |
+| `Stepper`            | 6     | `CheckoutForm` en 4 étapes (déjà prévu à l'étape 6)                |
+
+Raisons :
+
+- **Principe 8 du plan** : « seulement à l'étape où elle sert ». Une primitive écrite sans
+  consommateur fige une API (props, états, messages d'erreur) qu'on ne peut pas encore valider :
+  `Field` et `RadioCard` dépendent de la validation zod partagée de l'étape 6, `Toaster` et
+  `Drawer` du `CartProvider` et du réducteur du comparateur de l'étape 5.
+- Plusieurs n'ont **aucune référence dans la maquette** (`Drawer`, `Toaster`, `Field`,
+  `RadioCard`, `Stepper` : « nouveaux » au §4.3) ; leur forme se décide avec l'écran qui les
+  utilise.
+- Aucun critère d'acceptation de l'étape 2 n'en dépend.
+
+Règle : chaque primitive reportée est livrée **avec** sa section dans `/styleguide` et ses tests
+(unitaires, et axe sur le styleguide), à l'étape indiquée.
+
 ## Conséquences
 
 - Un composant ne contient que des classes de rôle (`bg-accent`, `text-muted`) ; changer l'accent
-  se fait en une ligne de `globals.css` (et de `design-tokens.ts`, vérifié par test).
+  se fait en une ligne de `globals.css` (et de `design-tokens.ts`, vérifié par test). Les
+  primitives `--white` et `--black` n'ont pas de classe Tailwind : on écrit `text-on-dark`,
+  `text-on-accent`, `bg-bg` ou `bg-header-bg`.
 - La maquette est en `box-sizing: content-box` : `.wrap` y mesure 1240 px de contenu + 2 × 24 px.
   Tailwind est en `border-box` : l'utilitaire `wrap` fait donc 1288 px au total, ce qui redonne
   les mêmes positions (logo à 100 px du bord à 1440 px).

@@ -43,6 +43,19 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 - Polices déclarées dans `src/app/fonts.ts` (partagé avec `global-error.tsx`).
 - `vitest.setup.ts` : nettoyage de Testing Library entre les tests et `showModal()` pour jsdom.
 
+### Corrigé (relecture de l'étape 2)
+
+- Menu mobile : le logo ferme le menu ; le menu se ferme aussi au changement de chemin et quand
+  `<Activity>` masque la page quittée, et `Dialog` se ferme au masquage (plus de `<dialog>`
+  modal caché qui rendait l'accueil inerte). `onClose` n'est plus appelé deux fois.
+- Accessibilité : tableaux défilants atteignables au clavier (`ScrollRegion`), lien d'évitement
+  de 44 px et contrasté, bandeau dans une région nommée, `aria-current` dans le pied de page,
+  cibles de 44 px (lien de fin des pages d'information, pied de page sous 641 px, logo), logos
+  du styleguide qui passent à la ligne à 320 px ; axe à 375 px et règle `region` dans les e2e.
+- Design system : parité `globals.css` / `design-tokens.ts` testée dans les deux sens, pont
+  Tailwind limité aux rôles (plus de `text-white`), `state-hover` sous `@media (hover: hover)`.
+- Primitives `ui/` restantes rattachées aux étapes 3 à 6 (ADR 002, décision 9 ; plan, révision 3).
+
 ## [0.1.0] : étape 1, socle (2026-11-13)
 
 ### Ajouté

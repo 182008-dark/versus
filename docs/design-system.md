@@ -35,6 +35,13 @@ Fichier unique : `src/app/globals.css`, en trois couches.
 | `--header-bg`, `--header-bg-translucent`, `--header-line` | blanc, blanc 78 %, noir 7 %                       | en-tête                                    |
 
 La palette par défaut de Tailwind est retirée (`--color-*: initial`) : `bg-blue-500` n'existe pas.
+Les primitives n'ont pas de classe non plus (ni `text-white`, ni `bg-black`) : le pont
+`@theme inline` ne renvoie qu'à des rôles, ce que vérifie `design-tokens.test.ts`.
+
+**Ajouter un token** : le déclarer dans le premier `:root` de `globals.css` **et** dans
+`src/data/design-tokens.ts` (`primitives` pour une valeur littérale, `semantic` pour un rôle). Le
+test de parité échoue dans les deux sens ; un token translucide ou non coloré s'ajoute à sa liste
+d'exceptions (`NOT_OPAQUE_COLORS`).
 
 ### Thèmes de marque
 
@@ -97,6 +104,9 @@ Points de rupture déclarés dans `@theme` : `sm` 641, `md` 901, `lg` 1025, `xl`
 ## 3. États et mouvement
 
 - `state-hover:`, `state-focus:`, `state-active:` : vrai état **ou** `data-state="…"` (styleguide).
+  Le vrai survol de `state-hover:` ne s'applique que sous `@media (hover: hover)` (comme `hover:`
+  dans Tailwind v4) : pas de survol collé après un appui sur écran tactile. Même règle pour les
+  liens de `prose-info`. Ne pas écrire `hover:` directement : utiliser `state-hover:`.
 - Anneau de focus global : `:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px }`.
 - `src/styles/animations.css` : keyframes `up`, `fade`, `art-in`, `float`, `glow`, `spin`, `fill`,
   `bump`, `tray-in`, `q-in`, `zoom`, `rise` ; classes `anim-*` et `.reveal/.zoom/.rise` sous
@@ -107,37 +117,45 @@ Points de rupture déclarés dans `@theme` : `sm` 641, `md` 901, `lg` 1025, `xl`
 
 ### `src/components/ui/`
 
-| Composant           | S/C | Props principales                                                                                    | Notes                                                                                                                           |
-| ------------------- | --- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `Button`            | S   | `variant` (primary, dark, light, outline, onDark, brand), `size` (md 44, lg 48), `href?`, `pressed?` | `href` → `<Link>` ; sinon `type="button"` ; `aria-pressed` ; `scale(1.04)` sous `motion-safe` ; classes dans `button-styles.ts` |
-| `TextLink`          | S   | `href`, `tone` (accent, ink, light, accentOnDark), `arrow?`                                          | 44 px de haut ; flèche décalée au survol et au focus                                                                            |
-| `Arrow`             | S   | —                                                                                                    | « → », `aria-hidden`                                                                                                            |
-| `IconButton`        | S/C | `label`, `icon`, `count?`, `countUnits?`, `href?`                                                    | nom « Panier, 3 articles » (`countLabel`), `aria-live`                                                                          |
-| `CountBadge`        | S   | `value`                                                                                              | pastille accent ; `bump` rejoué par `key`                                                                                       |
-| `Icon`              | S   | `name` (search, compare, account, cart, menu, close)                                                 | tracés de la maquette, `aria-hidden`                                                                                            |
-| `Badge`, `NewBadge` | S   | `tone` (accent, neutral, onDark)                                                                     | capsule ; « Nouveau » en `accent-soft`                                                                                          |
-| `Eyebrow`           | S   | `as`, `tone`                                                                                         | carré accent de 6 px                                                                                                            |
-| `Dialog`            | C   | `open`, `onClose`, `labelledBy`/`label`, `variant` (modal, fullscreen), `returnFocusRef`             | `<dialog>` natif, Échap, focus piégé (`lib/a11y/focus-trap.ts`), focus rendu                                                    |
-| `VisuallyHidden`    | S   | —                                                                                                    | `sr-only`                                                                                                                       |
-| `SkipLink`          | S   | `targetId`                                                                                           | au-dessus de l'en-tête collant                                                                                                  |
+| Composant           | S/C | Props principales                                                                                    | Notes                                                                                                                                                                  |
+| ------------------- | --- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`            | S   | `variant` (primary, dark, light, outline, onDark, brand), `size` (md 44, lg 48), `href?`, `pressed?` | `href` → `<Link>` ; sinon `type="button"` ; `aria-pressed` ; `scale(1.04)` sous `motion-safe` ; classes dans `button-styles.ts`                                        |
+| `TextLink`          | S   | `href`, `tone` (accent, ink, light, accentOnDark), `arrow?`                                          | 44 px de haut ; flèche décalée au survol et au focus                                                                                                                   |
+| `Arrow`             | S   | —                                                                                                    | « → », `aria-hidden`                                                                                                                                                   |
+| `IconButton`        | S/C | `label`, `icon`, `count?`, `countUnits?`, `href?`                                                    | nom « Panier, 3 articles » (`countLabel`), `aria-live`                                                                                                                 |
+| `CountBadge`        | S   | `value`                                                                                              | pastille accent ; `bump` rejoué par `key`                                                                                                                              |
+| `Icon`              | S   | `name` (search, compare, account, cart, menu, close)                                                 | tracés de la maquette, `aria-hidden`                                                                                                                                   |
+| `Badge`, `NewBadge` | S   | `tone` (accent, neutral, onDark)                                                                     | capsule ; « Nouveau » en `accent-soft`                                                                                                                                 |
+| `Eyebrow`           | S   | `as`, `tone`                                                                                         | carré accent de 6 px                                                                                                                                                   |
+| `Dialog`            | C   | `open`, `onClose`, `labelledBy`/`label`, `variant` (modal, fullscreen), `returnFocusRef`             | `<dialog>` natif, Échap, focus piégé (`lib/a11y/focus-trap.ts`), focus rendu ; `onClose` une fois par demande de l'utilisateur ; fermée si `<Activity>` masque la page |
+| `VisuallyHidden`    | S   | —                                                                                                    | `sr-only`                                                                                                                                                              |
+| `SkipLink`          | S   | `targetId`                                                                                           | hors écran tant qu'il n'a pas le focus (pas `sr-only`) ; capsule claire de 44 px, au-dessus de l'en-tête collant                                                       |
+| `ScrollRegion`      | S   | `label`, `className`                                                                                 | conteneur à défilement horizontal : `role="region"`, nom, `tabIndex={0}` (défilement au clavier)                                                                       |
 
 ### `src/components/layout/`
 
-| Composant         | S/C | Rôle                                                                        |
-| ----------------- | --- | --------------------------------------------------------------------------- |
-| `AnnouncementBar` | S   | bandeau « Projet pédagogique » (ancien `FictiveNotice`)                     |
-| `Logo`            | S   | monogramme « V/S » et nom ; lien « VERSUS, accueil »                        |
-| `SiteHeader`      | S   | `banner` collant de 56 px ; translucide ≥ 901 px, opaque en dessous         |
-| `MainNav`         | S   | groupes de `mainNav` séparés par un filet ; `preview` pour le styleguide    |
-| `NavLink`         | C   | `aria-current="page"` (`usePathname`)                                       |
-| `MobileMenu`      | C   | bouton `aria-expanded` + `Dialog` plein écran (≤ 900 px)                    |
-| `SiteFooter`      | S   | `contentinfo` : colonnes, moyens de paiement, liens légaux, mentions du bas |
-| `PaymentBadges`   | S   | T-Money, Flooz, Carte bancaire, À la livraison (simulés)                    |
-| `InfoPage`        | S   | gabarit des pages d'information                                             |
-| `ErrorState`      | S   | contenu des pages 404 et d'erreur                                           |
+| Composant         | S/C | Rôle                                                                                                                                                                  |
+| ----------------- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AnnouncementBar` | S   | bandeau « Projet pédagogique » (ancien `FictiveNotice`), région « Avertissement »                                                                                     |
+| `Logo`            | S   | monogramme « V/S » et nom ; lien « VERSUS, accueil » ; zone cliquable de 44 px de haut (pseudo-élément, sans changer la mise en page) ; `onClick` pour le menu mobile |
+| `SiteHeader`      | S   | `banner` collant de 56 px ; translucide ≥ 901 px, opaque en dessous                                                                                                   |
+| `MainNav`         | S   | groupes de `mainNav` séparés par un filet ; `preview` pour le styleguide                                                                                              |
+| `NavLink`         | C   | `aria-current="page"` (`usePathname`)                                                                                                                                 |
+| `MobileMenu`      | C   | bouton `aria-expanded` + `Dialog` plein écran (≤ 900 px) ; se ferme au clic sur un lien ou le logo, au changement de chemin et quand `<Activity>` masque la page      |
+| `SiteFooter`      | S   | `contentinfo` : colonnes, moyens de paiement, liens légaux, mentions du bas ; liens `NavLink` (`aria-current`, page courante soulignée) de 44 px sous 641 px          |
+| `PaymentBadges`   | S   | T-Money, Flooz, Carte bancaire, À la livraison (simulés)                                                                                                              |
+| `InfoPage`        | S   | gabarit des pages d'information                                                                                                                                       |
+| `ErrorState`      | S   | contenu des pages 404 et d'erreur                                                                                                                                     |
 
 Îlots client ajoutés à l'étape 2 : `MobileMenu` (prévu au §3.4), `Dialog` (utilisé par lui),
 `NavLink` (seul `usePathname` l'exige).
+
+### Primitives à venir
+
+Reportées à l'étape de leur premier usage (ADR 002, décision 9) : `Pill`, `PillGroup`, `Price`,
+`SectionHeader`, `Reveal` (étape 3) ; `Skeleton`, `Select`, `Checkbox`, `EmptyState` (étape 4) ;
+`Drawer`, `Toaster`, `Spinner` (étape 5) ; `Field`, `RadioCard`, `Stepper` (étape 6). Chacune
+arrive avec sa section dans `/styleguide` et ses tests.
 
 ### Pilotage par `src/config/site.ts`
 

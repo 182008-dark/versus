@@ -1134,7 +1134,7 @@ gh release create v0.1.0 --title "Étape 1 : socle" --notes "Production : <URL>"
 - **Objectif** : tous les tokens et toutes les primitives, plus un gabarit (bandeau, en-tête, menu mobile, pied de page) fidèle à la maquette, avec l'accent VERSUS validé (D1).
 - **Livrables** :
   - `globals.css` (§4.1), `styles/animations.css`, `lib/brand-themes.ts` (thèmes, dégradés du hero, couleurs du SVG de secours) ;
-  - `components/ui/*` ;
+  - `components/ui/*` : les primitives du gabarit et du styleguide ; les autres sont livrées avec leur premier usage, aux étapes 3 à 6 (ADR 002, décision 9, révision 3) ;
   - `layout/*` : `AnnouncementBar`, `SiteHeader` (icônes pilotées par `config/site.ts`, donc toutes masquées à ce stade), `MainNav`, `MobileMenu`, `Logo`, `SiteFooter` (liens issus de `config/site.ts`), `PaymentBadges` ;
   - layout `(site)` : `AnnouncementBar`, `SiteHeader`, `<main id="contenu">`, `SiteFooter`, dans cet ordre ;
   - pages provisoires `/confidentialite`, `/cgv`, `/livraison`, `/garantie` (contenu pédagogique réel) ;
@@ -1161,6 +1161,7 @@ gh release create v0.1.0 --title "Étape 1 : socle" --notes "Production : <URL>"
 - **Livrables** :
   - `lib/catalog/types.ts` (typé comme la future vue `catalog_products`), `repository.ts`, `static-repository.ts`, `queries.ts`, `is-new.ts`, `today.ts` (`getToday()`, `VS_TODAY` hors production) ;
   - `src/data/catalog.ts` : 9 produits, variantes (avec `color_hex`), specs, images et `home_slots` (syntaxe effaçable, sans `enum`) ;
+  - primitives `ui/` reportées de l'étape 2 (ADR 002) : `Pill`, `PillGroup`, `Price`, `SectionHeader`, `Reveal`, chacune avec sa section dans `/styleguide` ;
   - composants `home/*`, `ProductCard`, `ProductRail` avec flèches, `ProductVisual` (`data-product`), `ProductView`, `CompareShowcase` (tableau de 6 lignes clés, sélection par défaut), `QuizTeaser` (composant prêt, masqué jusqu'à l'étape 5) ;
   - `config/site.ts` : chaque élément de la table ci-dessous passe par `routeFor(clé)` ; l'en-tête, la navigation et le pied de page en dépendent entièrement ;
   - **fiche minimale** `/produit/[slug]` (`generateStaticParams`, rendu par `ProductView`) : visuel, nom, accroche, prix minimal, specs, garantie, mention « Prix indicatifs, aucune vente réelle » ;
@@ -1234,6 +1235,7 @@ npm run db:types   # "supabase gen types typescript --local > src/lib/database.t
   - migrations §5.11 (étape 4), seeds `20_catalog` et `30_home`, `database.types.ts` ;
   - `lib/supabase/public.ts` et `supabase-repository.ts`. `queries.ts` passe sur Supabase (`'use cache'`, `cacheLife('hours')`, tags `catalog`, `product:<slug>`, `home`) ;
   - `/boutique` (filtres marque, catégorie, prix et en stock, tri ; état dans l'URL ; grille sous `<Suspense>`), `/boutique/[categorie]`, `/marques/[marque]`, `/recherche` ;
+  - primitives `ui/` reportées de l'étape 2 (ADR 002) : `Skeleton`, `Select`, `Checkbox`, `EmptyState`, chacune avec sa section dans `/styleguide` ;
   - `config/site.ts` : CategoryNav passe sur `/boutique/[categorie]`, BrandCard sur `/marques/[marque]`, l'icône Rechercher apparaît ;
   - fiche complète :
     - `ProductGallery` par couleur ;
@@ -1302,6 +1304,7 @@ $$, 'anon et authenticated n''exécutent que les fonctions de la liste blanche')
     - `lib/cart/cart-reducer.ts` (`add`, `setQty`, `remove`, `clear`) et `storage.ts` (clé `versus.cart.v1`, validée par zod à la lecture, et l'événement `storage` pour synchroniser les onglets) ;
     - `CartProvider` avec un indicateur `hydrated` ;
     - `AddToCartButton`, `CartDrawer` (`<dialog>`, `aria-live`), `/panier` ;
+    - primitives `ui/` reportées de l'étape 2 (ADR 002) : `Drawer`, `Toaster`, `Spinner`, chacune avec sa section dans `/styleguide` ;
     - « Ajouter au panier » du `CompareShowcase` (variante par défaut), selon D5 ;
     - migration `rpc_quote_cart` et Server Action `priceCart(lines)` → `quote_cart`. Le total affiché vient **toujours** de la base.
   - **Comparateur** :
@@ -1348,6 +1351,7 @@ $$, 'anon et authenticated n''exécutent que les fonctions de la liste blanche')
   - `lib/delivery/fees.ts`, `lib/orders/transitions.ts`, `labels.ts` et `errors.ts`, `lib/validation/checkout.ts`, `lib/format/phone.ts` ;
   - `/commande` :
     - `CheckoutForm` en 4 étapes avec `Stepper` ;
+    - primitives `ui/` reportées de l'étape 2 (ADR 002) : `Field`, `RadioCard`, `Stepper`, chacune avec sa section dans `/styleguide` ;
     - un champ par ligne, `autocomplete` et `inputmode="tel"` ;
     - `FictionNotice` à chaque étape ;
     - case obligatoire « Je comprends qu'il s'agit d'une commande fictive… » ;
@@ -1620,6 +1624,8 @@ $$, 'anon et authenticated n''exécutent que les fonctions de la liste blanche')
 ---
 
 ## Journal des révisions
+
+**Révision 3 (13 novembre 2026), relecture de l'étape 2 :** les primitives `ui/` sans usage à l'étape 2 (`Pill`, `PillGroup`, `Price`, `SectionHeader`, `Reveal`, `Skeleton`, `Select`, `Checkbox`, `EmptyState`, `Drawer`, `Toaster`, `Spinner`, `Field`, `RadioCard`, `Stepper`) sont rattachées aux livrables des étapes 3 à 6, celle de leur premier usage (principe 8). Raisons et tableau : ADR 002, décision 9.
 
 **Révision 2 (12 novembre 2026), après la revue de démarrage :**
 
