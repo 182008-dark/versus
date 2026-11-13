@@ -5,7 +5,9 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
-Étape 2 : design system et gabarit global (`v0.2.0` à la fusion).
+## [0.2.0] : étape 2, design system et gabarit global (2026-11-13)
+
+Production : <https://versus-ecru.vercel.app> (PR #1).
 
 ### Ajouté
 
