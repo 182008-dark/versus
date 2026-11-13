@@ -11,6 +11,8 @@ commande complète avec quatre paiements fictifs : T-Money, Flooz, carte et paie
 Le projet avance en 9 étapes, chacune mise en production, taguée (`v0.N.0`) et présentable en
 5 minutes. Le plan complet est dans [`docs/PLAN.md`](docs/PLAN.md).
 
+**En ligne : <https://versus-ecru.vercel.app>** (compte Vercel personnel, déploiement de production).
+
 **État actuel : étape 1 (socle).** Une page « Bientôt en ligne », le bandeau « fictif », le
 `noindex`, les tests et la CI.
 

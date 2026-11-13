@@ -17,7 +17,7 @@
 ### 1.1 Résumé
 
 VERSUS est une boutique **fictive** (projet pédagogique, aucune vente réelle) de produits Apple, Samsung et Xiaomi pour le Togo. Elle affiche des prix en FCFA et propose quatre paiements simulés : T-Money, Flooz, carte et paiement à la livraison.
-Le projet utilise Next.js 16.4 (App Router, Cache Components), Supabase (Postgres, RLS, Auth, Storage) et Vercel (équipe `agorochito`).
+Le projet utilise Next.js 16.4 (App Router, Cache Components), Supabase (Postgres, RLS, Auth, Storage) et Vercel (projet `versus` du compte personnel, production : https://versus-ecru.vercel.app).
 Il avance en **9 étapes**. Chacune est mise en production dès sa fusion, porte un tag git et se présente en 5 minutes.
 L'accueil reste fidèle à la maquette validée et corrige toutes les remarques UX. Prix, stock et totaux sont calculés uniquement en base.
 La sécurité est démontrée par des tests automatisés (pgTAP, Playwright) et non simplement affirmée.
@@ -1084,7 +1084,7 @@ git commit -m "chore: socle VERSUS (Next 16.4.6, TS 5.9.3, Vitest, Playwright, C
 gh auth status
 gh repo create versus --public --source . --remote origin --push      # ou --private (D2)
 npx vercel login
-npx vercel link --scope agorochito --yes                               # crée/lie le projet « versus »
+npx vercel link --project versus --yes                                # crée/lie le projet « versus » (compte personnel)
 npx vercel git connect
 "https://versus.vercel.app" | npx vercel env add NEXT_PUBLIC_SITE_URL production   # URL réelle à reporter ; PAS en preview
 "false" | npx vercel env add ALLOW_INDEXING production

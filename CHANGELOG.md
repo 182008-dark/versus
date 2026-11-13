@@ -5,7 +5,7 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
-## [0.1.0] : étape 1, socle (en cours)
+## [0.1.0] : étape 1, socle (2026-11-13)
 
 ### Ajouté
 
@@ -22,6 +22,9 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 - Captures de la maquette à 1440 et 390 px (`scripts/capture-maquette.ts`).
 - Composant `FictiveNotice` : le bandeau « Projet pédagogique » s'affiche aussi sur la page 404.
 - Tests e2e : bandeau et `noindex` vérifiés sur chaque page publique et sur la page 404.
+
+- Mise en production sur Vercel : <https://versus-ecru.vercel.app> (projet `versus` du compte
+  personnel, variables `NEXT_PUBLIC_SITE_URL` en production et `ALLOW_INDEXING=false`).
 
 ### Corrigé
 
