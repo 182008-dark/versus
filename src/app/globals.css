@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
+/*
+ * Tokens provisoires de l'étape 1, repris de la maquette (Main.dc.html).
+ * Le design system complet (3 couches de tokens, §4.1 du plan) arrive à l'étape 2.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --vs-ink: #1d1d1f;
+  --vs-ink-muted: #6e6e73;
+  --vs-surface: #ffffff;
+  --vs-surface-alt: #f5f5f7;
+  --vs-line: #d2d2d7;
+  --vs-notice-bg: #1d1d1f;
+  --vs-notice-ink: #d2d2d7;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-ink: var(--vs-ink);
+  --color-ink-muted: var(--vs-ink-muted);
+  --color-surface: var(--vs-surface);
+  --color-surface-alt: var(--vs-surface-alt);
+  --color-line: var(--vs-line);
+  --color-notice-bg: var(--vs-notice-bg);
+  --color-notice-ink: var(--vs-notice-ink);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--vs-surface);
+  color: var(--vs-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.025em;
 }
