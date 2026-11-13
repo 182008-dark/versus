@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import type { NavGroup } from "@/config/site";
 import { Dialog } from "@/components/ui/Dialog";
 import { Eyebrow } from "@/components/ui/Eyebrow";
@@ -16,13 +17,27 @@ const DESKTOP_QUERY = "(min-width: 901px)";
  * c'est une correction UX (voir docs/ecarts-maquette.md).
  * - bouton « Menu » avec `aria-expanded` et `aria-controls` ;
  * - `<dialog>` plein écran : Échap ferme, focus piégé, focus rendu au bouton ;
- * - se ferme quand on suit un lien ou quand la fenêtre passe en mode bureau.
+ * - se ferme quand on suit un lien (logo compris), quand le chemin change (retour arrière…),
+ *   quand la fenêtre passe en mode bureau, et quand `<Activity>` masque la page quittée
+ *   (Next 16, cacheComponents) : sinon un `<dialog>` modal resterait ouvert dans l'arbre caché
+ *   et rendrait la nouvelle page inerte.
  */
 export function MobileMenu({ groups }: { groups: NavGroup[] }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [menuPath, setMenuPath] = useState(pathname);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dialogId = useId();
   const titleId = useId();
+
+  // Changement de chemin : on ferme pendant le rendu (ajustement d'état recommandé par React).
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setOpen(false);
+  }
+
+  // Page masquée par <Activity> : le nettoyage s'exécute avant le masquage (preserving-ui-state.md).
+  useLayoutEffect(() => () => setOpen(false), []);
 
   useEffect(() => {
     if (!open) return;
@@ -58,7 +73,7 @@ export function MobileMenu({ groups }: { groups: NavGroup[] }) {
         closeOnBackdrop={false}
       >
         <div className="wrap flex h-14 w-full shrink-0 items-center justify-between gap-5 border-b border-header-line">
-          <Logo />
+          <Logo onClick={close} />
           <IconButton label="Fermer le menu" icon="close" data-autofocus onClick={close} />
         </div>
         <nav aria-labelledby={titleId} className="wrap w-full flex-1 overflow-y-auto py-8">
