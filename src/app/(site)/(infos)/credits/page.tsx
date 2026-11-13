@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { InfoPage } from "@/components/layout/InfoPage";
+import { ScrollRegion } from "@/components/ui/ScrollRegion";
 
 export const metadata: Metadata = {
   title: "Crédits",
@@ -28,7 +29,7 @@ export default function CreditsPage() {
         appartiennent à leurs marques respectives. Ils ont été recadrés, détourés et réduits
         (900&nbsp;px au plus).
       </p>
-      <div className="overflow-x-auto">
+      <ScrollRegion label="Origine des visuels de produits">
         <table className="w-full border-collapse text-left text-sm">
           <caption className="sr-only">Origine des visuels de produits</caption>
           <thead>
@@ -58,7 +59,7 @@ export default function CreditsPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
 
       <h2>Polices</h2>
       <p>

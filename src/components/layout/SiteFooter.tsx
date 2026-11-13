@@ -1,10 +1,16 @@
-import Link from "next/link";
 import { footerColumns, legalLinks, site } from "@/config/site";
 import { Logo } from "./Logo";
+import { NavLink } from "./NavLink";
 import { PaymentBadges } from "./PaymentBadges";
 
+/**
+ * Liens du pied de page : 44 px de haut sous 641 px (cible tactile du design system), 26 px
+ * au-delà comme la maquette. La page courante (`aria-current`, posé par NavLink) est en encre
+ * et soulignée : l'indication ne repose pas sur la seule couleur.
+ */
 const linkClasses =
-  "block py-[5px] text-muted-strong state-hover:text-ink state-hover:underline underline-offset-2";
+  "flex min-h-11 items-center text-muted-strong state-hover:text-ink state-hover:underline " +
+  "aria-[current=page]:text-ink aria-[current=page]:underline sm:block sm:min-h-0 sm:py-[5px]";
 
 /**
  * Pied de page (maquette : `.foot`), landmark `contentinfo` de premier niveau.
@@ -33,9 +39,9 @@ export function SiteFooter() {
               <ul>
                 {column.links.map((link) => (
                   <li key={link.href}>
-                    <Link href={link.href} className={linkClasses}>
+                    <NavLink href={link.href} className={linkClasses}>
                       {link.label}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
@@ -48,9 +54,9 @@ export function SiteFooter() {
             <ul aria-label="Informations légales" className="mb-2 flex flex-wrap gap-x-5">
               {legalLinks.map((link) => (
                 <li key={link.href}>
-                  <Link href={link.href} className={linkClasses}>
+                  <NavLink href={link.href} className={linkClasses}>
                     {link.label}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>

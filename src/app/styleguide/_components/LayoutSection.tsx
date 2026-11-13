@@ -3,6 +3,7 @@ import { MainNav } from "@/components/layout/MainNav";
 import { PaymentBadges } from "@/components/layout/PaymentBadges";
 import { mainNavPreview, type NavGroup } from "@/config/site";
 import { BRANDS, brandThemes, heroStyle } from "@/lib/brand-themes";
+import { ScrollRegion } from "@/components/ui/ScrollRegion";
 import { StyleguideSection } from "./StyleguideSection";
 
 /** Aperçu non cliquable : les liens n'existent qu'une fois leur route livrée. */
@@ -54,7 +55,7 @@ export function LayoutSection() {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="rounded-box bg-surface-2 p-6">
           <h3 className="text-base font-bold">Logo (monogramme « V/S »)</h3>
-          <div className="mt-4 flex items-center gap-8">
+          <div className="mt-4 flex flex-wrap items-center gap-4 sm:gap-8">
             <Logo />
             <span className="rounded-chip bg-surface p-3">
               <Logo />
@@ -73,7 +74,7 @@ export function LayoutSection() {
           Disposition de la maquette. Dans l&apos;en-tête réel, chaque lien n&apos;apparaît
           qu&apos;une fois sa page livrée.
         </p>
-        <div className="mt-4 flex h-14 items-center rounded-chip bg-white px-6">
+        <div className="mt-4 flex h-14 items-center rounded-chip bg-header-bg px-6">
           <MainNav groups={previewGroups} preview />
         </div>
       </div>
@@ -82,7 +83,7 @@ export function LayoutSection() {
         <div className="rounded-box bg-surface-2 p-6">
           <h3 className="text-base font-bold">Anneau de focus (2 px, décalé de 2 px)</h3>
           <div className="mt-4 flex flex-wrap items-center gap-6">
-            <span data-state="focus" className="rounded-chip bg-white px-4 py-2 text-sm">
+            <span data-state="focus" className="rounded-chip bg-bg px-4 py-2 text-sm">
               Sur fond clair
             </span>
             <span data-tone="dark" className="rounded-chip bg-surface-dark p-3">
@@ -97,7 +98,7 @@ export function LayoutSection() {
           <ul className="mt-4 flex flex-wrap gap-3">
             {radii.map(([name, cls, value]) => (
               <li key={name} className="text-center text-xs">
-                <span className={`block size-14 border border-line bg-white ${cls}`} />
+                <span className={`block size-14 border border-line bg-bg ${cls}`} />
                 {name} · {value}
               </li>
             ))}
@@ -127,7 +128,7 @@ export function LayoutSection() {
       <h3 className="mt-10 text-xl font-bold">
         Points de rupture : maquette → mobile d&apos;abord
       </h3>
-      <div className="mt-4 overflow-x-auto">
+      <ScrollRegion label="Correspondance des points de rupture" className="mt-4">
         <table className="w-full min-w-[560px] border-collapse text-left text-sm">
           <caption className="sr-only">Correspondance des points de rupture</caption>
           <thead>
@@ -155,7 +156,7 @@ export function LayoutSection() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </StyleguideSection>
   );
 }

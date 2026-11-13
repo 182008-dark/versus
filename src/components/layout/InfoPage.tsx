@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { TextLink } from "@/components/ui/TextLink";
 import { routeFor } from "@/config/site";
 
 /**
@@ -30,12 +30,9 @@ export function InfoPage({
       <div className="prose-info mt-6">{children}</div>
       {home ? (
         <p className="mt-14">
-          <Link
-            href={home}
-            className="font-semibold text-accent underline underline-offset-4 state-hover:text-accent-hover"
-          >
+          <TextLink href={home} arrow>
             Retour à l&apos;accueil
-          </Link>
+          </TextLink>
         </p>
       ) : null}
     </article>

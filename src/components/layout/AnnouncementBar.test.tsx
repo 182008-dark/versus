@@ -10,8 +10,9 @@ describe("AnnouncementBar", () => {
     expect(screen.getByText(/Prix indicatifs en FCFA/)).toBeTruthy();
   });
 
-  it("n'est pas un landmark (l'en-tête reste le seul banner)", () => {
+  it("est une région nommée, pas un banner (l'en-tête reste le seul banner)", () => {
     const { container } = render(<AnnouncementBar />);
-    expect(container.querySelector("header, [role]")).toBeNull();
+    expect(screen.getByRole("region", { name: "Avertissement" })).toBeTruthy();
+    expect(container.querySelector("header, [role='banner']")).toBeNull();
   });
 });

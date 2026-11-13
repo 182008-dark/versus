@@ -1,5 +1,6 @@
 import { contrastPairs, primitives, semantic, tokenHex } from "@/data/design-tokens";
 import { contrastRatio, formatRatio, wcagLevel } from "@/lib/color/contrast";
+import { ScrollRegion } from "@/components/ui/ScrollRegion";
 import { StyleguideSection } from "./StyleguideSection";
 
 /** Résultat affiché d'une paire : le niveau WCAG est CALCULÉ, jamais écrit à la main. */
@@ -53,7 +54,7 @@ export function ColorsSection() {
       </ul>
 
       <h3 className="mt-10 text-xl font-bold">Contrastes mesurés (WCAG 2.2)</h3>
-      <div className="mt-4 overflow-x-auto">
+      <ScrollRegion label="Ratios de contraste des paires de couleurs du site" className="mt-4">
         <table className="w-full min-w-[640px] border-collapse text-left text-sm">
           <caption className="sr-only">Ratios de contraste des paires de couleurs du site</caption>
           <thead>
@@ -104,7 +105,7 @@ export function ColorsSection() {
             })}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </StyleguideSection>
   );
 }

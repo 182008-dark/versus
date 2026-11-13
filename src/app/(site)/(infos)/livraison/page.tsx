@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { InfoPage } from "@/components/layout/InfoPage";
+import { ScrollRegion } from "@/components/ui/ScrollRegion";
 import {
   cashOnDeliveryCapFcfa,
   deliveryZones,
@@ -31,7 +32,7 @@ export default function LivraisonPage() {
         commande et recalculés par le serveur : le montant envoyé par le navigateur n&apos;est
         jamais pris en compte.
       </p>
-      <div className="overflow-x-auto">
+      <ScrollRegion label="Frais et délais de livraison par zone">
         <table className="w-full border-collapse text-left text-[15px]">
           <caption className="sr-only">Frais et délais de livraison par zone</caption>
           <thead>
@@ -59,7 +60,7 @@ export default function LivraisonPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
       <p>
         La livraison à Lomé est offerte à partir de {formatFCFA(freeDeliveryLomeFromFcfa)} de
         commande. Ces montants sont des valeurs de démonstration.
