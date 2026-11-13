@@ -53,6 +53,17 @@ export function computeSiteUrl(env: Env): string {
   return "http://localhost:3000";
 }
 
+/**
+ * /styleguide est visible en local, en preview Vercel et sous `next start` (tests e2e), mais
+ * renvoie 404 en production.
+ *
+ * On teste `VERCEL_ENV` et non `NODE_ENV` : `NODE_ENV` vaut "production" pour tout build
+ * (`next build`, `next start`, previews Vercel), il ne distingue donc pas la production.
+ */
+export function isStyleguideEnabled(source: Pick<Env, "VERCEL_ENV">): boolean {
+  return source.VERCEL_ENV !== "production";
+}
+
 // Accès explicites : Next.js n'injecte les variables NEXT_PUBLIC_* que sous cette forme.
 export const env = parseEnv({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -65,3 +76,5 @@ export const siteUrl = computeSiteUrl(env);
 
 /** L'indexation n'est autorisée que si ALLOW_INDEXING vaut exactement "true". */
 export const allowIndexing = env.ALLOW_INDEXING === "true";
+
+export const styleguideEnabled = isStyleguideEnabled(env);

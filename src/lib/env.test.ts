@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { computeSiteUrl, parseEnv } from "./env";
+import { computeSiteUrl, isStyleguideEnabled, parseEnv } from "./env";
+
+describe("isStyleguideEnabled", () => {
+  it("masque /styleguide en production Vercel", () => {
+    const env = parseEnv({
+      VERCEL_ENV: "production",
+      NEXT_PUBLIC_SITE_URL: "https://versus.example",
+    });
+    expect(isStyleguideEnabled(env)).toBe(false);
+  });
+
+  it("l'affiche en preview et en développement Vercel", () => {
+    expect(isStyleguideEnabled(parseEnv({ VERCEL_ENV: "preview" }))).toBe(true);
+    expect(isStyleguideEnabled(parseEnv({ VERCEL_ENV: "development" }))).toBe(true);
+  });
+
+  it("l'affiche en local et sous next start (sans VERCEL_ENV), quel que soit NODE_ENV", () => {
+    // next start et next build fixent NODE_ENV=production : ce n'est pas la production.
+    expect(isStyleguideEnabled(parseEnv({ NODE_ENV: "production" }))).toBe(true);
+    expect(isStyleguideEnabled(parseEnv({}))).toBe(true);
+  });
+});
 
 describe("parseEnv", () => {
   it("accepte un environnement vide (local) avec les valeurs par défaut", () => {
