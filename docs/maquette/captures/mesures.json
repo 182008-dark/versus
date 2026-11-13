@@ -1,0 +1,260 @@
+{
+  "url": "http://localhost:4000/Main.dc.html",
+  "date": "2026-11-13T02:29:25.711Z",
+  "viewports": {
+    "390": {
+      "width": 390,
+      "pageHeight": 14246,
+      "sections": [
+        {
+          "slug": "en-tete",
+          "label": "En-tête (bandeau et barre de navigation)",
+          "file": "390/01-en-tete.png",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 390,
+            "height": 105
+          }
+        },
+        {
+          "slug": "hero",
+          "label": "Hero (carrousel)",
+          "file": "390/02-hero.png",
+          "box": {
+            "x": 0,
+            "y": 105,
+            "width": 390,
+            "height": 820
+          }
+        },
+        {
+          "slug": "categories",
+          "label": "Catégories",
+          "file": "390/03-categories.png",
+          "box": {
+            "x": 0,
+            "y": 925,
+            "width": 390,
+            "height": 258
+          }
+        },
+        {
+          "slug": "tuiles",
+          "label": "Tuiles promotionnelles",
+          "file": "390/04-tuiles.png",
+          "box": {
+            "x": 0,
+            "y": 1183,
+            "width": 390,
+            "height": 4263
+          }
+        },
+        {
+          "slug": "pin",
+          "label": "Section épinglée Smartphones (bloc collant, à 90 % du défilement)",
+          "file": "390/05-pin.png",
+          "box": {
+            "x": 0,
+            "y": 5445,
+            "width": 390,
+            "height": 2200
+          }
+        },
+        {
+          "slug": "nouveautes",
+          "label": "Nouveautés",
+          "file": "390/06-nouveautes.png",
+          "box": {
+            "x": 0,
+            "y": 7645,
+            "width": 390,
+            "height": 957
+          }
+        },
+        {
+          "slug": "marques",
+          "label": "Marques",
+          "file": "390/07-marques.png",
+          "box": {
+            "x": 0,
+            "y": 8602,
+            "width": 390,
+            "height": 1834
+          }
+        },
+        {
+          "slug": "comparateur",
+          "label": "Comparateur",
+          "file": "390/08-comparateur.png",
+          "box": {
+            "x": 0,
+            "y": 10436,
+            "width": 390,
+            "height": 1206
+          }
+        },
+        {
+          "slug": "quiz",
+          "label": "Quiz (aide au choix)",
+          "file": "390/09-quiz.png",
+          "box": {
+            "x": 0,
+            "y": 11641,
+            "width": 390,
+            "height": 866
+          }
+        },
+        {
+          "slug": "reassurance",
+          "label": "Réassurance",
+          "file": "390/10-reassurance.png",
+          "box": {
+            "x": 0,
+            "y": 12506,
+            "width": 390,
+            "height": 804
+          }
+        },
+        {
+          "slug": "pied-de-page",
+          "label": "Pied de page",
+          "file": "390/11-pied-de-page.png",
+          "box": {
+            "x": 0,
+            "y": 13310,
+            "width": 390,
+            "height": 936
+          }
+        }
+      ]
+    },
+    "1440": {
+      "width": 1440,
+      "pageHeight": 11103,
+      "sections": [
+        {
+          "slug": "en-tete",
+          "label": "En-tête (bandeau et barre de navigation)",
+          "file": "1440/01-en-tete.png",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 1440,
+            "height": 90
+          }
+        },
+        {
+          "slug": "hero",
+          "label": "Hero (carrousel)",
+          "file": "1440/02-hero.png",
+          "box": {
+            "x": 0,
+            "y": 90,
+            "width": 1440,
+            "height": 680
+          }
+        },
+        {
+          "slug": "categories",
+          "label": "Catégories",
+          "file": "1440/03-categories.png",
+          "box": {
+            "x": 0,
+            "y": 770,
+            "width": 1440,
+            "height": 173
+          }
+        },
+        {
+          "slug": "tuiles",
+          "label": "Tuiles promotionnelles",
+          "file": "1440/04-tuiles.png",
+          "box": {
+            "x": 0,
+            "y": 943,
+            "width": 1440,
+            "height": 3901
+          }
+        },
+        {
+          "slug": "pin",
+          "label": "Section épinglée Smartphones (bloc collant, à 90 % du défilement)",
+          "file": "1440/05-pin.png",
+          "box": {
+            "x": 0,
+            "y": 4843,
+            "width": 1440,
+            "height": 2200
+          }
+        },
+        {
+          "slug": "nouveautes",
+          "label": "Nouveautés",
+          "file": "1440/06-nouveautes.png",
+          "box": {
+            "x": 0,
+            "y": 7043,
+            "width": 1440,
+            "height": 918
+          }
+        },
+        {
+          "slug": "marques",
+          "label": "Marques",
+          "file": "1440/07-marques.png",
+          "box": {
+            "x": 0,
+            "y": 7961,
+            "width": 1440,
+            "height": 749
+          }
+        },
+        {
+          "slug": "comparateur",
+          "label": "Comparateur",
+          "file": "1440/08-comparateur.png",
+          "box": {
+            "x": 0,
+            "y": 8709,
+            "width": 1440,
+            "height": 1084
+          }
+        },
+        {
+          "slug": "quiz",
+          "label": "Quiz (aide au choix)",
+          "file": "1440/09-quiz.png",
+          "box": {
+            "x": 0,
+            "y": 9793,
+            "width": 1440,
+            "height": 660
+          }
+        },
+        {
+          "slug": "reassurance",
+          "label": "Réassurance",
+          "file": "1440/10-reassurance.png",
+          "box": {
+            "x": 0,
+            "y": 10453,
+            "width": 1440,
+            "height": 297
+          }
+        },
+        {
+          "slug": "pied-de-page",
+          "label": "Pied de page",
+          "file": "1440/11-pied-de-page.png",
+          "box": {
+            "x": 0,
+            "y": 10750,
+            "width": 1440,
+            "height": 353
+          }
+        }
+      ]
+    }
+  }
+}
