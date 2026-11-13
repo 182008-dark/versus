@@ -1,42 +1,360 @@
 @import "tailwindcss";
+@import "../styles/animations.css";
 
 /*
- * Tokens provisoires de l'étape 1, repris de la maquette (Main.dc.html).
- * Le design system complet (3 couches de tokens, §4.1 du plan) arrive à l'étape 2.
+ * Design system VERSUS (§4 du plan, ADR 002) : tokens en 3 couches.
+ *
+ * 1. Primitives : la palette brute relevée dans la maquette (Main.dc.html), plus l'accent vert
+ *    VERSUS (décision D1). Les composants ne les utilisent JAMAIS directement.
+ * 2. Sémantique : les rôles (fond, encre, accent…). Seule couche utilisée par les composants.
+ * 3. Pont Tailwind : `@theme inline` ne contient que des références `var()` ; les points de
+ *    rupture, qui doivent être des valeurs littérales, sont dans un `@theme` non inline.
+ *
+ * Les valeurs hexadécimales ne sont permises que dans ce fichier (et la liste blanche de
+ * `check:forbidden`). `src/data/design-tokens.ts` en garde une copie pour /styleguide ; un test
+ * unitaire vérifie que les deux restent identiques.
  */
+
 :root {
-  --vs-ink: #1d1d1f;
-  --vs-ink-muted: #6e6e73;
-  --vs-surface: #ffffff;
-  --vs-surface-alt: #f5f5f7;
-  --vs-line: #d2d2d7;
-  --vs-notice-bg: #1d1d1f;
-  --vs-notice-ink: #d2d2d7;
+  /* 1. Primitives (maquette) */
+  --white: #ffffff;
+  --black: #000000;
+  --gray-950: #1d1d1f;
+  --gray-700: #424245;
+  --gray-600: #6e6e73;
+  --gray-500: #86868b;
+  --gray-400: #a1a1a6;
+  --gray-300: #d2d2d7;
+  --gray-200: #ededf0;
+  --gray-100: #eaeaee;
+  --gray-50: #f5f5f7;
+  --gray-25: #fbfbfd;
+  --night-950: #111113;
+  --night-900: #0b0b0c;
+  --night-800: #1c1c1e;
+  --night-700: #2c2c2e;
+  /* Accent VERSUS (D1, ADR 002) : remplace les bleus Apple de la maquette. */
+  --green-700: #006b4b;
+  --green-600: #00805a;
+  --green-300: #3ddc97;
+  --green-50: #e6f4ee;
+  --red-700: #c62828;
+  --amber-800: #8a5a00;
+
+  /* 2. Sémantique */
+  --bg: var(--white);
+  --ink: var(--gray-950);
+  --ink-strong: var(--black);
+  --on-dark: var(--white);
+  --surface: var(--gray-50);
+  --surface-2: var(--gray-25);
+  --surface-hover: var(--gray-100);
+  --surface-dark: var(--night-900);
+  --surface-dark-2: var(--night-800);
+  --line: var(--gray-300);
+  --line-soft: var(--gray-200);
+  --line-strong: rgb(0 0 0 / 0.2);
+  --muted: var(--gray-600);
+  --muted-strong: var(--gray-700);
+  --muted-on-dark: var(--gray-400);
+  --eyebrow-on-dark: var(--gray-500);
+  --accent: var(--green-600);
+  --accent-hover: var(--green-700);
+  --accent-on-dark: var(--green-300);
+  --accent-soft: var(--green-50);
+  --on-accent: var(--white);
+  --danger: var(--red-700);
+  --warning: var(--amber-800);
+  --focus-ring: var(--accent);
+  /* Gabarit */
+  --notice-bg: var(--gray-950);
+  --notice-ink: var(--gray-300);
+  --header-bg: var(--white);
+  --header-bg-translucent: rgb(255 255 255 / 0.78);
+  --header-line: rgb(0 0 0 / 0.07);
+  --icon-hover: rgb(0 0 0 / 0.05);
+  --header-height: 56px;
+
+  /* Échelle typographique, mobile d'abord (maquette : ≤ 640 px) */
+  --text-hero: 48px;
+  --text-tile: 40px;
+  --text-h2: 36px;
+  --text-quiz: 24px;
+  --text-sub: 17px;
+}
+
+@media (min-width: 641px) {
+  :root {
+    --text-hero: 64px;
+    --text-tile: 58px;
+    --text-h2: 52px;
+    --text-quiz: 30px;
+    --text-sub: 21px;
+  }
+}
+
+@media (min-width: 1025px) {
+  :root {
+    --text-hero: 88px;
+  }
+}
+
+/* Thèmes de marque (mêmes valeurs que src/lib/brand-themes.ts, vérifiées par un test). */
+[data-brand="apple"] {
+  --brand-ground: #f5f5f7;
+  --brand-ink: #1d1d1f;
+  --brand-acc: #1d1d1f;
+  --brand-on-acc: #ffffff;
+}
+
+[data-brand="samsung"] {
+  --brand-ground: #eef1fb;
+  --brand-ink: #1428a0;
+  --brand-acc: #1428a0;
+  --brand-on-acc: #ffffff;
+}
+
+[data-brand="xiaomi"] {
+  --brand-ground: #fff1e6;
+  --brand-ink: #a84300;
+  --brand-acc: #ff6900;
+  --brand-on-acc: #1d1d1f;
+}
+
+/* Fond sombre : l'anneau de focus et l'accent passent en vert clair. */
+[data-tone="dark"] {
+  --focus-ring: var(--accent-on-dark);
+}
+
+/* 3. Pont Tailwind. Valeurs littérales : PAS dans @theme inline. */
+@theme {
+  --breakpoint-*: initial;
+  --breakpoint-sm: 641px;
+  --breakpoint-md: 901px;
+  --breakpoint-lg: 1025px;
+  --breakpoint-xl: 1240px;
 }
 
 @theme inline {
-  --color-ink: var(--vs-ink);
-  --color-ink-muted: var(--vs-ink-muted);
-  --color-surface: var(--vs-surface);
-  --color-surface-alt: var(--vs-surface-alt);
-  --color-line: var(--vs-line);
-  --color-notice-bg: var(--vs-notice-bg);
-  --color-notice-ink: var(--vs-notice-ink);
+  /* Seules les couleurs sémantiques existent en classes Tailwind (bg-accent, text-muted…). */
+  --color-*: initial;
+  --color-white: var(--white);
+  --color-black: var(--black);
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
+  --color-on-dark: var(--on-dark);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-hover: var(--surface-hover);
+  --color-surface-dark: var(--surface-dark);
+  --color-surface-dark-2: var(--surface-dark-2);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-line-strong: var(--line-strong);
+  --color-muted: var(--muted);
+  --color-muted-strong: var(--muted-strong);
+  --color-muted-on-dark: var(--muted-on-dark);
+  --color-eyebrow-on-dark: var(--eyebrow-on-dark);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-on-dark: var(--accent-on-dark);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-notice-bg: var(--notice-bg);
+  --color-notice-ink: var(--notice-ink);
+  --color-header-bg: var(--header-bg);
+  --color-header-line: var(--header-line);
+  --color-icon-hover: var(--icon-hover);
+  --color-brand-ground: var(--brand-ground);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-acc: var(--brand-acc);
+  --color-brand-on-acc: var(--brand-on-acc);
+
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), sans-serif;
+
+  --radius-tile: 30px;
+  --radius-box: 28px;
+  --radius-card: 26px;
+  --radius-result: 18px;
+  --radius-option: 16px;
+  --radius-icon: 14px;
+  --radius-chip: 8px;
+
+  --shadow-card: 0 30px 60px -30px rgb(0 0 0 / 0.35);
+  --shadow-tray: 0 20px 40px -12px rgb(0 0 0 / 0.45);
+
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
-body {
-  background: var(--vs-surface);
-  color: var(--vs-ink);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
+/*
+ * États forçables : /styleguide affiche le survol, le focus et l'appui sans interaction,
+ * avec data-state="hover|focus|active". En dehors du styleguide, seul l'état réel s'applique.
+ */
+@custom-variant state-hover {
+  &:hover,
+  &[data-state~="hover"] {
+    @slot;
+  }
 }
 
-h1,
-h2,
-h3,
-h4 {
+@custom-variant state-active {
+  &:active,
+  &[data-state~="active"] {
+    @slot;
+  }
+}
+
+@custom-variant state-focus {
+  &:focus-visible,
+  &[data-state~="focus"] {
+    @slot;
+  }
+}
+
+/* Utilitaires de mise en page (maquette : .wrap, .sec, .eyebrow) */
+/*
+ * La maquette est en `box-sizing: content-box` : son .wrap fait 1240 px de contenu + 2 × 24 px.
+ * Tailwind travaille en border-box : 1288 px de largeur totale redonnent les mêmes positions.
+ */
+@utility wrap {
+  max-width: 1288px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+@utility section {
+  padding-block: 76px;
+
+  @media (min-width: 641px) {
+    padding-block: 110px;
+  }
+}
+
+@utility eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Titres d'affichage (§4.1) */
+@utility text-display-hero {
   font-family: var(--font-display);
-  letter-spacing: -0.025em;
+  font-size: var(--text-hero);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-weight: 800;
+}
+
+@utility text-display-tile {
+  font-family: var(--font-display);
+  font-size: var(--text-tile);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+@utility text-display-h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+/* Texte long des pages d'information (mentions, CGV…) */
+@utility prose-info {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ink);
+
+  & h2 {
+    margin-top: 44px;
+    font-size: 24px;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+
+  & h3 {
+    margin-top: 28px;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  & p,
+  & ul,
+  & ol,
+  & table {
+    margin-top: 12px;
+  }
+
+  & ul {
+    list-style: disc;
+    padding-left: 1.25em;
+  }
+
+  & ol {
+    list-style: decimal;
+    padding-left: 1.25em;
+  }
+
+  & li + li {
+    margin-top: 6px;
+  }
+
+  & a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  & a:hover {
+    color: var(--accent-hover);
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* Base */
+@layer base {
+  html {
+    /* L'en-tête collant ne masque pas la cible d'une ancre (#id). */
+    scroll-padding-top: var(--header-height);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+
+  /* Anneau de focus VERSUS : 2 px, visible partout, au clavier seulement. */
+  :focus-visible,
+  [data-state~="focus"] {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Pas de défilement de la page derrière une boîte de dialogue modale. */
+  html:has(dialog[open]:modal) {
+    overflow: hidden;
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.4);
+  }
 }
