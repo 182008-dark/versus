@@ -1,4 +1,4 @@
-import { site } from "@/config/site";
+import { FictiveNotice } from "@/components/layout/FictiveNotice";
 
 /**
  * Gabarit public minimal de l'étape 1.
@@ -8,12 +8,7 @@ import { site } from "@/config/site";
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <div className="bg-notice-bg px-4 py-2 text-center text-xs text-notice-ink">
-        <p>
-          <strong className="font-semibold text-white">{site.notice.lead}</strong> ·{" "}
-          {site.notice.rest}
-        </p>
-      </div>
+      <FictiveNotice />
       <main id="contenu" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         {children}
       </main>

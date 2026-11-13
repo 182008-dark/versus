@@ -1,20 +1,20 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+/** Pages publiques livrées à l'étape 1. */
+const PAGES = ["/", "/mentions-legales", "/credits"];
+
+/** Principe 7 du plan : le bandeau « fictif » est visible partout. */
+async function expectFictiveNotice(page: Page) {
+  await expect(page.getByText("Projet pédagogique", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Site fictif, aucune vente réelle/)).toBeVisible();
+  await expect(page.getByText(/Prix indicatifs en FCFA/)).toBeVisible();
+}
 
 test.describe("accueil provisoire", () => {
-  test("affiche le bandeau « Projet pédagogique »", async ({ page }) => {
+  test("affiche le titre « Bientôt en ligne »", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByText("Projet pédagogique", { exact: true })).toBeVisible();
-    await expect(page.getByText(/Site fictif, aucune vente réelle/)).toBeVisible();
-    await expect(page.getByText(/Prix indicatifs en FCFA/)).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Bientôt en ligne" })).toBeVisible();
-  });
-
-  test("n'est pas indexable (meta robots noindex)", async ({ page }) => {
-    await page.goto("/");
-    const robots = page.locator('meta[name="robots"]');
-    await expect(robots).toHaveCount(1);
-    await expect(robots).toHaveAttribute("content", /noindex/);
   });
 
   test("robots.txt interdit tout", async ({ request }) => {
@@ -42,8 +42,22 @@ test.describe("accueil provisoire", () => {
     await expect(page).toHaveURL(/\/credits$/);
     await expect(page.getByRole("heading", { level: 1, name: "Crédits" })).toBeVisible();
   });
+});
 
-  for (const path of ["/", "/mentions-legales", "/credits"]) {
+test.describe("pages publiques", () => {
+  for (const path of PAGES) {
+    test(`bandeau « Projet pédagogique » sur ${path}`, async ({ page }) => {
+      await page.goto(path);
+      await expectFictiveNotice(page);
+    });
+
+    test(`non indexable (meta robots noindex) sur ${path}`, async ({ page }) => {
+      await page.goto(path);
+      const robots = page.locator('meta[name="robots"]');
+      await expect(robots).toHaveCount(1);
+      await expect(robots).toHaveAttribute("content", /noindex/);
+    });
+
     test(`axe : aucune violation sérieuse ou critique sur ${path}`, async ({ page }) => {
       await page.goto(path);
       const results = await new AxeBuilder({ page }).analyze();
@@ -53,4 +67,36 @@ test.describe("accueil provisoire", () => {
       expect(blocking.map((v) => `${v.id} : ${v.help}`)).toEqual([]);
     });
   }
+});
+
+test.describe("page 404", () => {
+  const MISSING = "/page-inexistante-versus";
+
+  test("répond 404 et affiche le bandeau « Projet pédagogique »", async ({ page }) => {
+    const response = await page.goto(MISSING);
+    expect(response?.status()).toBe(404);
+    await expectFictiveNotice(page);
+    await expect(page.getByRole("heading", { level: 1, name: "Page introuvable" })).toBeVisible();
+    await expect(page.locator("main#contenu")).toHaveCount(1);
+  });
+
+  test("n'est pas indexable", async ({ page }) => {
+    await page.goto(MISSING);
+    const robots = page.locator('meta[name="robots"]');
+    expect(await robots.count()).toBeGreaterThanOrEqual(1);
+    for (const content of await robots.evaluateAll((els) =>
+      els.map((el) => el.getAttribute("content") ?? ""),
+    )) {
+      expect(content).toMatch(/noindex/);
+    }
+  });
+
+  test("axe : aucune violation sérieuse ou critique", async ({ page }) => {
+    await page.goto(MISSING);
+    const results = await new AxeBuilder({ page }).analyze();
+    const blocking = results.violations.filter(
+      (v) => v.impact === "serious" || v.impact === "critical",
+    );
+    expect(blocking.map((v) => `${v.id} : ${v.help}`)).toEqual([]);
+  });
 });
