@@ -1,17 +1,21 @@
-import { FictiveNotice } from "@/components/layout/FictiveNotice";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 /**
- * Gabarit public minimal de l'étape 1.
- * Le bandeau « fictif » est ici pour être visible sur toutes les pages publiques ;
- * l'en-tête et le pied de page s'ajouteront autour du <main> à l'étape 2.
+ * Gabarit public (§3.1) : bandeau fictif, en-tête, <main id="contenu">, pied de page, dans cet
+ * ordre. `banner` (header) et `contentinfo` (footer) restent au premier niveau, hors du <main>.
+ * CompareTray, CartDrawer et Toaster s'ajouteront ici à l'étape 5.
  */
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <FictiveNotice />
+      <AnnouncementBar />
+      <SiteHeader />
       <main id="contenu" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         {children}
       </main>
+      <SiteFooter />
     </>
   );
 }
