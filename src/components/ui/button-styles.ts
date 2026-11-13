@@ -33,12 +33,12 @@ const sizes: Record<ButtonSize, string> = {
 
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-accent text-on-accent state-hover:bg-accent-hover state-active:bg-accent-hover",
-  dark: "bg-ink text-white state-hover:bg-ink-strong state-active:bg-ink-strong",
+  dark: "bg-ink text-on-dark state-hover:bg-ink-strong state-active:bg-ink-strong",
   light:
-    "bg-surface text-ink state-hover:bg-white state-hover:text-ink-strong state-active:bg-surface-hover",
+    "bg-surface text-ink state-hover:bg-bg state-hover:text-ink-strong state-active:bg-surface-hover",
   outline:
     "border border-line-strong bg-transparent text-ink state-hover:border-ink " +
-    "aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white",
+    "aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-on-dark",
   onDark:
     "border border-on-dark/40 bg-transparent text-on-dark state-hover:border-on-dark " +
     "aria-pressed:border-on-dark aria-pressed:bg-on-dark aria-pressed:text-ink",

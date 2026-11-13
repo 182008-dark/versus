@@ -10,7 +10,7 @@ export function PaymentBadges() {
       {site.payments.map((payment) => (
         <li
           key={payment}
-          className="rounded-chip border border-line bg-white px-2.5 py-1.5 text-xs leading-[normal] font-semibold text-ink"
+          className="rounded-chip border border-line bg-bg px-2.5 py-1.5 text-xs leading-[normal] font-semibold text-ink"
         >
           {payment}
         </li>

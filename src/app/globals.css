@@ -138,8 +138,6 @@
 @theme inline {
   /* Seules les couleurs sémantiques existent en classes Tailwind (bg-accent, text-muted…). */
   --color-*: initial;
-  --color-white: var(--white);
-  --color-black: var(--black);
   --color-bg: var(--bg);
   --color-ink: var(--ink);
   --color-ink-strong: var(--ink-strong);
@@ -194,9 +192,16 @@
 /*
  * États forçables : /styleguide affiche le survol, le focus et l'appui sans interaction,
  * avec data-state="hover|focus|active". En dehors du styleguide, seul l'état réel s'applique.
+ * Le vrai survol est réservé aux appareils qui le gèrent (`hover: hover`, comme la variante
+ * `hover:` de Tailwind v4) : sur écran tactile, le style ne reste pas collé après un appui.
  */
 @custom-variant state-hover {
-  &:hover,
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+
   &[data-state~="hover"] {
     @slot;
   }
@@ -314,9 +319,11 @@
     text-underline-offset: 4px;
   }
 
-  & a:hover {
-    color: var(--accent-hover);
-    text-decoration-thickness: 2px;
+  @media (hover: hover) {
+    & a:hover {
+      color: var(--accent-hover);
+      text-decoration-thickness: 2px;
+    }
   }
 }
 

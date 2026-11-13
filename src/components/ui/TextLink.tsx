@@ -9,7 +9,7 @@ export type TextLinkTone = (typeof TEXT_LINK_TONES)[number];
 const tones: Record<TextLinkTone, string> = {
   accent: "text-accent state-hover:text-accent-hover",
   ink: "text-ink state-hover:text-ink-strong",
-  light: "text-surface state-hover:text-white",
+  light: "text-surface state-hover:text-on-dark",
   accentOnDark: "text-accent-on-dark state-hover:text-on-dark",
 };
 
