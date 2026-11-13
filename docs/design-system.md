@@ -150,12 +150,16 @@ Points de rupture déclarés dans `@theme` : `sm` 641, `md` 901, `lg` 1025, `xl`
 Îlots client ajoutés à l'étape 2 : `MobileMenu` (prévu au §3.4), `Dialog` (utilisé par lui),
 `NavLink` (seul `usePathname` l'exige).
 
+### Primitives livrées à l'étape 3
+
+`Pill`, `PillGroup`, `Price`, `SectionHeader` et `Reveal` sont livrés avec leur premier usage à
+l'étape 3. Leurs exemples figurent dans `/styleguide#catalogue`.
+
 ### Primitives à venir
 
-Reportées à l'étape de leur premier usage (ADR 002, décision 9) : `Pill`, `PillGroup`, `Price`,
-`SectionHeader`, `Reveal` (étape 3) ; `Skeleton`, `Select`, `Checkbox`, `EmptyState` (étape 4) ;
-`Drawer`, `Toaster`, `Spinner` (étape 5) ; `Field`, `RadioCard`, `Stepper` (étape 6). Chacune
-arrive avec sa section dans `/styleguide` et ses tests.
+Reportées à l'étape de leur premier usage (ADR 002, décision 9) : `Skeleton`, `Select`, `Checkbox`,
+`EmptyState` (étape 4) ; `Drawer`, `Toaster`, `Spinner` (étape 5) ; `Field`, `RadioCard`, `Stepper`
+(étape 6). Chacune arrive avec sa section dans `/styleguide` et ses tests.
 
 ### Pilotage par `src/config/site.ts`
 

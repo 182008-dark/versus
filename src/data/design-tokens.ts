@@ -12,7 +12,7 @@ export const primitives = {
   black: "#000000",
   "gray-950": "#1D1D1F",
   "gray-700": "#424245",
-  "gray-600": "#6E6E73",
+  "gray-600": "#6D6D72",
   "gray-500": "#86868B",
   "gray-400": "#A1A1A6",
   "gray-300": "#D2D2D7",

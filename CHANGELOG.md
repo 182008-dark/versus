@@ -5,6 +5,15 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+### Ajouté
+
+- Étape 3 en cours sur `etape-3-accueil` : catalogue local typé à neuf produits, repository
+  remplaçable par Supabase à l'étape 4, accueil, boutique et fiches produit minimales.
+- Primitives catalogue et présentation : `Pill`, `PillGroup`, `Price`, `SectionHeader`, `Reveal`,
+  carrousel accessible, rails filtrables, cartes produit et comparateur d'accueil.
+- Tests catalogue, nouveauté par date, e2e visuels et budget ; captures de fidélité de l'accueil.
+- Décision D5 validée avant l'étape 3 ; le bouton panier du comparateur est prévu à l'étape 5.
+
 ## [0.2.0] : étape 2, design system et gabarit global (2026-11-13)
 
 Production : <https://versus-ecru.vercel.app> (PR #1).

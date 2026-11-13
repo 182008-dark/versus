@@ -28,6 +28,32 @@ const paths = {
   ),
   menu: <path d="M4 8h16M4 16h16" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  smartphone: (
+    <>
+      <rect x="7" y="2.5" width="10" height="19" rx="2.5" />
+      <path d="M11 18.5h2" />
+    </>
+  ),
+  buds: (
+    <>
+      <circle cx="8" cy="7.5" r="3" />
+      <path d="M8 10.5V19M8 15h2" />
+      <circle cx="16" cy="7.5" r="3" />
+      <path d="M16 10.5V19M16 15h-2" />
+    </>
+  ),
+  watch: (
+    <>
+      <rect x="6" y="6" width="12" height="12" rx="3.5" />
+      <path d="M9 6V2.5h6V6M9 18v3.5h6V18" />
+    </>
+  ),
+  band: (
+    <>
+      <rect x="9" y="5" width="6" height="14" rx="3" />
+      <path d="M10.5 2v3M13.5 2v3M10.5 19v3M13.5 19v3" />
+    </>
+  ),
 } as const;
 
 export type IconName = keyof typeof paths;

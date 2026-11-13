@@ -13,12 +13,14 @@ Le projet avance en 9 étapes, chacune mise en production, taguée (`v0.N.0`) et
 
 **En ligne : <https://versus-ecru.vercel.app>** (compte Vercel personnel, déploiement de production).
 
-**État actuel : étape 2 (design system et gabarit global).** Tokens en trois couches et accent
+**Dernière version publiée : v0.2.0 (étape 2, design system et gabarit global).** Tokens en trois couches et accent
 vert VERSUS (contrastes mesurés), composants de base, gabarit complet (bandeau « fictif »,
 en-tête, menu mobile, pied de page), pages d'information (mentions légales, crédits,
 confidentialité, CGV, livraison, garantie), pages d'erreur et `/styleguide` (visible en local et
-en preview, 404 en production). L'accueil reste la page provisoire « Bientôt en ligne » jusqu'à
-l'étape 3.
+en preview, 404 en production).
+
+**Étape 3 en cours sur `etape-3-accueil`**, après validation D5 : accueil, catalogue local typé,
+boutique et fiches produit minimales.
 
 ## Stack
 
@@ -55,6 +57,7 @@ Aucune variable n'est obligatoire en local : `NEXT_PUBLIC_SITE_URL` vaut par dé
 | `npm run check:forbidden`         | motifs interdits et versions non exactes                  |
 | `npm run capture:maquette`        | captures de la maquette (servie en HTTP sur le port 4000) |
 | `npm run capture:gabarit`         | captures de l'implémentation (site lancé, `SITE_URL`)     |
+| `npm run capture:accueil`         | captures de l'accueil à 1440 et 390 px (site lancé)       |
 | `npm run format`                  | Prettier                                                  |
 
 ## Variables d'environnement
