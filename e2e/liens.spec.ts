@@ -5,7 +5,7 @@ import { expect, test, type Page } from "@playwright/test";
  * Depuis `/`, on parcourt les pages internes et on vérifie :
  * - chaque <a href> et chaque <form action> interne répond 200 (GET) ;
  * - chaque ancre `#id` (seule ou `chemin#id`) existe sur la page cible ;
- * - aucun lien n'a href="#".
+ * - aucun lien ne mène « nulle part » : href="" (ou action=""), href="#", "/#", "/credits#"…
  */
 
 const MAX_PAGES = 200;
@@ -49,8 +49,15 @@ test("liens internes, actions de formulaires et ancres", async ({ page, request,
 
     const { hrefs, actions } = await collectTargets(page);
     for (const raw of [...hrefs, ...actions]) {
-      if (raw.trim() === "#") {
-        errors.push(`href="#" sur ${current}`);
+      // Tests sur la chaîne brute : new URL("/#") donne hash === "", un fragment vide
+      // passerait donc pour un lien valide vers la page.
+      const trimmed = raw.trim();
+      if (trimmed === "") {
+        errors.push(`lien ou action vide sur ${current}`);
+        continue;
+      }
+      if (trimmed.endsWith("#")) {
+        errors.push(`ancre vide (href="${raw}") sur ${current}`);
         continue;
       }
       const url = new URL(raw, origin + current);
@@ -74,10 +81,6 @@ test("liens internes, actions de formulaires et ancres", async ({ page, request,
   }
 
   for (const anchor of anchors) {
-    if (!anchor.id) {
-      errors.push(`ancre vide sur ${anchor.from}`);
-      continue;
-    }
     await page.goto(anchor.target);
     const count = await page.locator(`[id="${anchor.id.replace(/"/g, '\\"')}"]`).count();
     if (count === 0) errors.push(`${anchor.from} → ${anchor.target}#${anchor.id} : id introuvable`);
