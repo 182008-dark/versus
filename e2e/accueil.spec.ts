@@ -1,14 +1,33 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-/** Pages publiques livrées à l'étape 1. */
-const PAGES = ["/", "/mentions-legales", "/credits"];
+/** Pages publiques livrées (étapes 1 et 2). */
+const PAGES = [
+  "/",
+  "/mentions-legales",
+  "/credits",
+  "/confidentialite",
+  "/cgv",
+  "/livraison",
+  "/garantie",
+];
+
+/** Pages d'information de l'étape 2 et leur titre de niveau 1. */
+const INFO_PAGES = [
+  { path: "/confidentialite", title: "Confidentialité", link: "Confidentialité" },
+  { path: "/cgv", title: "Conditions générales de vente", link: "CGV" },
+  { path: "/livraison", title: "Livraison et retours", link: "Livraison et retours" },
+  { path: "/garantie", title: "Garantie", link: "Garantie" },
+];
 
 /** Principe 7 du plan : le bandeau « fictif » est visible partout. */
 async function expectFictiveNotice(page: Page) {
-  await expect(page.getByText("Projet pédagogique", { exact: true })).toBeVisible();
-  await expect(page.getByText(/Site fictif, aucune vente réelle/)).toBeVisible();
-  await expect(page.getByText(/Prix indicatifs en FCFA/)).toBeVisible();
+  const lead = page.getByText("Projet pédagogique", { exact: true });
+  await expect(lead).toBeVisible();
+  // Le pied de page répète « Prix indicatifs en FCFA » : on vérifie la phrase du bandeau.
+  const notice = page.locator("p").filter({ has: lead });
+  await expect(notice).toContainText("Site fictif, aucune vente réelle");
+  await expect(notice).toContainText("Prix indicatifs en FCFA");
 }
 
 test.describe("accueil provisoire", () => {
@@ -41,6 +60,29 @@ test.describe("accueil provisoire", () => {
     await page.getByRole("link", { name: "Crédits" }).click();
     await expect(page).toHaveURL(/\/credits$/);
     await expect(page.getByRole("heading", { level: 1, name: "Crédits" })).toBeVisible();
+  });
+});
+
+test.describe("pages d'information de l'étape 2", () => {
+  for (const { path, title, link } of INFO_PAGES) {
+    test(`le pied de page mène à ${path}`, async ({ page }) => {
+      await page.goto("/");
+      await page.getByRole("contentinfo").getByRole("link", { name: link, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`${path}$`));
+      await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+      await expect(page.getByText(/aucune vente/i).first()).toBeVisible();
+    });
+  }
+
+  test("les montants sont formatés en FCFA (espaces insécables)", async ({ page }) => {
+    await page.goto("/livraison");
+    const fee = await page
+      .getByRole("row", { name: /Lomé/ })
+      .getByRole("cell")
+      .first()
+      .textContent();
+    // formatFCFA : espace fine insécable (U+202F) entre les milliers, insécable (U+00A0) avant FCFA.
+    expect(fee).toBe("1\u202F500\u00A0FCFA");
   });
 });
 

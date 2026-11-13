@@ -2,7 +2,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 /**
  * Principe 3 du plan : un lien n'apparaît que si sa page existe.
- * Depuis `/`, on parcourt les pages internes et on vérifie :
+ * Depuis `/` et `/styleguide` (non lié depuis le site, visible sous next start), on parcourt
+ * les pages internes et on vérifie :
  * - chaque <a href> et chaque <form action> interne répond 200 (GET) ;
  * - chaque ancre `#id` (seule ou `chemin#id`) existe sur la page cible ;
  * - aucun lien ne mène « nulle part » : href="" (ou action=""), href="#", "/#", "/credits#"…
@@ -30,7 +31,7 @@ function isPage(pathname: string) {
 test("liens internes, actions de formulaires et ancres", async ({ page, request, baseURL }) => {
   test.setTimeout(120_000);
   const origin = new URL(baseURL ?? "http://localhost:3000").origin;
-  const queue = ["/"];
+  const queue = ["/", "/styleguide"];
   const visited = new Set<string>();
   const statusCache = new Map<string, number>();
   const anchors: Anchor[] = [];
@@ -86,6 +87,11 @@ test("liens internes, actions de formulaires et ancres", async ({ page, request,
     if (count === 0) errors.push(`${anchor.from} → ${anchor.target}#${anchor.id} : id introuvable`);
   }
 
-  expect(visited.size, "au moins l'accueil et les pages d'information").toBeGreaterThanOrEqual(3);
+  // Accueil, styleguide et les 6 pages d'information (mentions, crédits, confidentialité, CGV,
+  // livraison, garantie).
+  expect(visited.size, "accueil, styleguide et pages d'information").toBeGreaterThanOrEqual(8);
+  for (const path of ["/confidentialite", "/cgv", "/livraison", "/garantie"]) {
+    expect(visited.has(path), `${path} est atteinte par un lien`).toBe(true);
+  }
   expect(errors).toEqual([]);
 });
