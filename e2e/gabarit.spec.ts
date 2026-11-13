@@ -25,6 +25,15 @@ async function blockingViolations(page: Page) {
     .map((v) => `${v.id} : ${v.help} (${v.nodes.length})`);
 }
 
+/** Règle axe `region` (impact modéré) : tout le contenu visible est dans un landmark. */
+async function regionViolations(page: Page) {
+  const results = await new AxeBuilder({ page }).withRules(["region"]).analyze();
+  return results.violations.flatMap((v) => v.nodes.map((n) => n.target.join(" ")));
+}
+
+/** Pages hors gabarit de groupe ou dans un autre gabarit, d'où l'on suit le logo du menu. */
+const LOGO_ORIGINS = ["/styleguide", "/cgv", "/page-inexistante-versus"];
+
 test.describe("landmarks", () => {
   for (const path of PAGES) {
     test(`un seul main, banner et contentinfo au premier niveau sur ${path}`, async ({ page }) => {
@@ -128,6 +137,51 @@ test.describe("menu mobile à 375 px", () => {
     expect(await blockingViolations(page)).toEqual([]);
   });
 
+  for (const from of LOGO_ORIGINS) {
+    test(`le logo du menu ferme le menu et laisse l'accueil utilisable, depuis ${from}`, async ({
+      page,
+    }) => {
+      await page.goto(from);
+      const menuButton = page.getByRole("button", { name: "Menu", exact: true });
+      await menuButton.click();
+      const dialog = page.getByRole("dialog", { name: "Menu" });
+      await expect(dialog).toBeVisible();
+      // Nom calculé par Chromium : « VERSUS , accueil » (suffixe sr-only en position absolue).
+      await dialog.getByRole("link", { name: /^VERSUS\s*, accueil$/ }).click();
+      await expect(page).toHaveURL(/\/$/);
+
+      // Aucun <dialog> ouvert, même dans une page gardée masquée par <Activity>.
+      await expect(page.locator("dialog[open]")).toHaveCount(0);
+      await expect(menuButton).toHaveAttribute("aria-expanded", "false");
+      // La page n'est pas inerte : le bouton reçoit le clic et le menu se rouvre.
+      await menuButton.click();
+      await expect(dialog).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(dialog).toBeHidden();
+      await expect(menuButton).toBeFocused();
+    });
+  }
+
+  for (const path of ["/mentions-legales", "/styleguide"]) {
+    test(`axe à 375 px : aucune violation sérieuse sur ${path}`, async ({ page }) => {
+      await page.goto(path);
+      expect(await blockingViolations(page)).toEqual([]);
+      expect(await regionViolations(page)).toEqual([]);
+    });
+  }
+
+  test("lien d'évitement : capsule de 44 px une fois focalisé", async ({ page }) => {
+    await page.goto("/garantie");
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: "Aller au contenu" });
+    await expect(skip).toBeFocused();
+    const box = await skip.boundingBox();
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+    expect(box?.y).toBeGreaterThanOrEqual(0);
+    await page.keyboard.press("Enter");
+    await expect(page.locator("main#contenu")).toBeFocused();
+  });
+
   for (const path of PAGES) {
     test(`pas de défilement horizontal sur ${path}`, async ({ page }) => {
       await page.goto(path);
@@ -140,6 +194,20 @@ test.describe("menu mobile à 375 px", () => {
   }
 });
 
+test.describe("redistribution à 320 px (1280 px zoomés à 400 %, WCAG 1.4.10)", () => {
+  test.use({ viewport: { width: 320, height: 640 } });
+
+  for (const path of PAGES) {
+    test(`pas de défilement horizontal sur ${path}`, async ({ page }) => {
+      await page.goto(path);
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      );
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  }
+});
+
 test.describe("accessibilité (axe)", () => {
   for (const path of ["/mentions-legales", "/styleguide"]) {
     test(`aucune violation sérieuse ou critique sur ${path}`, async ({ page }) => {
@@ -148,8 +216,33 @@ test.describe("accessibilité (axe)", () => {
       expect(violations).toEqual([]);
       // Critère explicite de l'étape 2.
       expect(violations.join()).not.toMatch(/landmark-(banner|contentinfo)-is-top-level/);
+      // Le bandeau « Projet pédagogique » est dans une région nommée.
+      expect(await regionViolations(page)).toEqual([]);
     });
   }
+
+  test("lien d'évitement : capsule de 44 px une fois focalisé (1440 px)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/garantie");
+    await page.keyboard.press("Tab");
+    const skip = page.getByRole("link", { name: "Aller au contenu" });
+    await expect(skip).toBeFocused();
+    expect((await skip.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+  });
+});
+
+test.describe("pied de page", () => {
+  test("la page courante porte aria-current et reste soulignée (1440 px)", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/livraison");
+    const footer = page.getByRole("contentinfo");
+    const current = footer.getByRole("link", { name: "Livraison et retours" });
+    await expect(current).toHaveAttribute("aria-current", "page");
+    await expect(current).toHaveCSS("text-decoration-line", "underline");
+    await expect(footer.getByRole("link", { name: "Garantie" })).not.toHaveAttribute(
+      "aria-current",
+    );
+  });
 });
 
 test.describe("styleguide", () => {
