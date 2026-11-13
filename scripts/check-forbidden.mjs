@@ -6,7 +6,7 @@
  * Exporte `findViolations(path, content)` pour les tests (scripts/check-forbidden.test.ts).
  */
 import { readFileSync, readdirSync } from "node:fs";
-import { join, relative, sep } from "node:path";
+import { join, relative } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 /**
@@ -31,17 +31,25 @@ const SCANNED_EXTENSIONS = [
 /** Bleus Apple de la maquette : interdits partout, liste blanche comprise. */
 const FORBIDDEN_BLUES = /#(?:0071e3|0066cc|2997ff)(?![0-9a-f])/i;
 
-/** Littéral hexadécimal de couleur (#rgb, #rgba, #rrggbb, #rrggbbaa), hors entités HTML (&#123;). */
-const HEX_COLOR = /(?<![\w&])#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})(?![\w-])/i;
+/**
+ * Littéral hexadécimal de couleur (#rgb, #rgba, #rrggbb, #rrggbbaa), hors entités HTML (&#123;)
+ * et hors ancres : `chemin#ace`, `/#ace`, `href="#ace"`, `href: "#ace"`, `href={"#ace"}`.
+ */
+const HEX_COLOR =
+  /(?<![\w&/])(?<!href\s*[=:]\s*\{?\s*["'`])#(?:[0-9a-f]{8}|[0-9a-f]{6}|[0-9a-f]{3,4})(?![\w-])/i;
 
 /** Version exacte : x.y.z, avec éventuellement un suffixe de prépublication ou de build. */
 const EXACT_VERSION = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
 
 const DEPENDENCY_FIELDS = ["dependencies", "devDependencies", "optionalDependencies"];
 
-/** Normalise un chemin en chemin relatif à la racine, avec des barres obliques. */
+/**
+ * Normalise un chemin en chemin relatif à la racine, avec des barres obliques.
+ * Les deux séparateurs sont convertis quelle que soit la plateforme : sous Linux (CI),
+ * `path.sep` vaut déjà "/" et ne convertirait pas un chemin Windows.
+ */
 function normalizePath(path) {
-  return path.split(sep).join("/").replace(/^\.\//, "");
+  return path.replace(/\\/g, "/").replace(/^\.\//, "");
 }
 
 /**
@@ -79,7 +87,8 @@ const LINE_RULES = [
   },
   {
     rule: "href-diese",
-    test: (line) => /href\s*=\s*(?:(["'])#\1|\{\s*(["'`])#\2\s*\})/.test(line),
+    // Attribut JSX (href="#", href={"#"}) ou objet de configuration (href: "#").
+    test: (line) => /href\s*[=:]\s*(?:(["'`])#\1|\{\s*(["'`])#\2\s*\})/.test(line),
     message: 'href="#" est interdit : un lien doit mener à une page ou à une ancre existante.',
   },
   {

@@ -26,15 +26,26 @@ describe("liste blanche des hexadécimaux", () => {
     expect(rules("src/app/layout.tsx", "themeColor: '#fff',")).toEqual(["hex-hors-liste-blanche"]);
   });
 
-  it("accepte les chemins Windows", () => {
+  it("accepte les chemins Windows, quelle que soit la plateforme", () => {
     expect(isHexAllowed("src\\data\\catalog.ts")).toBe(true);
+    expect(isHexAllowed("src\\app\\(site)\\opengraph-image.tsx")).toBe(true);
+    expect(findViolations("src\\data\\catalog.ts", 'const color = "#5A1F2B";')).toEqual([]);
+    expect(rules("src\\components\\ui\\Button.tsx", 'const c = "#5A1F2B";')).toEqual([
+      "hex-hors-liste-blanche",
+    ]);
   });
 
-  it("ne confond pas une ancre ou une entité HTML avec une couleur", () => {
-    expect(findViolations("src/app/page.tsx", '<a href="#contenu">Aller au contenu</a>')).toEqual(
-      [],
-    );
-    expect(findViolations("src/app/page.tsx", "<p>&#123;</p>")).toEqual([]);
+  it.each([
+    '<a href="#contenu">Aller au contenu</a>',
+    '<a href="#ace">Ancre</a>',
+    "<a href='#cafe'>Ancre</a>",
+    '<Link href={"#bad"}>Ancre</Link>',
+    '{ label: "Ancre", href: "#ace" },',
+    '<a href="/#ace">Ancre</a>',
+    '<a href="/credits#cafe">Ancre</a>',
+    "<p>&#123;</p>",
+  ])("ne confond pas une ancre ou une entité HTML avec une couleur : %s", (line) => {
+    expect(findViolations("src/app/page.tsx", line)).toEqual([]);
   });
 });
 
@@ -74,6 +85,12 @@ describe("autres motifs interdits dans src/", () => {
     expect(rules("src/components/layout/SiteFooter.tsx", "<a href={'#'}>FAQ</a>")).toEqual([
       "href-diese",
     ]);
+  });
+
+  it('refuse href: "#" dans un objet de configuration', () => {
+    expect(rules("src/config/site.ts", '{ label: "FAQ", href: "#" },')).toEqual(["href-diese"]);
+    expect(rules("src/config/site.ts", "{ label: 'FAQ', href : '#' },")).toEqual(["href-diese"]);
+    expect(findViolations("src/config/site.ts", '{ label: "FAQ", href: "/faq" },')).toEqual([]);
   });
 
   it("ignore les fichiers hors de src/", () => {
