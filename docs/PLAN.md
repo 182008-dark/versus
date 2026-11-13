@@ -1115,7 +1115,7 @@ gh release create v0.1.0 --title "Étape 1 : socle" --notes "Production : <URL>"
 - [ ] Une PR de test crée une preview **qui se construit sans `NEXT_PUBLIC_SITE_URL`**, et la CI (`qualite`, `e2e`) est verte.
 - [ ] Le layout racine ne contient aucun landmark ; `<main id="contenu">` est dans `(site)/layout.tsx`.
 - [ ] `liens.spec` est vert (liens, `action` de formulaires, ancres).
-- [ ] `git grep -n "sb_secret"` ne renvoie rien ; `.env.local` est ignoré par git.
+- [ ] `git grep -nE "sb_secret_[A-Za-z0-9]"` ne renvoie rien (aucune clé secrète commitée ; les simples mentions de `sb_secret_` dans la documentation, ce plan compris, ne comptent pas) ; `.env.local` est ignoré par git.
 - [ ] `Device.dc.html` est restauré ; les captures de la maquette (1440 et 390 px, une par section) sont générées par `scripts/capture-maquette.ts` dans `docs/maquette/captures/`, et la hauteur de la maquette est notée.
 - [ ] Le tag `v0.1.0` et sa release GitHub sont publiés.
 

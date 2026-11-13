@@ -63,6 +63,11 @@ Supabase (`@supabase/supabase-js`, `@supabase/ssr`, CLI) n'est installé qu'à l
 - **`@types/node` 24** au lieu du 20 proposé par create-next-app, pour correspondre au runtime.
 - **Actions GitHub** : `actions/checkout@v7`, `actions/setup-node@v7`, `actions/upload-artifact@v7`
   (versions courantes, runtime `node24`), au lieu des `@v4` du plan.
+- **Critère « aucun secret Supabase »** : le plan demandait `git grep -n "sb_secret"` vide, ce qui
+  contredit la copie obligatoire du plan dans `docs/PLAN.md` (il mentionne le préfixe `sb_secret_`).
+  Le critère devient `git grep -nE "sb_secret_[A-Za-z0-9]"` vide : une vraie clé est refusée, une
+  mention du préfixe dans la documentation est permise. Corrigé dans le plan de référence et dans
+  sa copie.
 
 ## Écartés volontairement
 
