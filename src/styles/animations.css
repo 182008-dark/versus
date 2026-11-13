@@ -1,0 +1,229 @@
+/*
+ * Mouvement (§4.4 du plan).
+ *
+ * Règle anti-régression : l'état par défaut est TOUJOURS visible. Toute animation est déclarée
+ * dans `@media (prefers-reduced-motion: no-preference)` : sous mouvement réduit, rien ne bouge
+ * et rien ne reste caché (la maquette laissait le texte du hero invisible).
+ *
+ * Les doublons de la maquette (bumpA/bumpB, qa/qb, cfp/cfw/cfb) sont supprimés : pour rejouer
+ * une animation, on change la `key` React de l'élément.
+ */
+
+@keyframes up {
+  from {
+    opacity: 0;
+    translate: 0 40px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes art-in {
+  from {
+    opacity: 0;
+    scale: 0.82;
+    translate: 80px 20px;
+    rotate: 6deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+    rotate: 0deg;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.18);
+    opacity: 0.8;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes bump {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.55);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes tray-in {
+  from {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes q-in {
+  from {
+    opacity: 0;
+    translate: 28px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes zoom {
+  from {
+    scale: 0.86;
+    opacity: 0.2;
+  }
+  to {
+    scale: 1;
+    opacity: 1;
+  }
+}
+
+@keyframes rise {
+  from {
+    translate: 0 120px;
+    opacity: 0;
+  }
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@layer components {
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Entrées (une seule fois, au montage) */
+    .anim-up {
+      animation: up 0.9s var(--ease-out) both;
+    }
+
+    .anim-fade {
+      animation: fade 0.6s ease both;
+    }
+
+    .anim-art-in {
+      animation: art-in 1.3s var(--ease-out) both;
+    }
+
+    .anim-tray-in {
+      animation: tray-in 0.5s var(--ease-out) both;
+    }
+
+    .anim-q-in {
+      animation: q-in 0.45s var(--ease-out) both;
+    }
+
+    /* Rejouée par changement de `key` (compteurs du panier et du comparateur) */
+    .anim-bump {
+      animation: bump 0.45s var(--ease-bounce);
+    }
+
+    /* Flèche des liens fléchés : décalée au survol et au focus clavier (Arrow.tsx) */
+    .vs-arrow {
+      transition: translate 0.3s var(--ease-out);
+    }
+
+    :is(a, button):is(:hover, :focus-visible, [data-state~="hover"], [data-state~="focus"])
+      .vs-arrow {
+      translate: 5px 0;
+    }
+
+    /* Boucles décoratives du hero */
+    .anim-float {
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .anim-glow {
+      animation: glow 8s ease-in-out infinite;
+    }
+
+    .anim-spin {
+      animation: spin 60s linear infinite;
+    }
+  }
+
+  /* Apparitions au défilement : seulement si le navigateur sait les piloter par la vue. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: up linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 25%;
+      }
+
+      .zoom {
+        animation: zoom linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 45%;
+      }
+
+      .rise {
+        animation: rise linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 50%;
+      }
+    }
+  }
+}
+
+/* Filet de sécurité : sous mouvement réduit, aucune animation ni transition. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

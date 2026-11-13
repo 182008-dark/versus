@@ -16,6 +16,12 @@ Captures de référence de la maquette validée (`Accueil VERSUS-html/Main.dc.ht
 
 À comparer au critère de l'accueil (hauteur de `/` à 1440 px ≤ 6 000 px, étapes 3 et 9).
 
+## Captures de l'implémentation
+
+`docs/maquette/implementation/{1440,390}/` : en-tête, pied de page, menu mobile et page entière de
+`/mentions-legales`, produits par `npm run capture:gabarit` (site lancé, `SITE_URL`, défaut
+`http://localhost:3000`). Comparaison et écarts : `docs/ecarts-maquette.md`.
+
 ## Conventions de capture
 
 - Pas de `reducedMotion` (il masque le texte du hero dans la maquette).

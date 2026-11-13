@@ -53,6 +53,10 @@ fait foi ; tout écart est noté dans un ADR (`docs/decisions/`).
 - Pas de littéral hexadécimal hors de la liste blanche (`src/data/**`, `src/lib/brand-themes.ts`,
   `src/app/globals.css`, `**/*.svg`, `**/opengraph-image.tsx`) ; utiliser les tokens.
 - Les bleus Apple `#0071E3`, `#0066CC` et `#2997FF` sont interdits partout.
+- Les composants n'utilisent que les rôles sémantiques (`bg-accent`, `text-muted`…) : la palette
+  par défaut de Tailwind est retirée. Un token ajouté à `globals.css` l'est aussi dans
+  `src/data/design-tokens.ts` (parité testée). Détails : `docs/design-system.md`, ADR 002.
+- `/styleguide` est masqué en production par `VERCEL_ENV` (jamais par `NODE_ENV`).
 
 ## Dépendances
 

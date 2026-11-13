@@ -17,6 +17,7 @@
     "test:e2e": "playwright test",
     "check:forbidden": "node scripts/check-forbidden.mjs",
     "capture:maquette": "tsx scripts/capture-maquette.ts",
+    "capture:gabarit": "tsx scripts/capture-gabarit.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

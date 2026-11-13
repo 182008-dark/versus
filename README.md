@@ -13,8 +13,12 @@ Le projet avance en 9 étapes, chacune mise en production, taguée (`v0.N.0`) et
 
 **En ligne : <https://versus-ecru.vercel.app>** (compte Vercel personnel, déploiement de production).
 
-**État actuel : étape 1 (socle).** Une page « Bientôt en ligne », le bandeau « fictif », le
-`noindex`, les tests et la CI.
+**État actuel : étape 2 (design system et gabarit global).** Tokens en trois couches et accent
+vert VERSUS (contrastes mesurés), composants de base, gabarit complet (bandeau « fictif »,
+en-tête, menu mobile, pied de page), pages d'information (mentions légales, crédits,
+confidentialité, CGV, livraison, garantie), pages d'erreur et `/styleguide` (visible en local et
+en preview, 404 en production). L'accueil reste la page provisoire « Bientôt en ligne » jusqu'à
+l'étape 3.
 
 ## Stack
 
@@ -50,6 +54,7 @@ Aucune variable n'est obligatoire en local : `NEXT_PUBLIC_SITE_URL` vaut par dé
 | `npm run test:e2e`                | tests Playwright (build, puis `next start`)               |
 | `npm run check:forbidden`         | motifs interdits et versions non exactes                  |
 | `npm run capture:maquette`        | captures de la maquette (servie en HTTP sur le port 4000) |
+| `npm run capture:gabarit`         | captures de l'implémentation (site lancé, `SITE_URL`)     |
 | `npm run format`                  | Prettier                                                  |
 
 ## Variables d'environnement
@@ -63,6 +68,9 @@ jamais commité.
 - [`docs/PLAN.md`](docs/PLAN.md) : plan de projet de référence
 - [`docs/decisions/`](docs/decisions/) : décisions d'architecture (ADR)
 - [`docs/glossaire.md`](docs/glossaire.md) : correspondance français ↔ anglais
-- [`docs/maquette/`](docs/maquette/) : captures de la maquette validée
+- [`docs/design-system.md`](docs/design-system.md) : tokens, points de rupture, composants
+- [`docs/ecarts-maquette.md`](docs/ecarts-maquette.md) : registre des écarts à la maquette
+- [`docs/maquette/`](docs/maquette/) : captures de la maquette validée et de l'implémentation
+- `/styleguide` (local et preview) : vitrine du design system
 - [`AGENTS.md`](AGENTS.md) : conventions de code
 - [`CHANGELOG.md`](CHANGELOG.md) : historique des versions

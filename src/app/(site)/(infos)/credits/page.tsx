@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { routeFor } from "@/config/site";
+import { InfoPage } from "@/components/layout/InfoPage";
+import { ScrollRegion } from "@/components/ui/ScrollRegion";
 
 export const metadata: Metadata = {
   title: "Crédits",
@@ -21,20 +21,15 @@ const productVisuals = [
 ] as const;
 
 export default function CreditsPage() {
-  const accueil = routeFor("accueil");
-
   return (
-    <article className="mx-auto w-full max-w-3xl px-6 py-16 leading-relaxed">
-      <h1 className="text-4xl font-extrabold">Crédits</h1>
-      <p className="mt-2 text-sm text-ink-muted">Version provisoire.</p>
-
-      <h2 className="mt-10 text-2xl font-bold">Visuels des produits</h2>
-      <p className="mt-3">
+    <InfoPage title="Crédits">
+      <h2>Visuels des produits</h2>
+      <p>
         Visuels officiels des marques, utilisés pour un projet pédagogique non commercial. Ils
         appartiennent à leurs marques respectives. Ils ont été recadrés, détourés et réduits
         (900&nbsp;px au plus).
       </p>
-      <div className="mt-6 overflow-x-auto">
+      <ScrollRegion label="Origine des visuels de produits">
         <table className="w-full border-collapse text-left text-sm">
           <caption className="sr-only">Origine des visuels de produits</caption>
           <thead>
@@ -64,27 +59,19 @@ export default function CreditsPage() {
             ))}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
 
-      <h2 className="mt-10 text-2xl font-bold">Polices</h2>
-      <p className="mt-3">
+      <h2>Polices</h2>
+      <p>
         Inter (Rasmus Andersson) et Plus Jakarta Sans (Tokotype), sous licence SIL Open Font License
         1.1, servies par le site via next/font.
       </p>
 
-      <h2 className="mt-10 text-2xl font-bold">Marques</h2>
-      <p className="mt-3">
+      <h2>Marques</h2>
+      <p>
         Apple, Samsung et Xiaomi sont des marques de leurs propriétaires respectifs. Aucun logo
         officiel n&apos;est utilisé.
       </p>
-
-      {accueil ? (
-        <p className="mt-12">
-          <Link href={accueil} className="font-semibold underline underline-offset-4">
-            Retour à l&apos;accueil
-          </Link>
-        </p>
-      ) : null}
-    </article>
+    </InfoPage>
   );
 }
