@@ -70,6 +70,11 @@ fait foi ; tout écart est noté dans un ADR (`docs/decisions/`).
 npm run lint && npm run typecheck && npm test && npm run check:forbidden && npm run test:e2e
 ```
 
+- `typecheck` et `build` suppriment d'abord `.next/dev/types` (`npm run clean:dev-types`) : un
+  `next dev` lancé sur une autre branche y laisse des types de routes absentes de la branche
+  courante, que `tsconfig.json` inclut. Après un `git switch`, `npm run clean` repart d'un
+  `.next/` vide.
+
 ## Git
 
 - Branche `main` toujours déployable ; une branche par étape (`etape-2-design-system`).
