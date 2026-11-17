@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   images: {
+    // AVIF d'abord, WebP sinon (refonte, lot 1) : l'optimiseur choisit selon l'en-tête Accept,
+    // le PNG source reste servi aux navigateurs qui n'acceptent ni l'un ni l'autre.
+    formats: ["image/avif", "image/webp"],
     // Les visuels produits font au plus 900 px de côté (public/products/SOURCES.md) ; les
     // emplacements les plus grands (fiche produit) n'affichent pas plus de 520 px de haut, et
     // chaque largeur de plus alourdirait le srcset du HTML.
