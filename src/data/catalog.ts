@@ -11,6 +11,12 @@ import type {
  * prix officiel en France × 655,957, arrondi au millier de FCFA (relevés des 16 et 17/11/2026,
  * détail dans `docs/plans/produits-recherche.json` et `public/products/SOURCES.md`).
  * `new_until` = `release_date` + 90 jours, comme le trigger `products_defaults`.
+ *
+ * Conventions : coloris officiels de la marque, en minuscules après le premier mot (« Bleu clair »,
+ * « Violet nébuleux ») ; « Redmi » s'écrit comme un nom propre, alors que mi.com l'écrit en
+ * capitales (« REDMI Note 15 Pro+ 5G ») ; caractéristiques de la variante par défaut. Autonomie :
+ * lecture vidéo pour les téléphones ; un écouteur (ou le casque), réduction de bruit activée, pour
+ * l'audio ; utilisation normale pour les montres et bracelets.
  */
 
 const variant = (
@@ -235,7 +241,10 @@ export const products: readonly ProductDetail[] = [
       variant("IP18-ARG-256", "Argent · 256 Go", "argent", "#D9D9DC", 970000, 2, {
         storage_gb: 256,
       }),
-      variant("IP18-NOI-256", "Noir · 256 Go", "noir", "#29292D", 970000, 3, {
+      variant("IP18-GLA-256", "Glacier · 256 Go", "glacier", "#CFDCE3", 970000, 3, {
+        storage_gb: 256,
+      }),
+      variant("IP18-NOI-256", "Noir · 256 Go", "noir", "#29292D", 970000, 4, {
         storage_gb: 256,
       }),
     ],
@@ -246,7 +255,8 @@ export const products: readonly ProductDetail[] = [
       chip: "A20 Pro",
       autonomy_hours: 34,
       main_camera_mp: 48,
-      weight_g: 204,
+      weight_g: 211,
+      ip_rating: "IP68",
       has_5g: true,
       specs_note: NOTE,
     },
@@ -520,28 +530,26 @@ export const products: readonly ProductDetail[] = [
     image_width: 523,
     image_height: 641,
     image_alt: "Galaxy A57 5G bleu clair, vues de face et de dos",
-    variants: [
-      variant("A57-BLE-128", "Bleu glacier · 128 Go", "bleu-glacier", "#CFE0EE", 308000, 0, {
-        storage_gb: 128,
-      }),
-      variant("A57-BLE-256", "Bleu glacier · 256 Go", "bleu-glacier", "#CFE0EE", 360000, 1, {
-        storage_gb: 256,
-      }),
-      variant("A57-NOI-128", "Noir · 128 Go", "noir", "#29292D", 308000, 2, {
-        storage_gb: 128,
-      }),
-      variant("A57-NOI-256", "Noir · 256 Go", "noir", "#29292D", 360000, 3, {
-        storage_gb: 256,
-      }),
-    ],
+    variants: storageVariants(
+      "A57",
+      [
+        ["Bleu clair", "bleu-clair", "#CFE0EE", "BLC"],
+        ["Bleu", "bleu", "#2E3A56", "BLE"],
+      ],
+      [
+        [128, 308000],
+        [256, 360000],
+      ],
+    ),
     specs: {
       screen_size_in: 6.7,
-      screen_tech: "Super AMOLED",
+      screen_tech: "Super AMOLED Plus",
       refresh_hz: 120,
       chip: "Exynos 1680",
-      autonomy_hours: 28,
+      autonomy_hours: 29,
       main_camera_mp: 50,
       weight_g: 179,
+      ip_rating: "IP68",
       has_5g: true,
       specs_note: NOTE,
     },
@@ -581,7 +589,7 @@ export const products: readonly ProductDetail[] = [
       weight_g: 218.4,
       ip_rating: "IP68",
       has_5g: true,
-      specs_note: NOTE,
+      specs_note: `${NOTE} Version 16 Go + 1 To non proposée : aucun prix de référence sur mi.com/fr.`,
     },
   },
   {
@@ -622,6 +630,7 @@ export const products: readonly ProductDetail[] = [
       refresh_hz: 120,
       chip: "Snapdragon 8 Elite Gen 5",
       battery_mah: 6330,
+      autonomy_hours: 29.2,
       charging_w: 100,
       main_camera_mp: 50,
       weight_g: 191,
@@ -665,7 +674,7 @@ export const products: readonly ProductDetail[] = [
       weight_g: 219,
       ip_rating: "IP68",
       has_5g: true,
-      specs_note: NOTE,
+      specs_note: `${NOTE} Versions 512 Go et 1 To non proposées : aucun prix de référence sur mi.com/fr.`,
     },
   },
   {
@@ -685,7 +694,7 @@ export const products: readonly ProductDetail[] = [
     image_src: "/products/rn15.png",
     image_width: 457,
     image_height: 647,
-    image_alt: "Redmi Note 15 Pro+ 5G, plusieurs coloris",
+    image_alt: "Redmi Note 15 Pro+ 5G noir et moka, vus de dos",
     variants: [
       variant("RN15-NOI-256", "Noir · 256 Go", "noir", "#26282E", 330000, 0, {
         storage_gb: 256,
@@ -694,22 +703,23 @@ export const products: readonly ProductDetail[] = [
       variant("RN15-NOI-512", "Noir · 512 Go", "noir", "#26282E", 363000, 1, {
         storage_gb: 512,
       }),
-      variant("RN15-GRI-256", "Gris · 256 Go", "gris", "#8B8C90", 330000, 2, {
+      variant("RN15-MOK-256", "Moka · 256 Go", "moka", "#645042", 330000, 2, {
         storage_gb: 256,
       }),
-      variant("RN15-GRI-512", "Gris · 512 Go", "gris", "#8B8C90", 363000, 3, {
+      variant("RN15-MOK-512", "Moka · 512 Go", "moka", "#645042", 363000, 3, {
         storage_gb: 512,
       }),
     ],
     specs: {
-      screen_size_in: 6.8,
+      screen_size_in: 6.83,
       screen_tech: "AMOLED",
       refresh_hz: 120,
       chip: "Snapdragon 7s Gen 4",
       autonomy_hours: 30,
       charging_w: 100,
       main_camera_mp: 200,
-      weight_g: 205,
+      weight_g: 207.1,
+      ip_rating: "IP68",
       has_5g: true,
       specs_note: NOTE,
     },
@@ -741,7 +751,7 @@ export const products: readonly ProductDetail[] = [
         ["Minuit", "minuit", "#2E3138", "MIN"],
         ["Lumière stellaire", "lumiere-stellaire", "#E9E3D6", "LUM"],
         ["Bleu", "bleu", "#9DB3C9", "BLE"],
-        ["Mauve", "mauve", "#C9B6D3", "MAU"],
+        ["Violet", "violet", "#C9B6D3", "VIO"],
         ["Orange", "orange", "#E9A26B", "ORA"],
       ],
       380000,
@@ -800,8 +810,9 @@ export const products: readonly ProductDetail[] = [
     image_alt: "Écouteurs AirPods 5 et boîtier de recharge",
     variants: [variant("AP5-BLA", "Blanc", "blanc", "#FFFFFF", 98000, 0, { stock: 24 })],
     specs: {
-      autonomy_hours: 5,
+      autonomy_hours: 4,
       has_anc: true,
+      ip_rating: "IP57",
       specs_note: NOTE,
     },
   },
@@ -852,11 +863,12 @@ export const products: readonly ProductDetail[] = [
     image_alt: "Écouteurs Galaxy Buds4 blancs et boîtier",
     variants: [
       variant("GB4-BLA", "Blanc", "blanc", "#FFFFFF", 117000, 0),
-      variant("GB4-GRA", "Gris", "gris", "#C9CEDA", 117000, 1),
+      variant("GB4-NOI", "Noir", "noir", "#29292D", 117000, 1),
     ],
     specs: {
-      autonomy_hours: 6,
+      autonomy_hours: 5,
       has_anc: true,
+      ip_rating: "IP54",
       specs_note: NOTE,
     },
   },
@@ -878,14 +890,19 @@ export const products: readonly ProductDetail[] = [
     image_src: "/products/xb6.png",
     image_width: 532,
     image_height: 600,
-    image_alt: "Écouteurs Xiaomi Buds 6 dans leur boîtier ouvert",
+    image_alt: "Écouteurs Xiaomi Buds 6 violet nébuleux dans leur boîtier ouvert",
     variants: colorVariants(
       "XB6",
-      [["Titane", "titane", "#8E9095", "TIT"], ["Violet", "violet", "#B9A8C9", "VIO"], NOIR, BLANC],
+      [
+        ["Violet nébuleux", "violet-nebuleux", "#B9A8C9", "VIO"],
+        ["Gris titane", "gris-titane", "#8E9095", "TIT"],
+        ["Noir graphite", "noir-graphite", "#29292D", "NOI"],
+        ["Blanc nacré", "blanc-nacre", "#F4F4F2", "BLA"],
+      ],
       79000,
     ),
     specs: {
-      autonomy_hours: 6,
+      autonomy_hours: 3.5,
       has_anc: true,
       ip_rating: "IP54",
       specs_note: NOTE,
@@ -912,7 +929,7 @@ export const products: readonly ProductDetail[] = [
     image_alt: "Écouteurs Redmi Buds 8 noirs dans leur boîtier ouvert",
     variants: colorVariants("RB8", [NOIR, BLANC, ["Vert", "vert", "#9DB59A", "VER"]], 33000),
     specs: {
-      autonomy_hours: 11,
+      autonomy_hours: 6.5,
       has_anc: true,
       ip_rating: "IP54",
       specs_note: NOTE,
@@ -975,20 +992,24 @@ export const products: readonly ProductDetail[] = [
     image_src: "/products/aw12.png",
     image_width: 444,
     image_height: 520,
-    image_alt: "Apple Watch Series 12 avec bracelet sombre",
-    variants: [
-      variant("AW12-42-GRA", "42 mm · Graphite", "graphite", "#2C2C30", 295000, 0, {
-        size_mm: 42,
-      }),
-      variant("AW12-46-GRA", "46 mm · Graphite", "graphite", "#2C2C30", 327000, 1, {
-        size_mm: 46,
-      }),
-    ],
+    image_alt: "Apple Watch Series 12 en aluminium bronze sombre avec bracelet sport kaki",
+    variants: sizeVariants(
+      "AW12",
+      [
+        ["Bronze sombre", "bronze-sombre", "#4B3C30", "BRO"],
+        ["Noir", "noir", "#2A2A2C", "NOI"],
+        ["Gris sidéral", "gris-sideral", "#5E6066", "GRI"],
+      ],
+      [
+        [42, 295000],
+        [46, 327000],
+      ],
+    ),
     specs: {
       screen_tech: "OLED",
-      chip: "Série S",
-      autonomy_hours: 18,
-      weight_g: 38,
+      chip: "S11",
+      autonomy_hours: 24,
+      weight_g: 32.2,
       ip_rating: "WR50",
       specs_note: NOTE,
     },
@@ -1098,11 +1119,11 @@ export const products: readonly ProductDetail[] = [
       }),
     ],
     specs: {
-      screen_size_in: 1.4,
+      screen_size_in: 1.3,
       screen_tech: "Super AMOLED",
       chip: "Snapdragon Wear Elite",
       autonomy_hours: 40,
-      weight_g: 34,
+      weight_g: 31.5,
       ip_rating: "IP68",
       specs_note: NOTE,
     },
@@ -1167,7 +1188,7 @@ export const products: readonly ProductDetail[] = [
     image_alt: "Redmi Watch 6 noire",
     variants: [
       variant("RW6-NOI", "Noir", "noir", "#1E1E21", 72000, 0),
-      variant("RW6-ARG", "Argent", "argent", "#D1D2D4", 72000, 1),
+      variant("RW6-GRI", "Gris", "gris", "#8A8C90", 72000, 1),
     ],
     specs: {
       screen_tech: "AMOLED",
@@ -1192,7 +1213,9 @@ export const products: readonly ProductDetail[] = [
     release_date: "2024-02-21",
     new_until: "2024-05-21",
     compat: ["android"],
-    min_price_fcfa: 43000,
+    // Plus vendu sur samsung.com/fr : dernier prix de la boutique Samsung France (69,90 €, relevé
+    // par la presse en juillet 2025) × 655,957 = 45 851 FCFA, arrondi au millier.
+    min_price_fcfa: 46000,
     in_stock: true,
     image_src: "/products/gf3.png",
     image_width: 640,
@@ -1205,7 +1228,7 @@ export const products: readonly ProductDetail[] = [
         ["Argent", "argent", "#CDCFD1", "ARG"],
         ["Or rose", "or-rose", "#E8C4B8", "ORR"],
       ],
-      43000,
+      46000,
     ),
     specs: {
       screen_size_in: 1.6,
@@ -1266,11 +1289,12 @@ export const products: readonly ProductDetail[] = [
     image_src: "/products/sb10.png",
     image_width: 129,
     image_height: 339,
-    image_alt: "Bracelet connecté Xiaomi Smart Band 10",
-    variants: [
-      variant("SB10-NOI", "Noir", "noir", "#29292D", 39000, 0),
-      variant("SB10-ROS", "Rose", "rose", "#E6B9BB", 39000, 1),
-    ],
+    image_alt: "Bracelet connecté Xiaomi Smart Band 10 gris",
+    variants: colorVariants(
+      "SB10",
+      [["Gris", "gris", "#B8B9BB", "GRI"], NOIR, ["Rose", "rose", "#E6B9BB", "ROS"]],
+      39000,
+    ),
     specs: {
       screen_tech: "AMOLED",
       autonomy_hours: 504,
