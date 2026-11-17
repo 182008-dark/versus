@@ -97,8 +97,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 849000,
     in_stock: true,
     image_src: "/products/ip18.png",
-    image_width: 618,
-    image_height: 746,
+    image_width: 505,
+    image_height: 600,
     image_alt: "iPhone 18 Pro bordeaux, vue de face et de dos",
     variants: [
       variant("IP18-BOR-256", "Bordeaux · 256 Go", "bordeaux", "#5A1F2B", 849000, 0, {
@@ -146,8 +146,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 349000,
     in_stock: true,
     image_src: "/products/a57.png",
-    image_width: 475,
-    image_height: 593,
+    image_width: 523,
+    image_height: 641,
     image_alt: "Galaxy A57 5G bleu clair, vues de face et de dos",
     variants: [
       variant("A57-BLE-128", "Bleu glacier · 128 Go", "bleu-glacier", "#CFE0EE", 349000, 0, {
@@ -194,8 +194,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 289000,
     in_stock: true,
     image_src: "/products/rn15.png",
-    image_width: 409,
-    image_height: 599,
+    image_width: 457,
+    image_height: 647,
     image_alt: "Redmi Note 15 Pro+ 5G, plusieurs coloris",
     variants: [
       variant("RN15-NOI-256", "Noir · 256 Go", "noir", "#26282E", 289000, 0, {
@@ -244,8 +244,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 95000,
     in_stock: true,
     image_src: "/products/ap5.png",
-    image_width: 554,
-    image_height: 813,
+    image_width: 620,
+    image_height: 879,
     image_alt: "Écouteurs AirPods 5 et boîtier de recharge",
     variants: [variant("AP5-BLA", "Blanc", "blanc", "#FFFFFF", 95000, 0, { stock: 24 })],
     specs: {
@@ -273,8 +273,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 119000,
     in_stock: true,
     image_src: "/products/gb4.png",
-    image_width: 424,
-    image_height: 583,
+    image_width: 470,
+    image_height: 629,
     image_alt: "Écouteurs Galaxy Buds 4 blancs et boîtier",
     variants: [
       variant("GB4-BLA", "Blanc", "blanc", "#FFFFFF", 119000, 0),
@@ -305,8 +305,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 279000,
     in_stock: true,
     image_src: "/products/aw12.png",
-    image_width: 406,
-    image_height: 482,
+    image_width: 444,
+    image_height: 520,
     image_alt: "Apple Watch Series 12 avec bracelet sombre",
     variants: [
       variant("AW12-42-GRA", "42 mm · Graphite", "graphite", "#2C2C30", 279000, 0, {
@@ -344,8 +344,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 249000,
     in_stock: true,
     image_src: "/products/gw9.png",
-    image_width: 410,
-    image_height: 480,
+    image_width: 448,
+    image_height: 518,
     image_alt: "Galaxy Watch 9 ronde avec bracelet graphite",
     variants: [
       variant("GW9-40-GRA", "40 mm · Graphite", "graphite", "#33343A", 249000, 0, {
@@ -384,8 +384,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 69000,
     in_stock: true,
     image_src: "/products/rw6.png",
-    image_width: 387,
-    image_height: 612,
+    image_width: 435,
+    image_height: 660,
     image_alt: "Redmi Watch 6 noire",
     variants: [
       variant("RW6-NOI", "Noir", "noir", "#1E1E21", 69000, 0),
@@ -418,8 +418,8 @@ export const products: readonly ProductDetail[] = [
     min_price_fcfa: 32000,
     in_stock: true,
     image_src: "/products/sb10.png",
-    image_width: 103,
-    image_height: 313,
+    image_width: 129,
+    image_height: 339,
     image_alt: "Bracelet connecté Xiaomi Smart Band 10",
     variants: [
       variant("SB10-NOI", "Noir", "noir", "#29292D", 32000, 0),
