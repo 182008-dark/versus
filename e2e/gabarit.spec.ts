@@ -80,9 +80,10 @@ test.describe("en-tête de l'étape 3", () => {
       "href",
       "/boutique#smartphones",
     );
+    // routeFor("comparerAccueil") : la section de l'accueil, jusqu'à /comparer (étape 5).
     await expect(page.getByRole("link", { name: "Comparer", exact: true })).toHaveAttribute(
       "href",
-      "#comparer",
+      "/#comparer",
     );
     await expect(page.locator('a[href="#"]')).toHaveCount(0);
   });

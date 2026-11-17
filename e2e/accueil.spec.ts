@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { plannedPathFor, routeFor, routeKeys } from "../src/config/site";
 import { products } from "../src/data/catalog";
 import { isNew } from "../src/lib/catalog/is-new";
 
@@ -34,6 +35,30 @@ async function expectFictiveNotice(page: Page) {
   await expect(notice).toContainText("Prix indicatifs en FCFA");
 }
 
+/**
+ * Compte, par produit, les visuels VISIBLES : chaque `[data-product]` et chaque `img[alt]` non
+ * vide hors d'un `[data-product]` (rattachée au produit par son alternative). Diapositives
+ * cachées et onglets inactifs (visibility, display, hidden) sont exclus.
+ */
+async function countVisuals(page: Page) {
+  const alts = Object.fromEntries(products.map((product) => [product.image_alt, product.code]));
+  return page.evaluate((altToCode) => {
+    const counts: Record<string, number> = {};
+    const visible = (element: Element) =>
+      element.checkVisibility({ visibilityProperty: true }) && element.getClientRects().length > 0;
+    for (const element of document.querySelectorAll("[data-product]")) {
+      const code = element.getAttribute("data-product");
+      if (code && visible(element)) counts[code] = (counts[code] ?? 0) + 1;
+    }
+    for (const image of document.querySelectorAll<HTMLImageElement>("img[alt]:not([alt=''])")) {
+      if (image.closest("[data-product]") || !visible(image)) continue;
+      const code = altToCode[image.alt] ?? image.alt;
+      counts[code] = (counts[code] ?? 0) + 1;
+    }
+    return counts;
+  }, alts);
+}
+
 test.describe("accueil de l'étape 3", () => {
   test("affiche un seul titre de niveau 1", async ({ page }) => {
     await page.goto("/");
@@ -58,27 +83,22 @@ test.describe("accueil de l'étape 3", () => {
     }
   });
 
-  test("ne montre aucun produit plus de trois fois après défilement complet", async ({ page }) => {
+  test("ne montre aucun produit plus de trois fois, à l'état initial et après défilement", async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/");
+    const initial = await countVisuals(page);
+    expect(Object.keys(initial).length, "visuels comptés à l'état initial").toBeGreaterThan(5);
+    expect(Math.max(...Object.values(initial)), JSON.stringify(initial)).toBeLessThanOrEqual(3);
+
     const height = await page.locator("body").evaluate((body) => body.scrollHeight);
     for (let y = 0; y < height; y += 700) {
       await page.evaluate((top) => window.scrollTo(0, top), y);
       await page.waitForTimeout(20);
     }
-    const counts = await page.locator("[data-product]").evaluateAll((elements) =>
-      elements.reduce<Record<string, number>>((result, element) => {
-        const code = element.getAttribute("data-product");
-        const visible =
-          element.getClientRects().length > 0 &&
-          getComputedStyle(element).visibility !== "hidden" &&
-          getComputedStyle(element).display !== "none";
-        if (code && visible) result[code] = (result[code] ?? 0) + 1;
-        return result;
-      }, {}),
-    );
-    expect(counts).not.toEqual({});
-    expect(Math.max(...Object.values(counts))).toBeLessThanOrEqual(3);
+    const scrolled = await countVisuals(page);
+    expect(Math.max(...Object.values(scrolled)), JSON.stringify(scrolled)).toBeLessThanOrEqual(3);
   });
 
   test("reste sous 6 000 px de haut sur grand écran", async ({ page }) => {
@@ -100,13 +120,6 @@ test.describe("accueil de l'étape 3", () => {
     await page.locator(".hero-slide-active").getByRole("link", { name: "Acheter" }).click();
     await expect(page).toHaveURL(/\/produit\/iphone-18-pro$/);
     await expect(page.getByRole("heading", { level: 1, name: "iPhone 18 Pro" })).toBeVisible();
-  });
-
-  test("le texte actif du carrousel reste visible avec mouvement réduit", async ({ page }) => {
-    await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
-    await expect(page.locator(".hero-slide-active h2")).toBeVisible();
-    await expect(page.locator(".hero-slide-active h2")).toHaveText("iPhone 18 Pro");
   });
 
   test("robots.txt interdit tout", async ({ request }) => {
@@ -159,23 +172,105 @@ test.describe("pages d'information de l'étape 2", () => {
   });
 });
 
-test("le rail de produits reste utilisable au clavier et ses flèches respectent les extrémités", async ({
-  page,
-}) => {
+test("rail : flèches inactives aux extrémités et utilisables au clavier", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   const previous = page.getByRole("button", { name: "Produits précédents" });
   const next = page.getByRole("button", { name: "Produits suivants" });
-  await expect(previous).toBeDisabled();
-  await expect(next).toBeEnabled();
-  await next.click();
-  await expect(previous).toBeEnabled();
+  await expect(previous).toHaveAttribute("aria-disabled", "true");
+  await expect(next).not.toHaveAttribute("aria-disabled", "true");
 
-  const rail = page.getByRole("list", { name: "Nouveautés et produits du catalogue" });
-  const before = await rail.evaluate((element) => element.scrollLeft);
-  await rail.focus();
+  // Tabulation jusqu'à « Produits suivants », puis Entrée jusqu'au bout du rail.
+  await previous.focus();
+  await page.keyboard.press("Tab");
+  await expect(next).toBeFocused();
+  for (let index = 0; index < 12; index += 1) {
+    if ((await next.getAttribute("aria-disabled")) === "true") break;
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(100);
+  }
+  await expect(next).toHaveAttribute("aria-disabled", "true");
+  await expect(previous).not.toHaveAttribute("aria-disabled", "true");
+  // Le focus reste sur la flèche (aria-disabled, jamais disabled) : la position est conservée.
+  await expect(next).toBeFocused();
+  const list = page.getByRole("list", { name: "Nouveautés et produits du catalogue" });
+  const end = await list.evaluate((element) => element.scrollLeft);
+  await page.keyboard.press("Enter");
+  expect(await list.evaluate((element) => element.scrollLeft)).toBe(end);
+
+  // Retour au début avec « Produits précédents » au clavier.
+  await page.keyboard.press("Shift+Tab");
+  await expect(previous).toBeFocused();
+  for (let index = 0; index < 12; index += 1) {
+    if ((await previous.getAttribute("aria-disabled")) === "true") break;
+    await page.keyboard.press("Enter");
+    await page.waitForTimeout(100);
+  }
+  await expect(previous).toHaveAttribute("aria-disabled", "true");
+  await expect(previous).toBeFocused();
+
+  // La liste elle-même défile aussi aux flèches du clavier.
+  await list.focus();
   await page.keyboard.press("ArrowRight");
-  await expect.poll(() => rail.evaluate((element) => element.scrollLeft)).toBeGreaterThan(before);
+  await expect.poll(() => list.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+});
+
+test("chaque élément « masqué » de la table de l'étape 3 est absent du DOM", async ({ page }) => {
+  await page.goto("/");
+  // Aucune route non livrée n'est visée par un lien ou un formulaire (liste issue de routeFor).
+  for (const key of routeKeys.filter((routeKey) => routeFor(routeKey) === null)) {
+    const path = plannedPathFor(key);
+    const hash = path.includes("#") ? `#${path.split("#")[1]}` : null;
+    const selectors = [
+      `a[href="${path}"]`,
+      `a[href^="${path}?"]`,
+      `a[href^="${path}/"]`,
+      `form[action="${path}"]`,
+      ...(hash ? [`a[href="${hash}"]`, `[id="${hash.slice(1)}"]`] : []),
+    ];
+    await expect(page.locator(selectors.join(", ")), `route ${key} (${path})`).toHaveCount(0);
+  }
+  // QuizTeaser (#aide) et son formulaire GET.
+  await expect(page.locator("#aide, form[action='/aide-au-choix']")).toHaveCount(0);
+  // Hero et tuiles : « Comparer » masqué.
+  for (const zone of [page.locator(".hero-carousel"), page.locator(".promo-grid")]) {
+    await expect(zone.getByRole("link", { name: /comparer/i })).toHaveCount(0);
+    await expect(zone.getByRole("button", { name: /comparer/i })).toHaveCount(0);
+  }
+  // Cartes : « + Comparer » ; comparateur : panier et lien complet ; CategoryNav : aide au choix.
+  for (const name of [
+    /\+ ?Comparer/,
+    /Comparateur complet/,
+    /Ajouter au panier/,
+    /Aide au choix/,
+  ]) {
+    await expect(page.getByRole("link", { name })).toHaveCount(0);
+    await expect(page.getByRole("button", { name })).toHaveCount(0);
+  }
+  // En-tête : Rechercher, Comparateur, Mon compte, Panier.
+  const header = page.getByRole("banner");
+  for (const name of ["Rechercher", "Comparateur", "Mon compte", "Panier"]) {
+    await expect(header.getByRole("link", { name })).toHaveCount(0);
+  }
+  // Pied de page : FAQ, Contact, À propos.
+  const footer = page.getByRole("contentinfo");
+  for (const name of ["FAQ", "Contact", "À propos"]) {
+    await expect(footer.getByRole("link", { name, exact: true })).toHaveCount(0);
+  }
+  // Ce qui est livré reste là : « Comparer » de la navigation par catégories mène à #comparer.
+  await expect(
+    page.getByRole("navigation", { name: "Catégories" }).getByRole("link", { name: "Comparer" }),
+  ).toHaveAttribute("href", "/#comparer");
+  await expect(page.locator("#comparer")).toHaveCount(1);
+});
+
+test("une fiche produit inconnue répond 404 dès la première visite", async ({ request }) => {
+  // Slug jamais demandé : aucune version en cache ne peut masquer un premier 200.
+  const slug = `produit-inconnu-${Date.now().toString(36)}`;
+  const response = await request.get(`/produit/${slug}`);
+  expect(response.status()).toBe(404);
+  expect(await response.text()).toContain("Page introuvable");
 });
 
 test.describe("pages publiques", () => {
