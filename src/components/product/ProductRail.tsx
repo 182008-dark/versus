@@ -26,6 +26,7 @@ function statusLabel(brandName: string | null, count: number) {
  * sont rendues par le serveur (`card`), seuls le filtre et le défilement sont ici.
  * - flèches « précédents » et « suivants » : `aria-disabled` aux extrémités, jamais `disabled`,
  *   pour que le focus clavier reste sur le bouton ; un clic sur une flèche inactive est ignoré ;
+ *   les deux flèches sont inactives quand le filtre ne laisse aucun produit ;
  * - défilement d'une carte, doux seulement sans mouvement réduit ;
  * - filtre par marque : retour au début du rail et message de statut nommant la marque
  *   (WCAG 4.1.3), état vide.
@@ -45,6 +46,9 @@ export function ProductRail({
   const [brand, setBrand] = useState(ALL);
   const [filtered, setFiltered] = useState(false);
   const visible = brand === ALL ? items : items.filter((item) => item.brand === brand);
+  // Sans produit, le rail est démonté : l'état des bords serait périmé, les flèches sont inertes.
+  const backDisabled = visible.length === 0 || !canGoBack;
+  const forwardDisabled = visible.length === 0 || !canGoForward;
 
   const updateEdges = useCallback(() => {
     const rail = railRef.current;
@@ -69,7 +73,7 @@ export function ProductRail({
 
   function scroll(direction: -1 | 1) {
     const rail = railRef.current;
-    if (!rail || (direction < 0 ? !canGoBack : !canGoForward)) return;
+    if (!rail || (direction < 0 ? backDisabled : forwardDisabled)) return;
     const card = rail.querySelector<HTMLElement>("li");
     const gap = Number.parseFloat(getComputedStyle(rail).columnGap) || 0;
     const smooth = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
@@ -98,7 +102,7 @@ export function ProductRail({
           <button
             type="button"
             aria-label="Produits précédents"
-            aria-disabled={canGoBack ? undefined : true}
+            aria-disabled={backDisabled ? true : undefined}
             onClick={() => scroll(-1)}
             className={arrow}
           >
@@ -109,7 +113,7 @@ export function ProductRail({
           <button
             type="button"
             aria-label="Produits suivants"
-            aria-disabled={canGoForward ? undefined : true}
+            aria-disabled={forwardDisabled ? true : undefined}
             onClick={() => scroll(1)}
             className={arrow}
           >

@@ -126,4 +126,20 @@ describe("ProductRail", () => {
     expect(screen.queryByRole("list", { name: "Nouveautés" })).toBeNull();
     expect(screen.getByRole("status").textContent).toBe("Aucun produit Xiaomi pour le moment.");
   });
+
+  it("rend les deux flèches inactives quand le filtre ne laisse aucun produit", async () => {
+    const user = userEvent.setup();
+    render(<ProductRail items={items} label="Nouveautés" filters={filters} />);
+    scrollTo(300);
+    const previous = screen.getByRole("button", { name: "Produits précédents" });
+    const next = screen.getByRole("button", { name: "Produits suivants" });
+    expect(previous.hasAttribute("aria-disabled")).toBe(false);
+    expect(next.hasAttribute("aria-disabled")).toBe(false);
+    await user.click(screen.getByRole("button", { name: "Xiaomi" }));
+    expect(previous.getAttribute("aria-disabled")).toBe("true");
+    expect(next.getAttribute("aria-disabled")).toBe("true");
+    await user.click(screen.getByRole("button", { name: "Samsung" }));
+    expect(previous.getAttribute("aria-disabled")).toBe("true");
+    expect(next.hasAttribute("aria-disabled")).toBe(false);
+  });
 });
