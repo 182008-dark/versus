@@ -19,8 +19,10 @@ en-tête, menu mobile, pied de page), pages d'information (mentions légales, cr
 confidentialité, CGV, livraison, garantie), pages d'erreur et `/styleguide` (visible en local et
 en preview, 404 en production).
 
-**Étape 3 en cours sur `etape-3-accueil`**, après validation D5 : accueil, catalogue local typé,
-boutique et fiches produit minimales.
+**Étape 3 terminée sur `etape-3-accueil` (non publiée)** : accueil fidèle à la maquette (hero
+accessible, tuiles, nouveautés, marques, comparateur d'accueil), catalogue local typé, boutique et
+fiches produit minimales. Tous les critères de l'étape sont tenus sauf le LCP Lighthouse mobile
+(3,2 s pour 2,5 s), documenté dans [`docs/audits/lighthouse-etape-3.md`](docs/audits/lighthouse-etape-3.md).
 
 ## Stack
 
@@ -53,12 +55,15 @@ Aucune variable n'est obligatoire en local : `NEXT_PUBLIC_SITE_URL` vaut par dé
 | `npm run lint`                    | ESLint (`eslint .`)                                       |
 | `npm run typecheck`               | `next typegen && tsc --noEmit`                            |
 | `npm test`                        | tests unitaires Vitest (`src/**`, `scripts/**`)           |
-| `npm run test:e2e`                | tests Playwright (build, puis `next start`)               |
+| `npm run test:e2e`                | tests Playwright (build, puis `next start`)¹              |
 | `npm run check:forbidden`         | motifs interdits et versions non exactes                  |
 | `npm run capture:maquette`        | captures de la maquette (servie en HTTP sur le port 4000) |
 | `npm run capture:gabarit`         | captures de l'implémentation (site lancé, `SITE_URL`)     |
-| `npm run capture:accueil`         | captures de l'accueil à 1440 et 390 px (site lancé)       |
+| `npm run capture:accueil`         | captures de l'accueil par section, 1440 et 390 px         |
 | `npm run format`                  | Prettier                                                  |
+
+¹ Port 3000 par défaut ; `PLAYWRIGHT_PORT=3100 npm run test:e2e` en choisit un autre. Hors CI, un
+serveur déjà lancé sur ce port est réutilisé : il doit servir le build courant.
 
 ## Variables d'environnement
 
@@ -74,6 +79,8 @@ jamais commité.
 - [`docs/design-system.md`](docs/design-system.md) : tokens, points de rupture, composants
 - [`docs/ecarts-maquette.md`](docs/ecarts-maquette.md) : registre des écarts à la maquette
 - [`docs/maquette/`](docs/maquette/) : captures de la maquette validée et de l'implémentation
+- [`docs/fidelite-maquette.md`](docs/fidelite-maquette.md) : fidélité section par section
+- [`docs/audits/`](docs/audits/) : Lighthouse, budget JavaScript, régression visuelle
 - `/styleguide` (local et preview) : vitrine du design system
 - [`AGENTS.md`](AGENTS.md) : conventions de code
 - [`CHANGELOG.md`](CHANGELOG.md) : historique des versions
