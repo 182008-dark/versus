@@ -7,9 +7,18 @@ export type RailItem = { key: string; brand: string; card: ReactNode };
 
 const ALL = "all";
 
-function countLabel(count: number) {
-  if (count === 0) return "Aucun produit pour cette marque.";
-  return count === 1 ? "1 produit affiché." : `${count} produits affichés.`;
+const EMPTY_LABEL = "Aucun produit pour cette marque.";
+
+/**
+ * Message de statut du filtre : il nomme la marque pour changer à chaque filtre, même quand deux
+ * marques ont autant de produits, sans quoi un lecteur d'écran n'annoncerait rien.
+ */
+function statusLabel(brandName: string | null, count: number) {
+  if (brandName === null) return `Tous les produits affichés : ${count}.`;
+  if (count === 0) return `Aucun produit ${brandName} pour le moment.`;
+  return count === 1
+    ? `1 produit ${brandName} affiché.`
+    : `${count} produits ${brandName} affichés.`;
 }
 
 /**
@@ -18,7 +27,8 @@ function countLabel(count: number) {
  * - flèches « précédents » et « suivants » : `aria-disabled` aux extrémités, jamais `disabled`,
  *   pour que le focus clavier reste sur le bouton ; un clic sur une flèche inactive est ignoré ;
  * - défilement d'une carte, doux seulement sans mouvement réduit ;
- * - filtre par marque : retour au début du rail et message de statut (WCAG 4.1.3), état vide.
+ * - filtre par marque : retour au début du rail et message de statut nommant la marque
+ *   (WCAG 4.1.3), état vide.
  */
 export function ProductRail({
   items,
@@ -33,6 +43,7 @@ export function ProductRail({
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(true);
   const [brand, setBrand] = useState(ALL);
+  const [filtered, setFiltered] = useState(false);
   const visible = brand === ALL ? items : items.filter((item) => item.brand === brand);
 
   const updateEdges = useCallback(() => {
@@ -77,7 +88,10 @@ export function ProductRail({
         <PillGroup
           label="Filtrer par marque"
           defaultValue={ALL}
-          onChange={setBrand}
+          onChange={(value) => {
+            setBrand(value);
+            setFiltered(true);
+          }}
           options={filters}
         />
         <div className="flex gap-2">
@@ -106,10 +120,17 @@ export function ProductRail({
         </div>
       </div>
       <p role="status" className="sr-only">
-        {brand === ALL ? "" : countLabel(visible.length)}
+        {filtered
+          ? statusLabel(
+              brand === ALL
+                ? null
+                : (filters.find((option) => option.value === brand)?.label ?? brand),
+              visible.length,
+            )
+          : ""}
       </p>
       {visible.length === 0 ? (
-        <p className="mt-6 text-muted">{countLabel(0)}</p>
+        <p className="mt-6 text-muted">{EMPTY_LABEL}</p>
       ) : (
         <ul
           ref={railRef}

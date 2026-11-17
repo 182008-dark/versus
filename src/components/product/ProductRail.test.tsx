@@ -97,9 +97,26 @@ describe("ProductRail", () => {
     await user.click(screen.getByRole("button", { name: "Samsung" }));
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
     expect(rail().scrollLeft).toBe(0);
-    expect(screen.getByRole("status").textContent).toBe("2 produits affichés.");
+    expect(screen.getByRole("status").textContent).toBe("2 produits Samsung affichés.");
     await user.click(screen.getByRole("button", { name: "Apple" }));
-    expect(screen.getByRole("status").textContent).toBe("1 produit affiché.");
+    expect(screen.getByRole("status").textContent).toBe("1 produit Apple affiché.");
+  });
+
+  it("change le message de statut à chaque filtre, même à nombre égal, et annonce « Toutes »", async () => {
+    const user = userEvent.setup();
+    const balanced: RailItem[] = [
+      ...items,
+      { key: "aw12", brand: "apple", card: <p>Apple Watch 12</p> },
+    ];
+    render(<ProductRail items={balanced} label="Nouveautés" filters={filters} />);
+    const status = screen.getByRole("status");
+    expect(status.textContent).toBe("");
+    await user.click(screen.getByRole("button", { name: "Apple" }));
+    expect(status.textContent).toBe("2 produits Apple affichés.");
+    await user.click(screen.getByRole("button", { name: "Samsung" }));
+    expect(status.textContent).toBe("2 produits Samsung affichés.");
+    await user.click(screen.getByRole("button", { name: "Toutes" }));
+    expect(status.textContent).toBe("Tous les produits affichés : 4.");
   });
 
   it("affiche un état vide quand aucune carte ne correspond", async () => {
@@ -107,6 +124,6 @@ describe("ProductRail", () => {
     render(<ProductRail items={items} label="Nouveautés" filters={filters} />);
     await user.click(screen.getByRole("button", { name: "Xiaomi" }));
     expect(screen.queryByRole("list", { name: "Nouveautés" })).toBeNull();
-    expect(screen.getByRole("status").textContent).toBe("Aucun produit pour cette marque.");
+    expect(screen.getByRole("status").textContent).toBe("Aucun produit Xiaomi pour le moment.");
   });
 });
