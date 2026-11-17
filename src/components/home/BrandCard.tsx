@@ -1,33 +1,38 @@
-import { ProductVisual } from "@/components/product/ProductVisual";
+import type { CSSProperties } from "react";
+import { ProductVisual, type VisualProduct } from "@/components/product/ProductVisual";
 import { Arrow } from "@/components/ui/Arrow";
-import { routeFor } from "@/config/site";
-import type { CatalogProduct } from "@/lib/catalog/types";
+import { brandCardStyle } from "@/lib/brand-themes";
+import type { CatalogBrand } from "@/lib/catalog/types";
 
+/**
+ * Carte d'univers de marque (maquette : `.brand`), composant serveur. Lien vers `href`
+ * (`/boutique` à l'étape 3, `/marques/[marque]` à l'étape 4). Nom accessible court : le visuel
+ * est décoratif, donc le lien se lit « Apple iPhone, AirPods et Apple Watch. Découvrir ».
+ */
 export function BrandCard({
   brand,
-  tagline,
   visual,
+  href,
 }: {
-  brand: CatalogProduct["brand_slug"];
-  tagline: string;
-  visual: CatalogProduct;
+  brand: CatalogBrand;
+  visual: VisualProduct | undefined;
+  href: string;
 }) {
-  const href = routeFor("boutique");
-  if (!href) return null;
-  const labels = { apple: "Apple", samsung: "Samsung", xiaomi: "Xiaomi" };
-
   return (
-    <a href={href} data-brand={brand} className="brand-card zoom">
-      <h3>{labels[brand]}</h3>
-      <p>{tagline}</p>
-      <span className="mt-4 inline-flex min-h-11 items-center gap-2 font-semibold">
+    <a
+      href={href}
+      data-brand={brand.slug}
+      className="brand-card zoom"
+      style={brandCardStyle(brand.slug) as CSSProperties}
+    >
+      <h3>{brand.name}</h3>
+      <p>{brand.tagline}</p>
+      <span className="brand-card-go">
         Découvrir <Arrow />
       </span>
-      <ProductVisual
-        product={visual}
-        sizes="(max-width: 640px) 48vw, 260px"
-        className="brand-card-image"
-      />
+      {visual ? (
+        <ProductVisual product={visual} decorative sizes="260px" className="brand-card-art" />
+      ) : null}
     </a>
   );
 }

@@ -1,53 +1,70 @@
-import { Badge } from "@/components/ui/Badge";
+import type { CSSProperties } from "react";
+import { ProductVisual } from "@/components/product/ProductVisual";
+import { Arrow } from "@/components/ui/Arrow";
 import { Button } from "@/components/ui/Button";
 import { NewBadge } from "@/components/ui/NewBadge";
-import { ProductVisual } from "@/components/product/ProductVisual";
 import { productHref } from "@/config/site";
-import type { ProductCardData } from "@/lib/catalog/types";
+import { tileStyle, tileTheme } from "@/lib/brand-themes";
+import type { HomeEntry } from "@/lib/catalog/types";
 
+/**
+ * Tuile promotionnelle (maquette : `.tile`), composant serveur. Couleurs et libellé de gamme
+ * lus dans `tileThemes` (clé `home_slots.theme_key`) ; titre et accroche dans `home_slots`
+ * (`headline`, `subline`) ou, à défaut, dans le produit. La première tuile occupe toute la
+ * largeur.
+ * - « Acheter » ouvre la fiche ; son nom accessible cite le produit (WCAG 2.4.4) ;
+ * - « En savoir plus » mène à la même fiche : lien redondant pour la souris, retiré du clavier
+ *   et des lecteurs d'écran ; « Comparer » arrive à l'étape 5.
+ */
 export function PromoTile({
-  product,
-  featured = false,
+  entry,
+  isNew,
+  featured,
 }: {
-  product: ProductCardData;
-  featured?: boolean;
+  entry: HomeEntry;
+  isNew: boolean;
+  featured: boolean;
 }) {
-  const tone =
-    featured || product.code === "aw12"
-      ? "dark"
-      : product.brand_slug === "samsung"
-        ? "dark"
-        : "light";
+  const { product } = entry;
+  const theme = tileTheme(entry.theme_key, product.brand_slug);
+  const href = productHref(product.slug);
   return (
     <article
       data-product-card={product.code}
       data-brand={product.brand_slug}
-      className={`promo-tile ${featured ? "promo-tile-featured" : ""}`}
-      data-tone={tone}
+      data-tone={theme.tone}
+      className={featured ? "promo-tile promo-tile-featured" : "promo-tile"}
+      style={tileStyle(theme) as CSSProperties}
     >
-      <div className="promo-tile-copy">
-        {product.is_new ? (
-          <NewBadge tone={tone === "dark" ? "onDark" : "accent"} />
+      <div className="promo-tile-copy reveal">
+        {isNew ? (
+          <NewBadge tone={theme.tone === "dark" ? "onDark" : "accent"} />
         ) : (
-          <Badge tone={tone === "dark" ? "onDark" : "neutral"}>{product.brand_name}</Badge>
+          <p className="promo-tile-eyebrow">{theme.eyebrow}</p>
         )}
-        <h2 className="mt-3 text-display-tile">{product.name}</h2>
-        <p className="promo-tile-description mt-3 max-w-[380px] text-base leading-relaxed">
-          {product.tagline}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Button href={productHref(product.slug)} variant={tone === "dark" ? "light" : "primary"}>
+        <h2 className="promo-tile-title">{entry.headline ?? product.name}</h2>
+        <p className="promo-tile-sub">{entry.subline ?? product.tagline}</p>
+        <div className="promo-tile-links">
+          <Button
+            href={href}
+            variant={theme.button}
+            className="h-11 px-[22px]"
+            aria-label={`Acheter ${product.name}`}
+          >
             Acheter
           </Button>
-          <a className="promo-learn" href={productHref(product.slug)}>
-            En savoir plus <span aria-hidden="true">→</span>
-          </a>
+          {featured ? null : (
+            <a className="promo-learn" href={href} tabIndex={-1} aria-hidden="true">
+              En savoir plus <Arrow />
+            </a>
+          )}
         </div>
       </div>
       <ProductVisual
         product={product}
-        sizes="(max-width: 640px) 75vw, (max-width: 1024px) 48vw, 42vw"
-        className="promo-tile-image rise"
+        decorative
+        sizes="(max-width: 640px) 260px, 330px"
+        className="promo-tile-art rise"
       />
     </article>
   );

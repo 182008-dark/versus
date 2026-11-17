@@ -1,10 +1,27 @@
-import { Badge } from "@/components/ui/Badge";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Price } from "@/components/ui/Price";
+import type { ProductDetail } from "@/lib/catalog/types";
+import { compareRows } from "@/lib/compare/rows";
 import { ProductVisual } from "./ProductVisual";
-import type { CatalogProduct } from "@/lib/catalog/types";
 
-export function ProductView({ product }: { product: CatalogProduct }) {
+/**
+ * Fiche produit minimale de l'étape 3 (§4.3) : visuel, nom, accroche, prix minimal, coloris et
+ * prix des variantes, caractéristiques (lignes de `lib/compare/rows.ts`), garantie et mention
+ * « Prix indicatifs, aucune vente réelle ». Toutes les données arrivent en props : la même vue
+ * servira à l'aperçu admin (étape 8).
+ */
+export function ProductView({
+  product,
+  categoryName,
+}: {
+  product: ProductDetail;
+  categoryName: string;
+}) {
+  const specs = compareRows[product.compare_group].filter(
+    (row) => row.key !== "price" && row.key !== "warranty",
+  );
+  const variants = product.variants.filter((variant) => variant.is_active);
+
   return (
     <article className="product-view wrap section">
       <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
@@ -12,60 +29,58 @@ export function ProductView({ product }: { product: CatalogProduct }) {
           <ProductVisual
             product={product}
             priority
-            sizes="(max-width: 768px) 85vw, 46vw"
+            sizes="(max-width: 900px) 85vw, 46vw"
             className={`mx-auto flex h-[min(70vw,520px)] max-h-[520px] w-full ${product.visual_kind === "band" ? "max-w-[120px]" : "max-w-[460px]"}`}
           />
         </div>
         <div>
           <Eyebrow>
-            {product.brand_name} · {product.category_slug}
+            {product.brand_name} · {categoryName}
           </Eyebrow>
           <h1 className="mt-3 text-display-h2">{product.name}</h1>
-          <p className="mt-4 text-lg leading-relaxed text-muted">{product.description}</p>
+          <p className="mt-4 text-xl leading-snug font-semibold">{product.tagline}</p>
+          {product.description ? (
+            <p className="mt-3 text-lg leading-relaxed text-muted">{product.description}</p>
+          ) : null}
           <p className="mt-6 text-lg font-semibold">
-            À partir de <Price amount={product.min_price_fcfa} />
+            {product.min_price_fcfa !== null ? (
+              <Price amount={product.min_price_fcfa} prefix="À partir de" />
+            ) : (
+              "Prix indisponible"
+            )}
           </p>
           <p className="mt-2 text-sm text-muted">
-            {product.warranty_months} mois de garantie indiquée
+            Garantie indiquée : {product.warranty_months} mois
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {product.variants.map((variant) => (
-              <Badge
+          <h2 id="coloris-titre" className="mt-8 text-base font-bold">
+            Coloris et prix
+          </h2>
+          <ul role="list" aria-labelledby="coloris-titre" className="mt-3 flex flex-wrap gap-2">
+            {variants.map((variant) => (
+              <li
                 key={variant.sku}
-                tone={variant.stock > 0 ? "neutral" : "accent"}
-                className="product-variant !whitespace-normal"
+                className="rounded-full border border-line px-3.5 py-2 text-sm leading-tight"
               >
-                {variant.color_name} · <Price amount={variant.price_fcfa} />
-                {variant.stock === 0 ? " · Indisponible" : ""}
-              </Badge>
+                <span className="font-semibold">{variant.color_name}</span>
+                {" · "}
+                <Price amount={variant.price_fcfa} />
+                {variant.stock === 0 ? <span className="text-muted"> · Indisponible</span> : null}
+              </li>
             ))}
-          </div>
-          <dl className="mt-8 grid grid-cols-2 gap-4 border-t border-line-soft pt-6">
-            <div>
-              <dt className="text-sm text-muted">Écran</dt>
-              <dd className="mt-1 font-semibold">
-                {product.specs.screen_size_in ? `${product.specs.screen_size_in}″ ` : ""}
-                {product.specs.screen_tech ?? "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted">Puce</dt>
-              <dd className="mt-1 font-semibold">{product.specs.chip ?? "—"}</dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted">Autonomie indicative</dt>
-              <dd className="mt-1 font-semibold">
-                {product.specs.autonomy_hours ? `${product.specs.autonomy_hours} h` : "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-sm text-muted">Compatibilité</dt>
-              <dd className="mt-1 font-semibold">{product.compat.join(" · ")}</dd>
-            </div>
+          </ul>
+          <h2 className="mt-8 text-base font-bold">Caractéristiques</h2>
+          <dl className="mt-3 grid grid-cols-2 gap-4 border-t border-line-soft pt-4">
+            {specs.map((row) => (
+              <div key={row.key}>
+                <dt className="text-sm text-muted">{row.label}</dt>
+                <dd className="mt-1 font-semibold">{row.format(product) ?? "—"}</dd>
+              </div>
+            ))}
           </dl>
+          <p className="mt-3 text-xs text-muted">{product.specs.specs_note}</p>
           <p className="mt-8 rounded-option bg-surface p-4 text-sm leading-relaxed text-muted">
-            Projet pédagogique : aucune vente réelle. Prix indicatifs en FCFA, susceptibles de
-            varier. Les caractéristiques affichées sont données à titre indicatif.
+            Prix indicatifs, aucune vente réelle. Projet pédagogique : les prix en FCFA et les
+            caractéristiques affichées sont donnés à titre indicatif.
           </p>
         </div>
       </div>

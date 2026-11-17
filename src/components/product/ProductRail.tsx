@@ -1,29 +1,39 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useMemo } from "react";
-import { PillGroup } from "@/components/ui/PillGroup";
-import { ProductCard } from "./ProductCard";
-import type { ProductCardData } from "@/lib/catalog/types";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { PillGroup, type PillOption } from "@/components/ui/PillGroup";
 
+export type RailItem = { key: string; brand: string; card: ReactNode };
+
+const ALL = "all";
+
+function countLabel(count: number) {
+  if (count === 0) return "Aucun produit pour cette marque.";
+  return count === 1 ? "1 produit affiché." : `${count} produits affichés.`;
+}
+
+/**
+ * Rail horizontal de produits (maquette : `.pills` et `.rail`), îlot client minimal : les cartes
+ * sont rendues par le serveur (`card`), seuls le filtre et le défilement sont ici.
+ * - flèches « précédents » et « suivants » : `aria-disabled` aux extrémités, jamais `disabled`,
+ *   pour que le focus clavier reste sur le bouton ; un clic sur une flèche inactive est ignoré ;
+ * - défilement d'une carte, doux seulement sans mouvement réduit ;
+ * - filtre par marque : retour au début du rail et message de statut (WCAG 4.1.3), état vide.
+ */
 export function ProductRail({
-  products,
+  items,
   label,
+  filters,
 }: {
-  products: readonly ProductCardData[];
+  items: readonly RailItem[];
   label: string;
+  filters: readonly PillOption[];
 }) {
   const railRef = useRef<HTMLUListElement>(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [canGoForward, setCanGoForward] = useState(true);
-  const [brandFilter, setBrandFilter] = useState("all");
-  const filteredProducts = useMemo(
-    () =>
-      brandFilter === "all"
-        ? products
-        : products.filter((product) => product.brand_slug === brandFilter),
-    [brandFilter, products],
-  );
+  const [brand, setBrand] = useState(ALL);
+  const visible = brand === ALL ? items : items.filter((item) => item.brand === brand);
 
   const updateEdges = useCallback(() => {
     const rail = railRef.current;
@@ -35,6 +45,7 @@ export function ProductRail({
   useEffect(() => {
     const rail = railRef.current;
     if (!rail) return;
+    rail.scrollLeft = 0;
     updateEdges();
     rail.addEventListener("scroll", updateEdges, { passive: true });
     const observer = new ResizeObserver(updateEdges);
@@ -43,65 +54,77 @@ export function ProductRail({
       rail.removeEventListener("scroll", updateEdges);
       observer.disconnect();
     };
-  }, [updateEdges, filteredProducts.length]);
+  }, [updateEdges, brand]);
 
   function scroll(direction: -1 | 1) {
     const rail = railRef.current;
-    if (!rail) return;
+    if (!rail || (direction < 0 ? !canGoBack : !canGoForward)) return;
     const card = rail.querySelector<HTMLElement>("li");
     const gap = Number.parseFloat(getComputedStyle(rail).columnGap) || 0;
-    rail.scrollBy({ left: direction * ((card?.offsetWidth ?? 300) + gap), behavior: "smooth" });
+    const smooth = window.matchMedia("(prefers-reduced-motion: no-preference)").matches;
+    rail.scrollBy({
+      left: direction * ((card?.offsetWidth ?? 300) + gap),
+      behavior: smooth ? "smooth" : "auto",
+    });
   }
 
+  const arrow =
+    "grid size-11 place-items-center rounded-full border border-line text-ink aria-disabled:cursor-default aria-disabled:opacity-35 state-hover:bg-surface";
+
   return (
-    <section aria-label={label} role="region">
-      <div className="mb-3 flex justify-end gap-2">
-        <button
-          type="button"
-          aria-label="Produits précédents"
-          disabled={!canGoBack}
-          onClick={() => scroll(-1)}
-          className="grid size-11 place-items-center rounded-full border border-line text-ink disabled:opacity-35 state-hover:bg-surface"
-        >
-          <span aria-hidden="true" className="text-xl">
-            ←
-          </span>
-        </button>
-        <button
-          type="button"
-          aria-label="Produits suivants"
-          disabled={!canGoForward}
-          onClick={() => scroll(1)}
-          className="grid size-11 place-items-center rounded-full border border-line text-ink disabled:opacity-35 state-hover:bg-surface"
-        >
-          <span aria-hidden="true" className="text-xl">
-            →
-          </span>
-        </button>
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <PillGroup
+          label="Filtrer par marque"
+          defaultValue={ALL}
+          onChange={setBrand}
+          options={filters}
+        />
+        <div className="flex gap-2">
+          <button
+            type="button"
+            aria-label="Produits précédents"
+            aria-disabled={canGoBack ? undefined : true}
+            onClick={() => scroll(-1)}
+            className={arrow}
+          >
+            <span aria-hidden="true" className="text-xl">
+              ←
+            </span>
+          </button>
+          <button
+            type="button"
+            aria-label="Produits suivants"
+            aria-disabled={canGoForward ? undefined : true}
+            onClick={() => scroll(1)}
+            className={arrow}
+          >
+            <span aria-hidden="true" className="text-xl">
+              →
+            </span>
+          </button>
+        </div>
       </div>
-      <PillGroup
-        label="Filtrer par marque"
-        defaultValue="all"
-        onChange={setBrandFilter}
-        options={[
-          { value: "all", label: "Toutes" },
-          { value: "apple", label: "Apple" },
-          { value: "samsung", label: "Samsung" },
-          { value: "xiaomi", label: "Xiaomi" },
-        ]}
-      />
-      <ul
-        ref={railRef}
-        tabIndex={0}
-        aria-label={label}
-        className="grid snap-x snap-mandatory auto-cols-[minmax(260px,300px)] grid-flow-col gap-[18px] overflow-x-auto scroll-smooth px-1 pt-2 pb-6"
-      >
-        {filteredProducts.map((product) => (
-          <li key={product.code} className="snap-start">
-            <ProductCard product={product} />
-          </li>
-        ))}
-      </ul>
-    </section>
+      <p role="status" className="sr-only">
+        {brand === ALL ? "" : countLabel(visible.length)}
+      </p>
+      {visible.length === 0 ? (
+        <p className="mt-6 text-muted">{countLabel(0)}</p>
+      ) : (
+        <ul
+          ref={railRef}
+          role="list"
+          tabIndex={0}
+          aria-label={label}
+          className="-mx-6 mt-7 grid snap-x snap-mandatory scroll-px-6 auto-cols-[300px] grid-flow-col gap-[18px] overflow-x-auto px-6 pt-1.5 pb-6"
+        >
+          {visible.map((item) => (
+            <li key={item.key} className="flex snap-start">
+              {item.card}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

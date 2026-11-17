@@ -1,3 +1,4 @@
+import { QuizTeaser } from "@/components/home/QuizTeaser";
 import { ProductCard } from "@/components/product/ProductCard";
 import { PillGroup } from "@/components/ui/PillGroup";
 import { Price } from "@/components/ui/Price";
@@ -34,7 +35,11 @@ export function CatalogSection() {
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">Price · montant FCFA</h3>
-            <Price amount={sample.min_price_fcfa} prefix="Dès" className="font-semibold" />
+            <Price
+              amount={sample.variants[0]?.price_fcfa ?? 0}
+              prefix="Dès"
+              className="font-semibold"
+            />
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">SectionHeader · en-tête de section</h3>
@@ -50,6 +55,14 @@ export function CatalogSection() {
           <div className="max-w-[340px]">
             <ProductCard product={{ ...sample, is_new: true }} />
           </div>
+        </div>
+      </div>
+      <div className="mt-10">
+        <h3 className="mb-3 text-base font-bold">
+          QuizTeaser · aperçu non soumis (affiché sur l’accueil à l’étape 5)
+        </h3>
+        <div className="overflow-hidden rounded-box">
+          <QuizTeaser preview />
         </div>
       </div>
     </StyleguideSection>

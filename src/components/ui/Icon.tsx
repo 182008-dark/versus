@@ -1,6 +1,6 @@
 import clsx from "clsx";
 
-/** Tracés repris de la maquette (en-tête), plus le menu et la croix. */
+/** Tracés repris de la maquette (en-tête, hero, catégories, réassurance), plus le menu et la croix. */
 const paths = {
   search: (
     <>
@@ -54,19 +54,78 @@ const paths = {
       <path d="M10.5 2v3M13.5 2v3M10.5 19v3M13.5 19v3" />
     </>
   ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6" />
+      <path d="M12 17h.01" />
+    </>
+  ),
+  chevronLeft: <path d="M15 5l-7 7 7 7" />,
+  chevronRight: <path d="M9 5l7 7-7 7" />,
+  play: <path d="M8 5l11 7-11 7z" />,
+  pause: <path d="M9 5v14M15 5v14" />,
+  mobileMoney: (
+    <>
+      <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
+      <path d="M10 7h4M9.5 12.5l2 2 3.5-3.5" />
+    </>
+  ),
+  cash: (
+    <>
+      <rect x="2.5" y="6.5" width="19" height="11" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M6 9.5v5M18 9.5v5" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z" />
+      <path d="M9 12l2 2 4-4" />
+    </>
+  ),
+  truck: (
+    <>
+      <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z" />
+      <circle cx="7" cy="17.5" r="1.8" />
+      <circle cx="17" cy="17.5" r="1.8" />
+    </>
+  ),
+} as const;
+
+/** Tailles (maquette) : 16 px (commandes du hero), 19 px (en-tête), 24 px (réassurance), 34 px (catégories). */
+const sizes = { 16: "size-4", 19: "size-[19px]", 24: "size-6", 34: "size-[34px]" } as const;
+/** Épaisseurs du trait de la maquette. */
+const strokes = {
+  1.5: "stroke-[1.5]",
+  1.6: "stroke-[1.6]",
+  1.7: "stroke-[1.7]",
+  2: "stroke-2",
 } as const;
 
 export type IconName = keyof typeof paths;
 
-/** Icône au trait (19 px, trait de 1,7 px), décorative : le nom accessible est sur le bouton. */
-export function Icon({ name, className }: { name: IconName; className?: string }) {
+/** Icône au trait (19 px, trait de 1,7 px par défaut), décorative : le nom accessible est sur le bouton. */
+export function Icon({
+  name,
+  size = 19,
+  stroke = 1.7,
+  className,
+}: {
+  name: IconName;
+  size?: keyof typeof sizes;
+  stroke?: keyof typeof strokes;
+  className?: string;
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
       aria-hidden="true"
       focusable="false"
       className={clsx(
-        "size-[19px] fill-none stroke-current stroke-[1.7] [stroke-linecap:round] [stroke-linejoin:round]",
+        "fill-none stroke-current [stroke-linecap:round] [stroke-linejoin:round]",
+        sizes[size],
+        strokes[stroke],
         className,
       )}
     >
