@@ -804,6 +804,9 @@
 
   /* Comparateur d'accueil (maquette : .cmp-box, .cmp-row, .cmp-*) */
   .compare-box {
+    /* Bloc conteneur des textes `sr-only` (position: absolute) des en-têtes : sans lui, ils
+       sortent de la zone défilante et élargissent la page à 390 px. */
+    position: relative;
     overflow-x: auto;
     border-radius: var(--radius-box);
     background: var(--bg);
