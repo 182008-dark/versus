@@ -31,6 +31,11 @@ du plan (`v0.N.0`), puis `v1.0.0`.
   des thèmes de marque. Captures avant / après dans `docs/refonte/lot-2/`
   (`npm run capture:refonte`, `npm run capture:comparaison`) ; références visuelles de l'accueil
   régénérées. Avenant 1 à l'ADR 002.
+- Après revue : « Dès » seulement s'il y a plusieurs prix sur les cartes produit et dans le
+  comparateur, comme sur la fiche (nouvelle colonne `max_price_fcfa`, test de rendu de
+  `ProductCard`) ; titres de tuile sur `--text-tile` (700, −0,025 em) ; surtitres du hero et des
+  tuiles, marque du comparateur et des cartes en casse normale ; tuiles claires Apple et Xiaomi
+  sur le pastel et l'encre de `brandThemes`.
 
 ### Refonte, lot 1 : catalogue et visuels (branche `refonte-lot-1-catalogue`)
 

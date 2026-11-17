@@ -224,6 +224,15 @@ Règle : chaque primitive reportée est livrée **avec** sa section dans `/style
   `Badge` (casse normale, « Épuisé » gris), `BrandMark`, `VsMark` (médaillon « VS » de 44 px,
   signature de VERSUS, masqué aux lecteurs d'écran) ; formats `formatFCFAParts`, `formatSpec`,
   `categoryLabel`.
+- **Une seule formule de prix** : « Dès » n'apparaît que si les variantes actives ont plusieurs
+  prix, sur la carte comme sur la fiche et dans le comparateur. La ligne de catalogue gagne
+  `max_price_fcfa` (`max(price_fcfa) filter (where is_active)`, à ajouter à la vue
+  `catalog_products` de l'étape 4, voir `docs/PLAN.md` §5.4) ; 16 produits sur 30 n'ont qu'un prix.
+- **Classes de l'accueil alignées dès le lot 2** (alias, avant leur refonte au lot 4) : titres de
+  tuile sur `--text-tile` en 700 / −0,025 em ; surtitres du hero et des tuiles, marque du
+  comparateur et des cartes produit en style « méta », sans petites capitales espacées ; tuiles
+  claires Apple et Xiaomi sur le pastel et l'encre de `brandThemes` (plus de `#FFF1E6`, `#A84300`,
+  `#FBFBFD`, `#1D1D1F`).
 - **Contrastes verrouillés** : `contrastPairs` liste désormais toutes les paires texte / fond
   employées (37) et un test échoue si une classe `text-<rôle>` de `src/` n'a pas de paire mesurée.
 
