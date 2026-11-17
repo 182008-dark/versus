@@ -1,7 +1,10 @@
 import clsx from "clsx";
 import { Button } from "@/components/ui/Button";
-import { BUTTON_VARIANTS, type ButtonVariant } from "@/components/ui/button-styles";
-import { BRANDS, brandThemes } from "@/lib/brand-themes";
+import {
+  BUTTON_VARIANTS,
+  LEGACY_BUTTON_VARIANTS,
+  type ButtonVariant,
+} from "@/components/ui/button-styles";
 import { StyleguideSection } from "./StyleguideSection";
 
 /** États montrés sans interaction : data-state force survol, focus et appui (globals.css). */
@@ -9,44 +12,44 @@ const states = [
   { label: "Par défaut", props: {} },
   { label: "Survol", props: { "data-state": "hover" } },
   { label: "Focus clavier", props: { "data-state": "focus" } },
-  { label: "Appui", props: { "data-state": "active" } },
+  { label: "Appui (enfoncé)", props: { "data-state": "active" } },
   { label: "Désactivé", props: { disabled: true } },
-  { label: "Pressé (bascule)", props: { pressed: true } },
 ] as const;
 
-const variantInfo: Record<ButtonVariant, { label: string; dark?: boolean }> = {
-  primary: { label: "primary : action principale (accent)" },
-  dark: { label: "dark : action sur fond clair" },
-  light: { label: "light : action sur fond sombre", dark: true },
-  outline: { label: "outline : secondaire, bascule (comparer)" },
-  onDark: { label: "onDark : secondaire sur fond sombre", dark: true },
-  brand: { label: "brand : couleurs de la marque ([data-brand])" },
-};
+const rows: { variant: ButtonVariant; label: string; dark?: boolean; pressed?: boolean }[] = [
+  { variant: "primary", label: "primary : l'action principale, toujours verte" },
+  { variant: "primary", label: "primary sur fond sombre : toujours verte", dark: true },
+  { variant: "secondary", label: "secondary : contour, et bascule (comparer)", pressed: true },
+  { variant: "onDark", label: "onDark : secondaire sur fond sombre", dark: true, pressed: true },
+];
 
-function Row({ variant, brand }: { variant: ButtonVariant; brand?: (typeof BRANDS)[number] }) {
-  const info = variantInfo[variant];
+function Row({
+  variant,
+  dark,
+  pressed,
+}: {
+  variant: ButtonVariant;
+  dark?: boolean;
+  pressed?: boolean;
+}) {
+  const list = pressed
+    ? [...states, { label: "Pressé (bascule)", props: { pressed: true } }]
+    : states;
   return (
     <div
-      data-tone={info.dark ? "dark" : undefined}
-      data-brand={brand}
+      data-tone={dark ? "dark" : undefined}
       className={clsx(
-        "flex flex-wrap items-end gap-4 rounded-box p-5",
-        info.dark ? "bg-surface-dark text-on-dark" : brand ? "bg-brand-ground" : "bg-surface-2",
+        "flex flex-wrap items-end gap-4 rounded-card p-5",
+        dark ? "bg-surface-dark text-on-dark" : "bg-surface-2",
       )}
     >
-      {states.map((state) => (
+      {list.map((state) => (
         <figure key={state.label} className="flex flex-col items-start gap-2">
-          {/* --muted n'atteint pas AA sur le fond Samsung (4,49:1) : encre de la marque. */}
-          <figcaption
-            className={clsx(
-              "text-xs",
-              info.dark ? "text-muted-on-dark" : brand ? "text-brand-ink" : "text-muted",
-            )}
-          >
+          <figcaption className={clsx("text-xs", dark ? "text-muted-on-dark" : "text-muted")}>
             {state.label}
           </figcaption>
           <Button variant={variant} {...state.props}>
-            {brand ? `Acheter (${brandThemes[brand].label})` : "Acheter"}
+            Voir le produit
           </Button>
         </figure>
       ))}
@@ -59,39 +62,47 @@ export function ButtonsSection() {
     <StyleguideSection
       id="boutons"
       eyebrow="3. Boutons"
-      title="Variantes, tailles et états"
+      title="Trois variantes, deux tailles"
       intro={
         <p>
-          Hauteur de 44 px (<code>md</code>) ou 48 px (<code>lg</code>). Agrandissement de 4 % au
-          survol, seulement sans mouvement réduit. Anneau de focus de 2 px en accent, vert clair sur
-          fond sombre. Avec <code>href</code>, le bouton est un lien.
+          Une seule couleur d&apos;action, le vert VERSUS, y compris sur fond sombre. Pas
+          d&apos;agrandissement au survol ; léger enfoncement (<code>scale(.97)</code>) à
+          l&apos;appui, seulement sans mouvement réduit. Hauteur de 44 px (<code>md</code>) ou 48 px
+          (<code>lg</code>). Avec <code>href</code>, le bouton est un lien. Tant qu&apos;il n&apos;y
+          a pas de panier, on écrit « Voir le produit », jamais « Acheter ».
         </p>
       }
     >
       <div className="flex flex-col gap-8">
-        {BUTTON_VARIANTS.filter((v) => v !== "brand").map((variant) => (
-          <div key={variant}>
-            <h3 className="mb-3 text-base font-bold">{variantInfo[variant].label}</h3>
-            <Row variant={variant} />
+        {rows.map((row) => (
+          <div key={row.label}>
+            <h3 className="mb-3 text-base font-bold">{row.label}</h3>
+            <Row variant={row.variant} dark={row.dark} pressed={row.pressed} />
           </div>
         ))}
         <div>
-          <h3 className="mb-3 text-base font-bold">{variantInfo.brand.label}</h3>
-          <div className="flex flex-col gap-3">
-            {BRANDS.map((brand) => (
-              <Row key={brand} variant="brand" brand={brand} />
-            ))}
-          </div>
-        </div>
-        <div>
           <h3 className="mb-3 text-base font-bold">Tailles</h3>
-          <div className="flex flex-wrap items-center gap-4 rounded-box bg-surface-2 p-5">
+          <div className="flex flex-wrap items-center gap-4 rounded-card bg-surface-2 p-5">
             <Button size="md">Taille md (44 px)</Button>
             <Button size="lg">Taille lg (48 px)</Button>
-            <Button href="/livraison" variant="dark" size="lg">
+            <Button href="/livraison" variant="secondary" size="lg">
               Lien en bouton
             </Button>
           </div>
+        </div>
+        <div>
+          <h3 className="mb-3 text-base font-bold">Anciennes variantes : alias temporaires</h3>
+          <p className="max-w-3xl text-sm text-muted">
+            Une couleur de marque ne sert jamais à une action. Les anciens noms restent acceptés le
+            temps de refaire l&apos;accueil, les pages marque et la fiche (lots 3 à 5) :{" "}
+            {Object.entries(LEGACY_BUTTON_VARIANTS).map(([legacy, target], index) => (
+              <span key={legacy}>
+                {index > 0 ? ", " : ""}
+                <code>{legacy}</code> → <code>{target}</code>
+              </span>
+            ))}
+            . Variantes actuelles : {BUTTON_VARIANTS.join(", ")}.
+          </p>
         </div>
       </div>
     </StyleguideSection>

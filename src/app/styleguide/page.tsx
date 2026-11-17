@@ -7,6 +7,7 @@ import { Eyebrow } from "@/components/ui/Eyebrow";
 import { styleguideEnabled } from "@/lib/env";
 import { ButtonsSection } from "./_components/ButtonsSection";
 import { ColorsSection } from "./_components/ColorsSection";
+import { BrandSection } from "./_components/BrandSection";
 import { LayoutSection } from "./_components/LayoutSection";
 import { LinksBadgesSection } from "./_components/LinksBadgesSection";
 import { TypographySection } from "./_components/TypographySection";
@@ -22,7 +23,8 @@ const sections = [
   { id: "typographie", label: "Typographie" },
   { id: "boutons", label: "Boutons" },
   { id: "liens-badges", label: "Liens et badges" },
-  { id: "gabarit", label: "Gabarit et marques" },
+  { id: "marques", label: "Marques et signature" },
+  { id: "gabarit", label: "Gabarit" },
   { id: "catalogue", label: "Catalogue" },
 ];
 
@@ -44,7 +46,8 @@ export default function StyleguidePage() {
           <h1 className="mt-3 text-display-h2">Styleguide VERSUS</h1>
           <p className="mt-4 max-w-2xl text-[17px] leading-relaxed text-muted">
             Tokens en trois couches, contrastes mesurés par le calcul WCAG, et tous les états des
-            composants. Page absente en production.
+            composants. Refonte « évolution raffinée » (lot 2) : gris pierre, trois arrondis, une
+            seule couleur d&apos;action. Page absente en production.
           </p>
           <nav aria-label="Sections du styleguide" className="mt-6">
             <ul className="flex flex-wrap gap-2">
@@ -52,7 +55,7 @@ export default function StyleguidePage() {
                 <li key={s.id}>
                   <a
                     href={`#${s.id}`}
-                    className="inline-flex h-11 items-center rounded-full border border-line px-5 text-sm font-medium state-hover:border-ink"
+                    className="inline-flex h-11 items-center rounded-full border border-line-control px-5 text-sm font-medium state-hover:border-ink"
                   >
                     {s.label}
                   </a>
@@ -65,6 +68,7 @@ export default function StyleguidePage() {
         <TypographySection />
         <ButtonsSection />
         <LinksBadgesSection />
+        <BrandSection />
         <LayoutSection />
         <CatalogSection />
       </main>
