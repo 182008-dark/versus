@@ -1,6 +1,6 @@
 /**
- * Captures du gabarit implémenté (étape 2), à comparer aux captures de la maquette
- * (docs/maquette/captures/{1440,390}/01-en-tete.png et 11-pied-de-page.png).
+ * Captures du gabarit implémenté (à relancer à chaque étape qui le modifie), à comparer aux
+ * captures de la maquette (docs/maquette/captures/{1440,390}/01-en-tete.png et 11-pied-de-page.png).
  *
  * Prérequis : le site tourne (`npm run build && npm run start`, ou `npm run dev`).
  * Usage : npm run capture:gabarit
@@ -63,7 +63,7 @@ async function main() {
 
       await captureUnion(
         page,
-        ["body > div:has(> p > strong)", "header"],
+        ["section[aria-label='Avertissement']", "header"],
         join(dir, "01-en-tete.png"),
       );
       await captureUnion(page, ["footer"], join(dir, "11-pied-de-page.png"));

@@ -265,6 +265,30 @@ test.describe("styleguide", () => {
     await expect(accentRow).toContainText("AA");
   });
 
+  test("chaque primitive de l'étape 3 a sa section, Pill avec ses états", async ({ page }) => {
+    await page.goto("/styleguide");
+    for (const name of [
+      "Pill · pastille bascule",
+      "PillGroup · filtres de marque",
+      "Price · montant FCFA",
+      "SectionHeader · en-tête de section",
+      "Reveal · mouvement progressif",
+    ]) {
+      await expect(page.getByRole("heading", { level: 3, name })).toBeVisible();
+    }
+    const pills = page.locator("figure", { has: page.locator("figcaption") });
+    await expect(
+      pills
+        .filter({ hasText: "Sélectionnée" })
+        .getByRole("button", { name: "Toutes", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      pills
+        .filter({ hasText: "Focus clavier" })
+        .getByRole("button", { name: "Xiaomi", exact: true }),
+    ).toHaveAttribute("data-state", "focus");
+  });
+
   test("la boîte de dialogue se ferme avec Échap et rend le focus", async ({ page }) => {
     await page.goto("/styleguide");
     const trigger = page.getByRole("button", { name: "Ouvrir la boîte de dialogue" });
