@@ -45,7 +45,7 @@ export function ProductView({
           ) : null}
           <p className="mt-6 text-lg font-semibold">
             {product.min_price_fcfa !== null ? (
-              <Price amount={product.min_price_fcfa} prefix="À partir de" />
+              <Price amount={variants.map((variant) => variant.price_fcfa)} />
             ) : (
               "Prix indisponible"
             )}

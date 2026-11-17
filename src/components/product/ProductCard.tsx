@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       <p className="flex-1 text-[14.5px] leading-[1.45] text-muted-strong">{product.tagline}</p>
       <p className="mt-3.5 mb-3 text-[15px] font-semibold">
         {product.min_price_fcfa !== null ? (
-          <Price amount={product.min_price_fcfa} prefix="Dès" />
+          <Price amount={product.min_price_fcfa} from />
         ) : (
           "Prix indisponible"
         )}
