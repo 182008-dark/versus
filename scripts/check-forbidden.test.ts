@@ -1,4 +1,5 @@
 // @vitest-environment node
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { findViolations, isHexAllowed, scanRepository } from "./check-forbidden.mjs";
 
@@ -121,5 +122,19 @@ describe("versions exactes dans package.json", () => {
 describe("dépôt réel", () => {
   it("ne contient aucun motif interdit", () => {
     expect(scanRepository()).toEqual([]);
+  });
+
+  // Critère de l'étape 3 : la liste blanche est éprouvée sur de vrais fichiers, qui contiennent
+  // bien des hexadécimaux (sinon le contrôle ne prouverait rien).
+  it.each([
+    "src/data/catalog.ts",
+    "src/lib/brand-themes.ts",
+    "src/app/opengraph-image.tsx",
+    "src/app/icon.svg",
+  ])("accepte les hexadécimaux du vrai fichier %s", (path) => {
+    const content = readFileSync(path, "utf8");
+    expect(content).toMatch(/#[0-9a-f]{6}(?![0-9a-f])/i);
+    expect(isHexAllowed(path)).toBe(true);
+    expect(findViolations(path, content)).toEqual([]);
   });
 });

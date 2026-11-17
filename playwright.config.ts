@@ -3,7 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 // Date du jour figée pour les tests (badge « Nouveau », §7.1 du plan).
 process.env.VS_TODAY ??= "2026-11-12";
 
-const PORT = 3000;
+// Port configurable (PLAYWRIGHT_PORT) : utile quand 3000 est déjà pris en local.
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3000);
 const baseURL = `http://localhost:${PORT}`;
 
 export default defineConfig({
@@ -24,6 +25,6 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 300_000,
-    env: { VS_TODAY: process.env.VS_TODAY },
+    env: { VS_TODAY: process.env.VS_TODAY, PORT: String(PORT) },
   },
 });

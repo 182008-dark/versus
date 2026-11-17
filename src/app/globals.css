@@ -21,7 +21,7 @@
   --black: #000000;
   --gray-950: #1d1d1f;
   --gray-700: #424245;
-  --gray-600: #6e6e73;
+  --gray-600: #6d6d72;
   --gray-500: #86868b;
   --gray-400: #a1a1a6;
   --gray-300: #d2d2d7;
@@ -236,7 +236,7 @@
   padding-block: 76px;
 
   @media (min-width: 641px) {
-    padding-block: 110px;
+    padding-block: 100px;
   }
 }
 
@@ -323,6 +323,653 @@
     & a:hover {
       color: var(--accent-hover);
       text-decoration-thickness: 2px;
+    }
+  }
+}
+
+@layer components {
+  /* Hero (maquette : .hero, .slide, .s-*, .h-ctrl). Couleurs : variables --hero-* (brand-themes). */
+  .hero-carousel {
+    position: relative;
+    height: 820px;
+    overflow: hidden;
+    background: var(--ink-strong);
+    color: var(--hero-ink, var(--on-dark));
+    --focus-ring: var(--hero-ring);
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    visibility: hidden;
+    opacity: 0;
+    background: radial-gradient(
+      120% 100% at 75% 55%,
+      var(--hero-from) 0%,
+      var(--hero-via) var(--hero-via-stop),
+      var(--hero-to) var(--hero-to-stop)
+    );
+    color: var(--hero-ink);
+    --focus-ring: var(--hero-ring);
+  }
+
+  .hero-slide-active {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* Avant `load` : diapositives cachées non affichées, leurs images paresseuses attendent. */
+  .hero-carousel[data-deferred] .hero-slide:not(.hero-slide-active) {
+    display: none;
+  }
+
+  .hero-slide-inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    height: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    padding-top: 40px;
+    text-align: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    margin-bottom: 18px;
+    color: var(--hero-muted);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: var(--text-hero);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .hero-sub {
+    max-width: 480px;
+    margin: 22px auto 0;
+    color: var(--hero-muted);
+    font-size: var(--text-sub);
+    line-height: 1.45;
+  }
+
+  .hero-price {
+    margin-top: 18px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .hero-art {
+    position: relative;
+    display: flex;
+    height: 300px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-halo,
+  .hero-ring {
+    position: absolute;
+    border-radius: 50%;
+  }
+
+  .hero-halo {
+    width: 300px;
+    height: 300px;
+    background: var(--hero-halo);
+    opacity: 0.55;
+    filter: blur(60px);
+  }
+
+  .hero-ring {
+    width: 320px;
+    height: 320px;
+    border: 1px dashed color-mix(in srgb, var(--hero-ink) 18%, transparent);
+  }
+
+  .hero-art-in,
+  .hero-float {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-controls {
+    position: absolute;
+    z-index: 5;
+    right: 0;
+    bottom: 28px;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .hero-button {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--hero-control);
+    color: var(--hero-ink);
+    backdrop-filter: blur(10px);
+    transition: background-color 0.2s;
+  }
+
+  @media (hover: hover) {
+    .hero-button:hover {
+      background: var(--hero-control-hover);
+    }
+  }
+
+  .hero-dot {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+  }
+
+  .hero-dot-active {
+    width: 76px;
+  }
+
+  .hero-dot-track {
+    display: block;
+    width: 32px;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--hero-track);
+    transition: width 0.4s;
+  }
+
+  .hero-dot-active .hero-dot-track {
+    width: 64px;
+  }
+
+  /* Barre de progression : vide au repos, pleine sous mouvement réduit (point actif visible). */
+  .hero-dot-fill {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--hero-fill);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  @media (min-width: 901px) {
+    .hero-carousel {
+      height: 680px;
+    }
+
+    .hero-slide-inner {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 32px;
+      padding-top: 0;
+      text-align: left;
+    }
+
+    .hero-sub {
+      margin-inline: 0;
+    }
+
+    .hero-cta {
+      justify-content: flex-start;
+    }
+
+    .hero-art {
+      height: 540px;
+    }
+
+    .hero-halo {
+      width: 520px;
+      height: 520px;
+    }
+
+    .hero-ring {
+      width: 560px;
+      height: 560px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-dot-active .hero-dot-fill {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-slide {
+      transition:
+        opacity 1s ease,
+        visibility 1s;
+    }
+
+    /* Une seule horloge : la barre du point actif ; sa fin fait avancer le carrousel. */
+    .hero-carousel[data-autoplay] .hero-dot-active .hero-dot-fill {
+      animation: fill var(--hero-interval) linear forwards;
+    }
+
+    /* Plus spécifique que la règle ci-dessus : le raccourci `animation` remettrait l'état à
+       « running ». La barre est figée, jamais remise à zéro (pause synchronisée). */
+    .hero-carousel[data-autoplay][data-paused] .hero-dot-active .hero-dot-fill,
+    .hero-carousel[data-stopped] :is(.hero-halo, .hero-ring, .hero-float) {
+      animation-play-state: paused;
+    }
+
+    .hero-halo {
+      animation: glow 8s ease-in-out infinite;
+    }
+
+    .hero-ring {
+      animation: spin 60s linear infinite;
+    }
+
+    .hero-float {
+      animation: float 7s ease-in-out infinite;
+    }
+
+    /* Entrées rejouées au changement de diapositive, jamais au chargement (LCP). */
+    .hero-carousel[data-changed] .hero-slide-active .hero-art-in {
+      animation: art-in 1.3s var(--ease-out) both;
+    }
+
+    .hero-carousel[data-changed] .hero-slide-active .hero-text > * {
+      opacity: 0;
+      animation: up 0.9s var(--ease-out) both;
+    }
+
+    .hero-carousel[data-changed] .hero-slide-active .hero-text > :nth-child(2) {
+      animation-delay: 0.12s;
+    }
+
+    .hero-carousel[data-changed] .hero-slide-active .hero-text > :nth-child(3) {
+      animation-delay: 0.24s;
+    }
+
+    .hero-carousel[data-changed] .hero-slide-active .hero-text > :nth-child(4) {
+      animation-delay: 0.36s;
+    }
+
+    .hero-carousel[data-changed] .hero-slide-active .hero-text > :nth-child(5) {
+      animation-delay: 0.48s;
+    }
+  }
+
+  /* Catégories (maquette : .cats, .cat, .cat-ico) */
+  .category-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    padding: 44px 24px 8px;
+  }
+
+  .category-link {
+    display: flex;
+    min-width: 96px;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .category-icon {
+    display: grid;
+    width: 68px;
+    height: 68px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface);
+    transition:
+      transform 0.4s var(--ease-out),
+      background-color 0.3s;
+  }
+
+  .category-link:is(:hover, :focus-visible) .category-icon {
+    transform: translateY(-6px) scale(1.05);
+    background: var(--surface-hover);
+  }
+
+  /* Tuiles (maquette : .tiles, .tile, .grid2). Hauteurs réduites : écart E20 (plafond 6 000 px). */
+  .promo-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .promo-tile {
+    position: relative;
+    display: flex;
+    min-height: 520px;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    border-radius: var(--radius-tile);
+    padding: 44px 24px 0;
+    background: var(--tile-bg);
+    color: var(--tile-ink);
+    text-align: center;
+  }
+
+  .promo-tile-eyebrow {
+    margin-bottom: 10px;
+    color: var(--tile-eyebrow);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .promo-tile .promo-tile-copy > :first-child:not(.promo-tile-eyebrow) {
+    margin-bottom: 10px;
+  }
+
+  .promo-tile-title {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+
+  .promo-tile-sub {
+    max-width: 380px;
+    margin: 12px auto 0;
+    color: var(--tile-sub);
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .promo-tile-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .promo-learn {
+    display: inline-flex;
+    height: 44px;
+    align-items: center;
+    gap: 6px;
+    padding-inline: 12px;
+    color: var(--tile-link);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .promo-tile-art {
+    display: flex;
+    width: 100%;
+    max-width: 640px;
+    height: 280px;
+    flex: 1 0 280px;
+    align-items: flex-end;
+    justify-content: center;
+    margin-top: 20px;
+    transition: transform 1s var(--ease-out);
+  }
+
+  /* Cartes de marque (maquette : .brands, .brand) */
+  /* Maquette : #marques n'a qu'une marge basse (la section Nouveautés la précède). */
+  .brand-section {
+    padding-bottom: 76px;
+  }
+
+  .brand-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    padding-inline: 12px;
+  }
+
+  .brand-card {
+    position: relative;
+    display: flex;
+    min-height: 520px;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: var(--radius-tile);
+    padding: 44px 36px;
+    background: var(--card-bg);
+    color: var(--card-ink);
+    text-decoration: none;
+    transition: transform 0.5s var(--ease-out);
+  }
+
+  .brand-card h3 {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .brand-card p {
+    position: relative;
+    z-index: 1;
+    max-width: 300px;
+    margin-top: 14px;
+    color: var(--card-sub);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .brand-card-go {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    color: var(--card-link);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .brand-card-art {
+    position: absolute;
+    right: -20px;
+    bottom: -30px;
+    width: 260px;
+    height: 340px;
+    transition: transform 0.8s var(--ease-out);
+  }
+
+  /* Comparateur d'accueil (maquette : .cmp-box, .cmp-row, .cmp-*) */
+  .compare-box {
+    overflow-x: auto;
+    border-radius: var(--radius-box);
+    background: var(--bg);
+    padding: 8px;
+  }
+
+  .compare-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    text-align: left;
+  }
+
+  .compare-table th,
+  .compare-table td {
+    border-bottom: 1px solid var(--line-soft);
+    padding: 20px 24px;
+    vertical-align: middle;
+  }
+
+  .compare-table tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .compare-table .compare-row-label {
+    position: sticky;
+    left: 0;
+    width: 22%;
+    background: var(--bg);
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .compare-product {
+    font-weight: 400;
+  }
+
+  .compare-art {
+    display: flex;
+    height: 130px;
+    margin-bottom: 10px;
+  }
+
+  .compare-brand {
+    display: block;
+    color: var(--compare-brand);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .compare-name {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .compare-table tbody td {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .compare-table tbody td.compare-price {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .compare-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--accent);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (hover: hover) {
+    .promo-tile:hover .promo-tile-art {
+      transform: scale(1.05) translateY(-8px);
+    }
+
+    .brand-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .brand-card:hover .brand-card-art {
+      transform: translate(-10px, -14px) rotate(-6deg) scale(1.05);
+    }
+  }
+
+  @media (min-width: 641px) {
+    .category-nav {
+      gap: 28px;
+    }
+
+    .category-icon {
+      width: 92px;
+      height: 92px;
+    }
+
+    .promo-tile-art {
+      height: 240px;
+      flex-basis: 240px;
+    }
+
+    .brand-section {
+      padding-bottom: 110px;
+    }
+  }
+
+  @media (min-width: 901px) {
+    .promo-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .promo-tile {
+      min-height: 460px;
+      padding-top: 46px;
+    }
+
+    .promo-tile-featured {
+      grid-column: 1 / -1;
+      min-height: 520px;
+    }
+
+    .promo-tile-featured .promo-tile-title {
+      font-size: var(--text-tile);
+    }
+
+    .promo-tile-featured .promo-tile-sub {
+      max-width: none;
+      font-size: 22px;
+    }
+
+    .promo-tile-featured .promo-tile-art {
+      height: 280px;
+      flex-basis: 280px;
+    }
+
+    .promo-tile-sub {
+      max-width: 540px;
+    }
+  }
+
+  @media (min-width: 1025px) {
+    .brand-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    /* La maquette laisse le visuel recouvrir le texte : on le réduit sous l'accroche. */
+    .brand-card-art {
+      width: 190px;
+      height: 250px;
+    }
+
+    .brand-card p {
+      max-width: 220px;
     }
   }
 }

@@ -2,13 +2,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Gabarit global de l'étape 2 : landmarks, menu mobile au clavier, absence de défilement
+ * Gabarit global : landmarks, menu mobile au clavier, absence de défilement
  * horizontal à 375 px, accessibilité de /mentions-legales et /styleguide.
  */
 
 /** Pages livrées à l'étape 2 (le styleguide est visible sous next start, sans VERCEL_ENV). */
 const PAGES = [
   "/",
+  "/boutique",
+  "/produit/iphone-18-pro",
   "/mentions-legales",
   "/credits",
   "/confidentialite",
@@ -64,8 +66,8 @@ test.describe("landmarks", () => {
   });
 });
 
-test.describe("en-tête de l'étape 2", () => {
-  test("les icônes et la navigation dont la route n'est pas livrée sont absentes du DOM", async ({
+test.describe("en-tête de l'étape 3", () => {
+  test("les icônes non livrées sont absentes et la navigation mène à la boutique", async ({
     page,
   }) => {
     await page.goto("/");
@@ -74,9 +76,15 @@ test.describe("en-tête de l'étape 2", () => {
       await expect(header.getByRole("link", { name })).toHaveCount(0);
       await expect(header.getByRole("button", { name })).toHaveCount(0);
     }
-    for (const name of ["Apple", "Samsung", "Xiaomi", "Smartphones", "Comparer"]) {
-      await expect(page.getByRole("link", { name, exact: true })).toHaveCount(0);
-    }
+    await expect(header.getByRole("link", { name: "Smartphones" })).toHaveAttribute(
+      "href",
+      "/boutique#smartphones",
+    );
+    // routeFor("comparerAccueil") : la section de l'accueil, jusqu'à /comparer (étape 5).
+    await expect(page.getByRole("link", { name: "Comparer", exact: true })).toHaveAttribute(
+      "href",
+      "/#comparer",
+    );
     await expect(page.locator('a[href="#"]')).toHaveCount(0);
   });
 

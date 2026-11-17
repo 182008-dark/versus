@@ -6,16 +6,15 @@
  * pour une route prévue mais pas encore livrée : le lien est alors retiré du DOM.
  */
 
+import { notice } from "./notice";
+
 export const site = {
   name: "VERSUS",
   tagline: "Apple, Samsung et Xiaomi réunis dans une seule boutique.",
   description:
     "VERSUS, boutique fictive de smartphones, écouteurs et montres Apple, Samsung et Xiaomi pour le Togo. Projet pédagogique : aucune vente réelle, prix indicatifs en FCFA.",
   locale: "fr_FR",
-  notice: {
-    lead: "Projet pédagogique",
-    rest: "Site fictif, aucune vente réelle · Prix indicatifs en FCFA",
-  },
+  notice,
   /** Année écrite en dur : lire la date pendant le rendu empêcherait le prérendu statique. */
   copyrightYear: 2026,
   legal:
@@ -28,14 +27,20 @@ export const site = {
 const plannedRoutes = {
   accueil: "/",
   boutique: "/boutique",
+  produit: "/produit",
   marqueApple: "/marques/apple",
   marqueSamsung: "/marques/samsung",
   marqueXiaomi: "/marques/xiaomi",
-  smartphones: "/boutique/smartphones",
-  ecouteurs: "/boutique/ecouteurs",
-  montres: "/boutique/montres",
+  smartphones: "/boutique#smartphones",
+  ecouteurs: "/boutique#ecouteurs",
+  montres: "/boutique#montres",
+  bracelets: "/boutique#bracelets",
   comparer: "/comparer",
+  /** Section « comparer » de l'accueil : cible de « Comparer » tant que /comparer n'existe pas. */
+  comparerAccueil: "/#comparer",
   aideAuChoix: "/aide-au-choix",
+  /** Section « aide au choix » de l'accueil (QuizTeaser), affichée avec /aide-au-choix (étape 5). */
+  aideAccueil: "/#aide",
   recherche: "/recherche",
   panier: "/panier",
   suivi: "/suivi",
@@ -54,9 +59,16 @@ const plannedRoutes = {
 
 export type RouteKey = keyof typeof plannedRoutes;
 
-/** Routes livrées à ce jour (étape 2). À compléter à chaque étape. */
+/** Routes livrées à ce jour (étape 3). À compléter à chaque étape. */
 const deliveredRoutes: ReadonlySet<RouteKey> = new Set<RouteKey>([
   "accueil",
+  "boutique",
+  "produit",
+  "smartphones",
+  "ecouteurs",
+  "montres",
+  "bracelets",
+  "comparerAccueil",
   "mentionsLegales",
   "credits",
   "confidentialite",
@@ -68,6 +80,24 @@ const deliveredRoutes: ReadonlySet<RouteKey> = new Set<RouteKey>([
 /** Chemin de la route si elle est livrée, sinon `null` (le lien doit alors être masqué). */
 export function routeFor(key: RouteKey): string | null {
   return deliveredRoutes.has(key) ? plannedRoutes[key] : null;
+}
+
+/** Toutes les clés de route prévues, livrées ou non. */
+export const routeKeys = Object.keys(plannedRoutes) as RouteKey[];
+
+/**
+ * Chemin prévu d'une route, même non livrée : réservé aux tests, qui vérifient qu'aucun lien ni
+ * formulaire ne vise une route non livrée. Ne jamais en faire un lien (utiliser `routeFor`).
+ */
+export function plannedPathFor(key: RouteKey): string {
+  return plannedRoutes[key];
+}
+
+/** URL d'une fiche produit dont la route dynamique est livrée. */
+export function productHref(slug: string): string {
+  const route = routeFor("produit");
+  if (!route) throw new Error("La route des fiches produit n'est pas livrée.");
+  return `${route}/${encodeURIComponent(slug)}`;
 }
 
 export type LinkSpec = { label: string; route: RouteKey };
@@ -92,9 +122,9 @@ export function deliveredGroups(groups: ReadonlyArray<GroupSpec>): NavGroup[] {
 }
 
 const brandLinks = [
-  { label: "Apple", route: "marqueApple" },
-  { label: "Samsung", route: "marqueSamsung" },
-  { label: "Xiaomi", route: "marqueXiaomi" },
+  { label: "Apple", route: "boutique" },
+  { label: "Samsung", route: "boutique" },
+  { label: "Xiaomi", route: "boutique" },
 ] as const satisfies ReadonlyArray<LinkSpec>;
 
 const helpLinks = [
@@ -104,7 +134,7 @@ const helpLinks = [
   { label: "Contact", route: "contact" },
 ] as const satisfies ReadonlyArray<LinkSpec>;
 
-/** Navigation principale de la maquette : marques | catégories | outils. */
+/** Navigation livrée; les routes à venir sont redirigées vers la boutique existante. */
 const mainNavSpec: ReadonlyArray<GroupSpec> = [
   { label: "Marques", links: brandLinks },
   {
@@ -113,6 +143,7 @@ const mainNavSpec: ReadonlyArray<GroupSpec> = [
       { label: "Smartphones", route: "smartphones" },
       { label: "Écouteurs", route: "ecouteurs" },
       { label: "Montres", route: "montres" },
+      { label: "Bracelets", route: "bracelets" },
     ],
   },
   {

@@ -10,6 +10,7 @@ import { ColorsSection } from "./_components/ColorsSection";
 import { LayoutSection } from "./_components/LayoutSection";
 import { LinksBadgesSection } from "./_components/LinksBadgesSection";
 import { TypographySection } from "./_components/TypographySection";
+import { CatalogSection } from "./_components/CatalogSection";
 
 export const metadata: Metadata = {
   title: "Design system",
@@ -22,6 +23,7 @@ const sections = [
   { id: "boutons", label: "Boutons" },
   { id: "liens-badges", label: "Liens et badges" },
   { id: "gabarit", label: "Gabarit et marques" },
+  { id: "catalogue", label: "Catalogue" },
 ];
 
 /**
@@ -64,6 +66,7 @@ export default function StyleguidePage() {
         <ButtonsSection />
         <LinksBadgesSection />
         <LayoutSection />
+        <CatalogSection />
       </main>
       <SiteFooter />
     </>

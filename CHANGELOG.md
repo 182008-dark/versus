@@ -5,6 +5,50 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+Étape 3 : accueil fidèle, données locales typées, fiche et boutique minimales (branche
+`etape-3-accueil`, future `v0.3.0`).
+
+### Ajouté
+
+- Catalogue local typé : `src/data/catalog.ts` (9 produits, variantes, specs, images,
+  `home_slots`), `lib/catalog/` (`types.ts` calqué sur la vue `catalog_products` avec les colonnes
+  nullables, `CatalogRepository` et sa version statique, `queries.ts` en cache, `isNew`,
+  `getToday` qui expire à minuit à Lomé, `VS_TODAY` hors production).
+- Accueil complet dans l'ordre du §4.5 : hero (`HeroCarousel` serveur, îlot `HeroRotator`,
+  `CarouselControls`, `HeroSlide`), `CategoryNav`, `PromoTile` × 5, Nouveautés (`PillGroup` et
+  `ProductRail`), `BrandCard` × 3, `CompareShowcase` (onglets de famille, six lignes clés de
+  `lib/compare/rows.ts`), `FeatureGrid` ; `QuizTeaser` prêt et masqué jusqu'à l'étape 5.
+- Carrousel accessible (modèle APG) : une seule horloge (fin de l'animation de la barre), pause au
+  survol à la souris, au focus et onglet caché, bouton lecture/pause (WCAG 2.2.2), flèches du
+  clavier, diapositives `group` « n sur 3 », région `aria-live` à l'arrêt, aucun défilement sous
+  mouvement réduit.
+- Fiche `/produit/[slug]` (accroche, coloris et prix, caractéristiques, garantie, mention
+  « Prix indicatifs ») et `/boutique` groupée par catégorie ; 404 dès la première visite d'un slug
+  inconnu (`ensureStatic = "navigation"`).
+- `src/app/icon.svg` et `src/app/opengraph-image.tsx` (monogramme V/S, mention du caractère fictif).
+- Tests : composants `CarouselControls`, `HeroRotator`, `ProductRail` ; e2e `carrousel.spec.ts`
+  (pauses, synchronisation, clavier, tactile, mouvement réduit), `hydratation.spec.ts`, éléments
+  masqués de la table de l'étape 3, rail au clavier, répétition des visuels à l'état initial,
+  régression visuelle `toHaveScreenshot` à 1440 et 390 px (références Windows), contrastes du hero.
+- Audits : `docs/audits/lighthouse-etape-3.md` (rapport HTML et JSON), `budget.md`, `visuel.md` ;
+  captures section par section (`npm run capture:accueil`).
+
+### Modifié
+
+- Budget JavaScript ramené au seuil du plan, 150 Ko (le relèvement à 180 Ko n'était pas validé) :
+  pages d'erreur sans `Button` ni `next/link`, menu mobile rendu par le serveur autour d'un îlot
+  minimal, visuels par `getImageProps()` sans composant client `<Image>`. Le test compte aussi le
+  document HTML dans le poids total.
+- Largeurs d'images réduites aux tailles utiles (`deviceSizes`, `imageSizes`).
+- `PLAYWRIGHT_PORT` permet de lancer les e2e sur un autre port que 3000.
+- Registre des écarts : statuts D5, captures avant/après par section, écarts E20 à E24.
+
+### Connu
+
+- Lighthouse mobile : LCP simulé de 3,2 s pour un seuil de 2,5 s (les quatre autres seuils sont
+  tenus) ; cause et mesures dans `docs/audits/lighthouse-etape-3.md`, décision à prendre.
+- Écarts E5, E6, E12 à E15 et E20 à E22 au statut « proposé », à faire valider.
+
 ## [0.2.0] : étape 2, design system et gabarit global (2026-11-13)
 
 Production : <https://versus-ecru.vercel.app> (PR #1).

@@ -9,6 +9,7 @@
  *   CSS par `[data-brand="…"]` dans `globals.css` (un test vérifie qu'elles sont identiques).
  * - `heroThemes` : dégradés et couleurs des diapositives du hero, injectés en variables inline
  *   (`style={{ "--hero-from": … }}`) par HeroSlide (étape 3).
+ * - `tileThemes`, `brandCardThemes` : couleurs des tuiles et des cartes de marque de la maquette.
  * - `fallbackVisuals` : couleurs du SVG de secours de ProductVisual (repris de Device.dc.html).
  */
 
@@ -40,15 +41,25 @@ export const brandThemes: Record<Brand, BrandTheme> = {
 };
 
 export type HeroTheme = {
-  /** Dégradé radial du fond : centre, milieu, bord. */
+  /** Dégradé radial du fond : centre, milieu, bord, et position des deux derniers arrêts. */
   from: string;
   via: string;
   to: string;
+  viaStop: string;
+  toStop: string;
   /** Texte principal et texte secondaire. */
   ink: string;
   muted: string;
   /** Halo lumineux derrière le produit. */
   halo: string;
+  /** Anneau de focus, contrasté (≥ 3:1) sur tout le dégradé. */
+  ring: string;
+  /** Pastilles rondes des commandes (maquette : `.h-btn`, `.dark-ctrl .h-btn`). */
+  control: string;
+  controlHover: string;
+  /** Piste des points (≥ 3:1 sur le fond, WCAG 1.4.11) et barre de progression. */
+  track: string;
+  fill: string;
   /** Fond sombre (boutons clairs, contrôles clairs) ou clair (boutons sombres). */
   tone: "dark" | "light";
 };
@@ -59,27 +70,48 @@ export const heroThemes: Record<Brand, HeroTheme> = {
     from: "#4A1420",
     via: "#120507",
     to: "#000000",
+    viaStop: "45%",
+    toStop: "75%",
     ink: "#F5F5F7",
     muted: "#C7C7CC",
     halo: "#8E2A3E",
+    ring: "#3DDC97",
+    control: "rgb(255 255 255 / 0.16)",
+    controlHover: "rgb(255 255 255 / 0.3)",
+    track: "rgb(255 255 255 / 0.7)",
+    fill: "#FFFFFF",
     tone: "dark",
   },
   samsung: {
     from: "#2F55FF",
     via: "#1428A0",
     to: "#07103F",
+    viaStop: "45%",
+    toStop: "85%",
     ink: "#FFFFFF",
     muted: "#D6DDFF",
     halo: "#6F8BFF",
+    ring: "#3DDC97",
+    control: "rgb(255 255 255 / 0.16)",
+    controlHover: "rgb(255 255 255 / 0.3)",
+    track: "rgb(255 255 255 / 0.7)",
+    fill: "#FFFFFF",
     tone: "dark",
   },
   xiaomi: {
     from: "#FFB27A",
     via: "#FF7A1A",
     to: "#F25C00",
+    viaStop: "40%",
+    toStop: "85%",
     ink: "#1D1D1F",
     muted: "#3A1A00",
     halo: "#FFE2C7",
+    ring: "#1D1D1F",
+    control: "rgb(0 0 0 / 0.1)",
+    controlHover: "rgb(0 0 0 / 0.18)",
+    track: "rgb(29 29 31 / 0.7)",
+    fill: "#1D1D1F",
     tone: "light",
   },
 };
@@ -91,9 +123,132 @@ export function heroStyle(brand: Brand): Record<`--hero-${string}`, string> {
     "--hero-from": t.from,
     "--hero-via": t.via,
     "--hero-to": t.to,
+    "--hero-via-stop": t.viaStop,
+    "--hero-to-stop": t.toStop,
     "--hero-ink": t.ink,
     "--hero-muted": t.muted,
     "--hero-halo": t.halo,
+    "--hero-ring": t.ring,
+    "--hero-control": t.control,
+    "--hero-control-hover": t.controlHover,
+    "--hero-track": t.track,
+    "--hero-fill": t.fill,
+  };
+}
+
+/**
+ * Thèmes des tuiles promotionnelles (maquette : style en ligne de chaque `.tile`), désignés par
+ * `home_slots.theme_key`. `eyebrow` : libellé de gamme affiché quand le produit n'est pas nouveau.
+ */
+export type TileTheme = {
+  background: string;
+  ink: string;
+  sub: string;
+  eyebrow: string;
+  eyebrowInk: string;
+  /** Lien « En savoir plus ». */
+  link: string;
+  /** Bouton « Acheter » : variante de Button. */
+  button: "light" | "primary" | "brand";
+  tone: "dark" | "light";
+};
+
+export const tileThemes: Record<string, TileTheme> = {
+  "samsung-dark": {
+    background: "#000000",
+    ink: "#F5F5F7",
+    sub: "#A1A1A6",
+    eyebrow: "Samsung Galaxy",
+    eyebrowInk: "#8AB4FF",
+    link: "#3DDC97",
+    button: "light",
+    tone: "dark",
+  },
+  "apple-light": {
+    background: "#FBFBFD",
+    ink: "#1D1D1F",
+    sub: "#1D1D1F",
+    eyebrow: "Apple",
+    eyebrowInk: "#1D1D1F",
+    link: "#00805A",
+    button: "primary",
+    tone: "light",
+  },
+  "samsung-light": {
+    background: "#EEF1FB",
+    ink: "#0B1A57",
+    sub: "#3A4775",
+    eyebrow: "Samsung Galaxy",
+    eyebrowInk: "#1428A0",
+    link: "#1428A0",
+    button: "brand",
+    tone: "light",
+  },
+  "apple-night": {
+    background: "#111113",
+    ink: "#F5F5F7",
+    sub: "#A1A1A6",
+    eyebrow: "Apple",
+    eyebrowInk: "#F5F5F7",
+    link: "#3DDC97",
+    button: "light",
+    tone: "dark",
+  },
+  "xiaomi-light": {
+    background: "#FFF1E6",
+    ink: "#1D1D1F",
+    sub: "#5C3A20",
+    eyebrow: "Xiaomi",
+    eyebrowInk: "#A84300",
+    link: "#A84300",
+    button: "brand",
+    tone: "light",
+  },
+};
+
+/** Thème d'une tuile, ou celui de la marque du produit quand la clé est inconnue (`default`). */
+export function tileTheme(themeKey: string, brand: Brand): TileTheme {
+  return tileThemes[themeKey] ?? tileThemes[`${brand}-light`] ?? tileThemes["apple-light"]!;
+}
+
+/** Variables CSS inline d'une tuile. */
+export function tileStyle(theme: TileTheme): Record<`--tile-${string}`, string> {
+  return {
+    "--tile-bg": theme.background,
+    "--tile-ink": theme.ink,
+    "--tile-sub": theme.sub,
+    "--tile-eyebrow": theme.eyebrowInk,
+    "--tile-link": theme.link,
+  };
+}
+
+/**
+ * Cartes de marque (maquette : `.brand`) : fond, texte, accroche et « Découvrir », et le produit
+ * qui les illustre (écart E17 : un visuel propre à chaque univers).
+ */
+export const brandCardThemes: Record<
+  Brand,
+  { background: string; ink: string; sub: string; link: string; visual: string }
+> = {
+  apple: { background: "#000000", ink: "#F5F5F7", sub: "#A1A1A6", link: "#3DDC97", visual: "aw12" },
+  samsung: {
+    background: "#1428A0",
+    ink: "#FFFFFF",
+    sub: "#DDE3FF",
+    link: "#FFFFFF",
+    visual: "gb4",
+  },
+  xiaomi: { background: "#FF6900", ink: "#1D1D1F", sub: "#3A1A00", link: "#1D1D1F", visual: "rw6" },
+};
+
+/** Variables CSS inline d'une carte de marque. */
+export function brandCardStyle(brand: Brand): Record<`--card-${string}`, string> {
+  const t = brandCardThemes[brand];
+  return {
+    "--card-bg": t.background,
+    "--card-ink": t.ink,
+    "--card-sub": t.sub,
+    "--card-link": t.link,
   };
 }
 

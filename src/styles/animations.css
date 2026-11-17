@@ -11,7 +11,6 @@
 
 @keyframes up {
   from {
-    opacity: 0;
     translate: 0 40px;
   }
   to {
@@ -118,7 +117,6 @@
 @keyframes zoom {
   from {
     scale: 0.86;
-    opacity: 0.2;
   }
   to {
     scale: 1;
@@ -129,7 +127,6 @@
 @keyframes rise {
   from {
     translate: 0 120px;
-    opacity: 0;
   }
   to {
     translate: 0 0;
