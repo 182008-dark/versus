@@ -175,3 +175,71 @@ Règle : chaque primitive reportée est livrée **avec** sa section dans `/style
   les mêmes positions (logo à 100 px du bord à 1440 px).
 - `--muted` (`#6E6E73`) n'atteint que 4,49:1 sur le fond Samsung `#EEF1FB` : sur un fond de
   marque, le texte secondaire utilise `--brand-ink` (relevé par axe dans `/styleguide`).
+
+## Avenant 1 : refonte « évolution raffinée », lot 2 (17 novembre 2026)
+
+- **Statut** : accepté (direction validée dans `docs/plans/refonte.md`, lot 2 du §6)
+- **Branche** : `refonte-lot-2-fondations`
+
+### Pourquoi la refonte
+
+1. **L'interface ressemblait à apple.com.** Les gris de la maquette (`#1D1D1F`, `#F5F5F7`,
+   `#86868B`…) sont ceux d'Apple, comme ses titres très serrés (−0,05 em) et ses surtitres en
+   petites capitales espacées. Pour un site qui se veut l'**arbitre neutre** entre Apple, Samsung
+   et Xiaomi, c'était donner l'avantage à une marque.
+2. **Les couleurs de marque servaient d'actions et d'aplats** : bouton `brand` bleu Samsung ou
+   orange Xiaomi, cartes de marque saturées. Deux couleurs d'action se disputaient l'attention avec
+   le vert VERSUS.
+3. **Sept arrondis** (8 à 30 px) sans règle d'emboîtement : des écarts de 2 px invisibles, mais
+   des cartes, photos et encarts qui ne s'alignaient pas.
+4. **Un contraste limite** : le vert VERSUS ne fait que 4,53:1 sur la nouvelle surface grise et
+   4,32:1 sur le gris de survol ; un texte vert sur gris pouvait passer sous AA sans qu'aucun test
+   ne le voie (seules 18 paires étaient vérifiées).
+5. **Des prix secondaires** : « À partir de » ou « Dès », en 14 à 15 px, plus petits que le texte
+   autour, alors que le prix est l'information principale après le nom.
+
+### Décisions
+
+- **Gris « pierre » légèrement verdis** (`--gray-950` `#1A1D1B` à `--gray-25` `#FAFBFA`, nuit
+  `#0B0D0C` / `#141715`) : ils s'accordent au vert VERSUS au lieu de reprendre ceux d'Apple. Les
+  **noms** des tokens sont gardés : seules les valeurs changent. Nouveau `--gray-450` (`#8A9089`)
+  pour le contour des contrôles.
+- **Une seule couleur d'action, le vert VERSUS**, y compris sur fond sombre. `Button` passe à
+  trois variantes (`primary`, `secondary`, `onDark`) ; `dark`, `light`, `brand` et `outline`
+  restent des **alias temporaires** pour ne casser aucune page avant leur refonte (lots 3 à 5).
+- **Nouveaux rôles** : `--accent-ink` (`#006B4B`) pour tout texte vert sur gris clair,
+  `--badge-new-ink`, `--line-control`, `--price`, `--scrim`, `--outline-image`.
+- **Thèmes de marque discrets** : `--brand-ground` (pastel), `--brand-ink` (texte AA),
+  `--brand-mark` (pastille et filet de 3 px, décoratif, jamais seul). `--brand-acc` et
+  `--brand-on-acc` sont **retirés** : une couleur de marque ne sert jamais à une action.
+- **Trois arrondis** : 28 px (tuile), 20 px (carte), 12 px (contrôle), plus `rounded-full`, avec la
+  règle d'emboîtement 12 + 8 = 20. Les cinq anciens noms sont des alias de même valeur (testés).
+- **Typographie** : polices inchangées (pas de nouvel ADR de police), titres moins serrés
+  (−0,03 / −0,025 em) et équilibrés, hero ramené de 88 à 76 px, nouveau `text-display-brand` ;
+  plus de petites capitales (le surtitre devient la pastille de marque `BrandMark`).
+- **Mouvement et espacements** : durées 150 / 220 / 400 ms, plus de rebond (`--ease-bounce`
+  retirée), plus d'agrandissement des boutons au survol ; un seul espacement de section (64 /
+  96 px) et une gouttière de 16 / 24 px.
+- **Composants** : `Price` (« Dès 970 000 FCFA », espaces insécables, chiffres alignés),
+  `Badge` (casse normale, « Épuisé » gris), `BrandMark`, `VsMark` (médaillon « VS » de 44 px,
+  signature de VERSUS, masqué aux lecteurs d'écran) ; formats `formatFCFAParts`, `formatSpec`,
+  `categoryLabel`.
+- **Contrastes verrouillés** : `contrastPairs` liste désormais toutes les paires texte / fond
+  employées (37) et un test échoue si une classe `text-<rôle>` de `src/` n'a pas de paire mesurée.
+
+### Écart relevé
+
+`--gray-450` (valeur exacte du plan) fait 3,26:1 sur blanc mais **2,98:1 sur `--surface`**, un
+centième sous le seuil de 3:1 du critère 1.4.11. Parade retenue : `--line-control` ne se pose que
+sur un fond blanc ou `--surface-2` ; une pastille posée sur la surface grise (onglets du
+comparateur) garde un fond blanc, son contour reste à 3,26:1 contre ce fond. À revoir au lot 4 si
+le comparateur garde son fond gris : foncer `--gray-450` d'un cran (par exemple `#858B84`) réglerait
+le cas sans toucher au reste.
+
+### Conséquences
+
+- Toutes les pages changent de teinte sans changer de structure ; les références de régression
+  visuelle de l'accueil sont régénérées (`docs/audits/visuel.md`).
+- Les alias (variantes de bouton, arrondis, `eyebrow`, ton `accent` de `Badge`) disparaîtront une
+  fois l'accueil, les pages marque et la fiche refaits (lot 6 au plus tard).
+- Aucune nouvelle dépendance.
