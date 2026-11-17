@@ -18,12 +18,14 @@ export type CompareRow = {
 };
 
 const decimal = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
+/** Diagonale d’écran : deux décimales, comme les fiches officielles (6,83 pouces). */
+const inches = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 2 });
 const COMPAT_LABELS = { ios: "iPhone (iOS)", android: "Android" } as const;
 
 function autonomy(hours: number | undefined) {
   if (hours === undefined) return null;
   // Affichée en jours au-delà de 72 h (§5.4).
-  return hours > 72 ? `${Math.round(hours / 24)} jours` : `${hours} h`;
+  return hours > 72 ? `${Math.round(hours / 24)} jours` : `${decimal.format(hours)} h`;
 }
 
 /** Capacité de stockage : en To à partir de 1 024 Go (`1024` → « 1 To »). */
@@ -52,7 +54,7 @@ const rows = {
     label: "Écran",
     format: (p) =>
       [
-        p.specs.screen_size_in ? `${decimal.format(p.specs.screen_size_in)} pouces` : null,
+        p.specs.screen_size_in ? `${inches.format(p.specs.screen_size_in)} pouces` : null,
         p.specs.screen_tech,
       ]
         .filter(Boolean)

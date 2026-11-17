@@ -24,6 +24,9 @@ describe("lignes du comparateur", () => {
   it("formate les décimales et la compatibilité en français", () => {
     const screen = compareRows.phones.find((row) => row.key === "screen");
     expect(screen?.format(product("ip18"))).toBe("6,3 pouces OLED");
+    expect(screen?.format(product("rn15"))).toBe("6,83 pouces AMOLED");
+    const autonomy = compareRows.audio.find((row) => row.key === "autonomy");
+    expect(autonomy?.format(product("xb6"))).toBe("3,5 h");
     expect(formatCompat(["ios", "android"])).toBe("iPhone (iOS) · Android");
   });
 
