@@ -6,7 +6,7 @@ import { ProductRail, type RailItem } from "./ProductRail";
 const items: RailItem[] = [
   { key: "ip18", brand: "apple", card: <p>iPhone 18 Pro</p> },
   { key: "a57", brand: "samsung", card: <p>Galaxy A57</p> },
-  { key: "gb4", brand: "samsung", card: <p>Galaxy Buds 4</p> },
+  { key: "gb4", brand: "samsung", card: <p>Galaxy Buds4</p> },
 ];
 const filters = [
   { value: "all", label: "Toutes" },

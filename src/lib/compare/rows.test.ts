@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { products } from "@/data/catalog";
-import { compareRows, formatCompat, homeRows } from "./rows";
+import { compareRows, formatCompat, formatStorage, homeRows } from "./rows";
 
 const product = (code: string) => {
   const found = products.find((p) => p.code === code);
@@ -32,5 +32,12 @@ describe("lignes du comparateur", () => {
     expect(autonomy?.format(product("rw6"))).toBe("24 jours");
     const storage = compareRows.phones.find((row) => row.key === "storage");
     expect(storage?.format(product("ip18"))).toBe("256 Go · 512 Go");
+    expect(storage?.format(product("ipd"))).toBe("256 Go · 512 Go · 1 To · 2 To");
+  });
+
+  it("exprime les capacités d'au moins 1 024 Go en To", () => {
+    expect(formatStorage(512)).toBe("512 Go");
+    expect(formatStorage(1024)).toBe("1 To");
+    expect(formatStorage(2048)).toBe("2 To");
   });
 });

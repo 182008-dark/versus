@@ -6,7 +6,7 @@ import { expect, test } from "@playwright/test";
  * temps que l'hydratation et les îlots client (carrousel, rail, menu) aient tourné.
  * En production, React signale un écart d'hydratation par une erreur minifiée (#418, #423, #425).
  */
-const PAGES = ["/", "/boutique", "/produit/iphone-18-pro", "/produit/galaxy-buds-4"];
+const PAGES = ["/", "/boutique", "/produit/iphone-18-pro", "/produit/galaxy-buds4"];
 const HYDRATION = /hydrat|did not match|server rendered|#418|#423|#425/i;
 
 for (const path of PAGES) {

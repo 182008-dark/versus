@@ -26,6 +26,11 @@ function autonomy(hours: number | undefined) {
   return hours > 72 ? `${Math.round(hours / 24)} jours` : `${hours} h`;
 }
 
+/** Capacité de stockage : en To à partir de 1 024 Go (`1024` → « 1 To »). */
+export function formatStorage(gb: number) {
+  return gb >= 1024 && gb % 1024 === 0 ? `${gb / 1024} To` : `${gb} Go`;
+}
+
 function yesNo(value: boolean | undefined) {
   return value === undefined ? null : value ? "Oui" : "Non";
 }
@@ -75,7 +80,7 @@ const rows = {
       return sizes.length
         ? sizes
             .sort((a, b) => a - b)
-            .map((gb) => `${gb} Go`)
+            .map(formatStorage)
             .join(" · ")
         : null;
     },
