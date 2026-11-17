@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CATEGORIES } from "@/lib/catalog/types";
 import { brands, categories, homeSlots, products } from "./catalog";
+import { productVisualSources } from "./product-visuals";
 
 /** Largeur et hauteur lues dans l'en-tête IHDR d'un PNG (octets 16 à 23). */
 function pngSize(file: string) {
@@ -64,6 +65,19 @@ describe("catalogue de démonstration", () => {
         900,
       );
       expect(product.image_alt?.length, product.code).toBeGreaterThan(0);
+    }
+  });
+
+  it("crédite chaque visuel dans SOURCES.md et sur la page /credits", () => {
+    const sources = readFileSync(join(process.cwd(), "public/products/SOURCES.md"), "utf8");
+    expect(productVisualSources.map((visual) => visual.code).toSorted()).toEqual(
+      products.map((product) => product.code).toSorted(),
+    );
+    for (const product of products) {
+      expect(sources, product.code).toContain(`| ${product.code}.png |`);
+      expect(productVisualSources.find((visual) => visual.code === product.code)?.brand).toBe(
+        product.brand_slug,
+      );
     }
   });
 
