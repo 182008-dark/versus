@@ -22,9 +22,7 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       className="flex h-full min-h-[470px] w-full min-w-0 flex-col rounded-card bg-brand-ground p-6 transition-[translate,box-shadow] duration-500 ease-out state-hover:-translate-y-2 state-hover:shadow-card"
     >
       <div className="flex min-h-6 items-center justify-between gap-2">
-        <span className="text-xs font-bold tracking-[0.1em] text-brand-ink uppercase">
-          {product.brand_name}
-        </span>
+        <span className="text-meta text-brand-ink">{product.brand_name}</span>
         {product.is_new ? <NewBadge /> : null}
       </div>
       <ProductVisual

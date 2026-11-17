@@ -3,7 +3,14 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { primitives, tokenHex } from "@/data/design-tokens";
-import { BRANDS, brandThemes, fallbackAccent, heroStyle, heroThemes } from "./brand-themes";
+import {
+  BRANDS,
+  brandThemes,
+  fallbackAccent,
+  heroStyle,
+  heroThemes,
+  tileThemes,
+} from "./brand-themes";
 import { contrastRatio } from "./color/contrast";
 
 const css = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
@@ -48,6 +55,19 @@ describe("thèmes de marque", () => {
     expect(brandThemes.apple.mark).toBe(primitives["gray-950"]);
     expect(fallbackAccent.apple).toBe(primitives["gray-950"]);
     expect(source).not.toMatch(/#(?:0071e3|0066cc|2997ff)/i);
+  });
+
+  it.each(BRANDS)("la tuile claire %s reprend le fond pastel et l'encre de la marque", (brand) => {
+    const tile = tileThemes[`${brand}-light`];
+    expect(tile?.background).toBe(brandThemes[brand].ground);
+    expect(tile?.eyebrowInk).toBe(brandThemes[brand].ink);
+  });
+
+  it.each(Object.keys(tileThemes))("les textes de la tuile %s sont lisibles (AA)", (key) => {
+    const tile = tileThemes[key]!;
+    for (const role of ["ink", "sub", "eyebrowInk", "link"] as const) {
+      expect(contrastRatio(tile[role], tile.background), role).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it("heroStyle expose le dégradé en variables CSS", () => {
