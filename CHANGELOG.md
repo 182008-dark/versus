@@ -5,6 +5,33 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+### Refonte, lot 2 : fondations du design (branche `refonte-lot-2-fondations`)
+
+- Gris « pierre » légèrement verdis (`--gray-950` `#1A1D1B` … `--gray-25` `#FAFBFA`, nuit
+  `#0B0D0C` / `#141715`), nouveau `--gray-450` ; rôles `--accent-ink` (`#006B4B`, tout texte vert
+  sur gris clair), `--badge-new-ink`, `--line-control`, `--price`, `--scrim`, `--outline-image`.
+- Thèmes de marque discrets : `--brand-ground`, `--brand-ink`, nouveau `--brand-mark` (pastille et
+  filet de 3 px) ; Apple `#F1F2F0` / `#1A1D1B`, Xiaomi `#FFF4EC` / `#9A3D00` / `#FF6900` ;
+  `--brand-acc`, `--brand-on-acc` et le bouton `brand` retirés.
+- Trois arrondis (28 / 20 / 12 px) avec alias temporaires des sept anciens ; nouvelle ombre de
+  carte ; durées 150 / 220 / 400 ms, `--ease-bounce` retirée ; `--space-section` 64 / 96 px et
+  `--gutter` 16 / 24 px ; utilitaires `grid-page`, `grid-products`, `text-meta`, `text-card-name`,
+  `text-display-brand`.
+- Typographie : hero 44 / 64 / 76 px, tuiles et sections en 700, approche −0,03 / −0,025 em, titres
+  équilibrés ; plus de petites capitales (surtitre en casse normale, alias temporaire).
+- Composants : `Button` à trois variantes (`primary` toujours vert, `secondary`, `onDark`), sans
+  agrandissement au survol, enfoncement à l'appui ; `Price` (« Dès 970 000 FCFA », espaces
+  insécables, tailles `card`, `lead`, `inline`) ; `Badge` (casse normale, « Épuisé » gris) ;
+  nouveaux `BrandMark` et `VsMark` ; `TextLink tone="accentInk"`. Formats `formatFCFAParts`,
+  `formatSpec`, `categoryLabel`.
+- Tests : parité de tous les tokens (couleurs, translucides, échelles par palier, durées,
+  arrondis et alias), 37 paires de contraste AA, test qui exige une paire pour chaque rôle de texte
+  employé, contrastes des thèmes de marque ; tests de `Price`, `Badge`, `BrandMark`, `VsMark`.
+- `/styleguide` : nouvelles sections « Marques et signature » et « Gabarit », contrastes mesurés
+  des thèmes de marque. Captures avant / après dans `docs/refonte/lot-2/`
+  (`npm run capture:refonte`, `npm run capture:comparaison`) ; références visuelles de l'accueil
+  régénérées. Avenant 1 à l'ADR 002.
+
 ### Refonte, lot 1 : catalogue et visuels (branche `refonte-lot-1-catalogue`)
 
 - Catalogue de 30 produits, 10 par marque (21 ajoutés), prix indicatifs = prix officiel en
