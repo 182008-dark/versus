@@ -12,7 +12,7 @@ type PillProps = Omit<
 /**
  * Pastille bascule (maquette : `.pill`), `aria-pressed` selon `selected`. Les autres attributs
  * passent au bouton, dont `data-state` qui force survol et focus dans /styleguide. Non sélectionnée :
- * contour `--line-control` (3,27:1) sur un fond blanc, y compris posée sur la surface grise.
+ * contour `--line-control` (3,26:1) sur un fond blanc, y compris posée sur la surface grise.
  */
 export function Pill({ selected = false, children, ...rest }: PillProps) {
   return (
