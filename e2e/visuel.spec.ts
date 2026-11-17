@@ -1,5 +1,6 @@
 import { existsSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
+import { products } from "../src/data/catalog";
 
 /**
  * Régression visuelle de l'accueil (§4.6 et §7.1) : `toHaveScreenshot` pleine page à 1440 et
@@ -69,7 +70,7 @@ test("les visuels produits du hero et de la boutique sont chargés", async ({ pa
 
   await page.goto("/boutique");
   const images = page.locator("[data-product] img");
-  await expect(images).toHaveCount(9);
+  await expect(images).toHaveCount(products.length);
   const height = await page.locator("body").evaluate((body) => body.scrollHeight);
   for (let y = 0; y < height; y += 650) {
     await page.evaluate((top) => window.scrollTo(0, top), y);

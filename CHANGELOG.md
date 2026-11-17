@@ -5,6 +5,25 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+### Refonte, lot 1 : catalogue et visuels (branche `refonte-lot-1-catalogue`)
+
+- Catalogue de 30 produits, 10 par marque (21 ajoutés), prix indicatifs = prix officiel en
+  France × 655,957 arrondi au millier ; neuf prix existants réalignés (dont iPhone 18 Pro
+  970 000 FCFA) ; noms officiels « Galaxy Buds4 » et « Galaxy Watch9 », anciennes adresses
+  redirigées (308).
+- 30 visuels officiels recadrés avec une marge homogène, 900 px au plus, moins de 200 Ko chacun
+  (`ip18.png` : 789 → 157 Ko) ; AVIF puis WebP servis par l'optimiseur d'images.
+- Crédits : `public/products/SOURCES.md` et `/credits` lisent les mêmes données ; planche contact
+  `docs/refonte/planche-produits.png` (`npm run capture:planche`).
+- Boutique : nombre de produits et liste des marques calculés ; test d'intégrité du catalogue et
+  test de bout en bout de la boutique ; comparateur : capacités en To au-delà de 1 024 Go.
+- Revue des données (17/11/2026) : coloris officiels (Apple Watch Series 12, Galaxy Buds4,
+  Galaxy A57 5G, Redmi Note 15 Pro+ 5G, Redmi Watch 6, AirPods Max 2, Xiaomi Buds 6, finition
+  Glacier de l’iPhone 18 Pro) ; variante par défaut alignée sur le coloris du visuel (Apple Watch
+  Series 12, Xiaomi Buds 6, Smart Band 10) ; autonomie des écouteurs réduction de bruit activée ;
+  poids, écrans et indices IP corrigés ; Galaxy Fit3 au dernier prix France (46 000 FCFA) ;
+  `aw12.png` sans liseré blanc ; la fiche n’agrandit plus un visuel au-delà de sa taille.
+
 ## [0.3.0] : étape 3, accueil, catalogue typé, fiche et boutique (2026-11-17)
 
 Production : <https://versus-ecru.vercel.app> (PR #2 et #3). Critère non tenu : LCP Lighthouse

@@ -73,14 +73,19 @@ test.describe("accueil de l'étape 3", () => {
   }) => {
     await page.goto("/");
     const today = process.env.VS_TODAY ?? "2026-11-12";
+    let shown = 0;
     for (const product of products) {
       const card = page.locator(
         `[data-product-card="${product.code}"], [data-product-slide="${product.code}"]`,
       );
+      // L'accueil ne montre que les produits de home_slots, pas tout le catalogue.
+      if ((await card.count()) === 0) continue;
+      shown += 1;
       const badge = card.getByText("Nouveau", { exact: true });
       if (isNew(product, today)) await expect(badge.first()).toBeAttached();
       else await expect(badge).toHaveCount(0);
     }
+    expect(shown, "produits de l'accueil vérifiés").toBeGreaterThan(5);
   });
 
   test("ne montre aucun produit plus de trois fois, à l'état initial et après défilement", async ({

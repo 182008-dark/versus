@@ -22,6 +22,7 @@
     "capture:maquette": "tsx scripts/capture-maquette.ts",
     "capture:gabarit": "tsx scripts/capture-gabarit.ts",
     "capture:accueil": "tsx scripts/capture-accueil.ts",
+    "capture:planche": "tsx scripts/planche-produits.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

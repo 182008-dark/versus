@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import { CarouselControls } from "./CarouselControls";
 
 const icons = { previous: "‹", next: "›", play: "▶", pause: "❚❚" };
-const names = ["iPhone 18 Pro", "Galaxy Watch 9", "Redmi Note 15 Pro+ 5G"];
+const names = ["iPhone 18 Pro", "Galaxy Watch9", "Redmi Note 15 Pro+ 5G"];
 
 function setup(overrides: Partial<Parameters<typeof CarouselControls>[0]> = {}) {
   const props = {
@@ -32,7 +32,7 @@ describe("CarouselControls", () => {
     setup();
     expect(screen.getByRole("button", { name: "Diapositive précédente" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Diapositive suivante" })).toBeTruthy();
-    const current = screen.getByRole("button", { name: "Afficher Galaxy Watch 9" });
+    const current = screen.getByRole("button", { name: "Afficher Galaxy Watch9" });
     expect(current.getAttribute("aria-current")).toBe("true");
     expect(
       screen.getByRole("button", { name: "Afficher iPhone 18 Pro" }).hasAttribute("aria-current"),
@@ -49,7 +49,7 @@ describe("CarouselControls", () => {
     await user.click(screen.getByRole("button", { name: "Afficher Redmi Note 15 Pro+ 5G" }));
     expect(props.onSelect).toHaveBeenLastCalledWith(2);
 
-    screen.getByRole("button", { name: "Afficher Galaxy Watch 9" }).focus();
+    screen.getByRole("button", { name: "Afficher Galaxy Watch9" }).focus();
     await user.keyboard("{ArrowRight}");
     expect(props.onSelect).toHaveBeenLastCalledWith(2);
     await user.keyboard("{ArrowLeft}");

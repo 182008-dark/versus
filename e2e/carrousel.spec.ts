@@ -173,7 +173,7 @@ test.describe("carrousel du hero", () => {
 
   test("le premier clic sur un point change la diapositive", async ({ page }) => {
     await openHome(page);
-    await page.getByRole("button", { name: "Afficher Galaxy Watch 9" }).click();
+    await page.getByRole("button", { name: "Afficher Galaxy Watch9" }).click();
     expect(await activeSlide(page)).toBe("gw9");
   });
 
@@ -201,7 +201,7 @@ test.describe("carrousel sur écran tactile", () => {
   test("le premier appui sur un point change la diapositive", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator(HERO)).toHaveAttribute("data-autoplay", "");
-    await page.getByRole("button", { name: "Afficher Galaxy Watch 9" }).tap();
+    await page.getByRole("button", { name: "Afficher Galaxy Watch9" }).tap();
     expect(await activeSlide(page)).toBe("gw9");
     // Le toucher ne laisse pas de « survol » collé : seule la sortie du focus compte.
     await page.locator("body").evaluate(() => (document.activeElement as HTMLElement).blur());

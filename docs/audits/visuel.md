@@ -18,7 +18,10 @@ référence par la plateforme :
 - `e2e/visuel.spec.ts-snapshots/accueil-1440-chromium-win32.png`
 - `e2e/visuel.spec.ts-snapshots/accueil-390-chromium-win32.png`
 
-Les références Windows ont été prises le 17 novembre 2026, à la fin de l'étape 3. **Une plateforme
+Les références Windows ont été prises le 17 novembre 2026, à la fin de l'étape 3, puis régénérées
+le même jour au lot 1 de la refonte (`--update-snapshots=changed`) : visuels recadrés avec une marge
+homogène, prix réalignés (iPhone 18 Pro « À partir de 970 000 FCFA ») et nom « Galaxy Buds4 ». La
+composition de l'accueil n'a pas changé. **Une plateforme
 sans référence est ignorée** (test marqué `skipped`, avec le chemin attendu dans l'annotation) au
 lieu d'échouer : la CI Linux reste verte tant que ses références n'existent pas.
 
