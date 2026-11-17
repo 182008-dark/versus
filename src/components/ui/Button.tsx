@@ -1,9 +1,15 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
-import { buttonClasses, type ButtonSize, type ButtonVariant } from "./button-styles";
+import {
+  buttonClasses,
+  type ButtonSize,
+  type ButtonVariant,
+  type LegacyButtonVariant,
+} from "./button-styles";
 
 type CommonProps = {
-  variant?: ButtonVariant;
+  /** `primary`, `secondary` ou `onDark` ; les anciens noms sont des alias temporaires. */
+  variant?: ButtonVariant | LegacyButtonVariant;
   size?: ButtonSize;
   className?: string;
   children: ReactNode;
@@ -25,7 +31,7 @@ type NativeButtonProps = CommonProps &
 export type ButtonProps = LinkButtonProps | NativeButtonProps;
 
 /**
- * Bouton VERSUS (§4.3). Avec `href`, il rend un `<Link>` (navigation) ; sinon un `<button>`
+ * Bouton VERSUS (§4.7 du plan de refonte). Avec `href`, il rend un `<Link>` (navigation) ; sinon un `<button>`
  * (`type="button"` par défaut, pour ne jamais soumettre un formulaire par accident).
  */
 export function Button(props: ButtonProps) {
