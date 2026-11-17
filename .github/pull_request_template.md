@@ -8,7 +8,7 @@
 - [ ] Preview vérifiée à 375 px et à 1440 px
 - [ ] `e2e/liens.spec.ts` vert (liens, `action` de formulaires, ancres `#id`)
 - [ ] axe sans violation « serious » ni « critical » sur les pages touchées
-- [ ] Budgets respectés (`e2e/budget.spec.ts`, dès l'étape 3) : JS < 180 Ko compressé sur `/` et une fiche, `/` < 1 Mo transféré
+- [ ] Budgets respectés (`e2e/budget.spec.ts`, dès l'étape 3) : JS < 150 Ko compressé sur `/` et une fiche, `/` < 1 Mo transféré
 - [ ] Documentation à jour (README, ADR, `docs/`, `CHANGELOG.md`)
 - [ ] Captures dans `docs/fidelite-maquette.md` si l'interface a changé
 - [ ] Critères d'acceptation de l'étape cochés
