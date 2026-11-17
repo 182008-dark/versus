@@ -30,6 +30,12 @@ describe("lignes du comparateur", () => {
     expect(formatCompat(["ios", "android"])).toBe("iPhone (iOS) · Android");
   });
 
+  it("préfixe le prix de « Dès » seulement quand les variantes ont plusieurs prix", () => {
+    const price = compareRows.audio.find((row) => row.key === "price");
+    expect(price?.format(product("ap5"))?.replace(/\s/g, " ")).toBe("98 000 FCFA");
+    expect(price?.format(product("ip18"))?.replace(/\s/g, " ")).toBe("Dès 970 000 FCFA");
+  });
+
   it("affiche l'autonomie en jours au-delà de 72 h et calcule le stockage", () => {
     const autonomy = compareRows.wearables.find((row) => row.key === "autonomy");
     expect(autonomy?.format(product("rw6"))).toBe("24 jours");

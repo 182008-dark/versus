@@ -109,9 +109,9 @@ describe("catalogue de démonstration", () => {
         product.code,
       ).toBe(true);
       if (product.category_slug !== "smartphones") expect(hasStorage[0]).toBe(false);
-      expect(product.min_price_fcfa).toBe(
-        Math.min(...variants.filter((variant) => variant.is_active).map((v) => v.price_fcfa)),
-      );
+      const activePrices = variants.filter((v) => v.is_active).map((v) => v.price_fcfa);
+      expect(product.min_price_fcfa).toBe(Math.min(...activePrices));
+      expect(product.max_price_fcfa).toBe(Math.max(...activePrices));
       expect(product.in_stock).toBe(variants.some((v) => v.is_active && v.stock > 0));
     }
   });

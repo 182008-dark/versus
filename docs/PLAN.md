@@ -666,6 +666,7 @@ create view public.catalog_products with (security_invoker = true) as
 select p.id, p.code, p.slug, p.name, p.tagline, p.brand_slug, b.name as brand_name, p.category_slug,
        c.compare_group, p.visual_kind, p.release_date, p.new_until, p.warranty_months, p.compat,
        min(v.price_fcfa) filter (where v.is_active)            as min_price_fcfa,
+       max(v.price_fcfa) filter (where v.is_active)            as max_price_fcfa,
        coalesce(sum(v.stock) filter (where v.is_active), 0) > 0  as in_stock,
        i.src as image_src, i.width as image_width, i.height as image_height, i.alt as image_alt
 from public.products p

@@ -9,9 +9,10 @@ export type ProductCardData = CatalogProductRow & { is_new: boolean };
 
 /**
  * Carte produit (maquette : `.card`), composant serveur : marque, badge « Nouveau » (isNew),
- * visuel, nom, accroche, prix minimal, « Acheter » vers la fiche (le choix de la variante se
- * fait sur la fiche). « + Comparer » arrive à l'étape 5. Le visuel est décoratif : le titre
- * nomme déjà le produit, et « Acheter » porte son nom (WCAG 2.4.4).
+ * visuel, nom, accroche, prix minimal (« Dès » seulement si les variantes ont plusieurs prix,
+ * comme sur la fiche), « Acheter » vers la fiche (le choix de la variante se fait sur la fiche).
+ * « + Comparer » arrive à l'étape 5. Le visuel est décoratif : le titre nomme déjà le produit, et
+ * « Acheter » porte son nom (WCAG 2.4.4).
  */
 export function ProductCard({ product }: { product: ProductCardData }) {
   return (
@@ -38,7 +39,9 @@ export function ProductCard({ product }: { product: ProductCardData }) {
       <p className="flex-1 text-[14.5px] leading-[1.45] text-muted-strong">{product.tagline}</p>
       <p className="mt-3.5 mb-3 text-[15px] font-semibold">
         {product.min_price_fcfa !== null ? (
-          <Price amount={product.min_price_fcfa} from />
+          <Price
+            amount={[product.min_price_fcfa, product.max_price_fcfa ?? product.min_price_fcfa]}
+          />
         ) : (
           "Prix indisponible"
         )}

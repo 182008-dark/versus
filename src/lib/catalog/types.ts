@@ -60,6 +60,11 @@ export type CatalogProductRow = {
   compat: readonly Compat[];
   /** `min(price_fcfa) filter (where is_active)` : null sans variante active. */
   min_price_fcfa: number | null;
+  /**
+   * `max(price_fcfa) filter (where is_active)` : null sans variante active. Égal à
+   * `min_price_fcfa` quand toutes les variantes ont le même prix, ce qui retire « Dès » (§4.7).
+   */
+  max_price_fcfa: number | null;
   in_stock: boolean;
   /** Image principale (LEFT JOIN `product_images … and is_primary`). */
   image_src: string | null;
