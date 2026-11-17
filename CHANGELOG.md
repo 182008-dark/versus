@@ -5,8 +5,10 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
-Étape 3 : accueil fidèle, données locales typées, fiche et boutique minimales (branche
-`etape-3-accueil`, future `v0.3.0`).
+## [0.3.0] : étape 3, accueil, catalogue typé, fiche et boutique (2026-11-17)
+
+Production : <https://versus-ecru.vercel.app> (PR #2 et #3). Critère non tenu : LCP Lighthouse
+simulé 3,2 s (seuil 2,5 s), cause et reprise documentées dans `docs/audits/lighthouse-etape-3.md`.
 
 ### Ajouté
 
