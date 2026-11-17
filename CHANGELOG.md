@@ -17,6 +17,12 @@ du plan (`v0.N.0`), puis `v1.0.0`.
   `docs/refonte/planche-produits.png` (`npm run capture:planche`).
 - Boutique : nombre de produits et liste des marques calculés ; test d'intégrité du catalogue et
   test de bout en bout de la boutique ; comparateur : capacités en To au-delà de 1 024 Go.
+- Revue des données (17/11/2026) : coloris officiels (Apple Watch Series 12, Galaxy Buds4,
+  Galaxy A57 5G, Redmi Note 15 Pro+ 5G, Redmi Watch 6, AirPods Max 2, Xiaomi Buds 6, finition
+  Glacier de l’iPhone 18 Pro) ; variante par défaut alignée sur le coloris du visuel (Apple Watch
+  Series 12, Xiaomi Buds 6, Smart Band 10) ; autonomie des écouteurs réduction de bruit activée ;
+  poids, écrans et indices IP corrigés ; Galaxy Fit3 au dernier prix France (46 000 FCFA) ;
+  `aw12.png` sans liseré blanc ; la fiche n’agrandit plus un visuel au-delà de sa taille.
 
 ## [0.3.0] : étape 3, accueil, catalogue typé, fiche et boutique (2026-11-17)
 
