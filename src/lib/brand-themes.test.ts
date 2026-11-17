@@ -50,3 +50,28 @@ describe("thèmes de marque", () => {
     });
   });
 });
+
+/** Couleur `rgb(r g b / a)` composée sur un fond opaque (piste semi-transparente des points). */
+function over(color: string, background: string) {
+  const match = /rgb\((\d+) (\d+) (\d+) \/ ([\d.]+)\)/.exec(color);
+  if (!match) return color;
+  const [r, g, b, alpha] = match.slice(1).map(Number) as [number, number, number, number];
+  const bg = background.replace("#", "");
+  const channel = (index: number, value: number) =>
+    Math.round(value * alpha + Number.parseInt(bg.slice(index, index + 2), 16) * (1 - alpha));
+  return { r: channel(0, r), g: channel(2, g), b: channel(4, b) };
+}
+
+describe("hero : anneau de focus et points lisibles sur chaque dégradé (WCAG 1.4.11)", () => {
+  it.each(BRANDS)("%s : anneau et piste à au moins 3:1 sur les trois arrêts", (brand) => {
+    const theme = heroThemes[brand];
+    for (const stop of [theme.from, theme.via, theme.to]) {
+      expect(contrastRatio(theme.ring, stop), `anneau sur ${stop}`).toBeGreaterThanOrEqual(3);
+      expect(
+        contrastRatio(over(theme.track, stop), stop),
+        `piste sur ${stop}`,
+      ).toBeGreaterThanOrEqual(3);
+      expect(contrastRatio(theme.fill, stop), `barre sur ${stop}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+});
