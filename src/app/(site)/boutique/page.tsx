@@ -2,17 +2,25 @@ import type { Metadata } from "next";
 import { ProductCard } from "@/components/product/ProductCard";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { routeFor } from "@/config/site";
-import { getCatalog, getCategories } from "@/lib/catalog/queries";
+import { getBrands, getCatalog, getCategories } from "@/lib/catalog/queries";
 import { isNew } from "@/lib/catalog/is-new";
+import { brandNames, productCount } from "@/lib/catalog/summary";
 import { getToday } from "@/lib/catalog/today";
 
-export const metadata: Metadata = {
-  title: "Boutique",
-  description: "Les neuf produits Apple, Samsung et Xiaomi de la boutique fictive VERSUS.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [products, brands] = await Promise.all([getCatalog(), getBrands()]);
+  return {
+    title: "Boutique",
+    description: `Les ${productCount(products.length)} ${brandNames(brands)} de la boutique fictive VERSUS.`,
+  };
+}
 
 export default async function ShopPage() {
-  const [products, categories] = await Promise.all([getCatalog(), getCategories()]);
+  const [products, categories, brands] = await Promise.all([
+    getCatalog(),
+    getCategories(),
+    getBrands(),
+  ]);
   const today = await getToday();
   const home = routeFor("accueil");
 
@@ -21,8 +29,8 @@ export default async function ShopPage() {
       <Eyebrow>La boutique</Eyebrow>
       <h1 className="mt-3 text-display-h2">Les produits VERSUS.</h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted">
-        Neuf produits pour découvrir les univers Apple, Samsung et Xiaomi. Prix indicatifs en FCFA,
-        projet pédagogique sans vente réelle.
+        {productCount(products.length)} pour découvrir les univers {brandNames(brands)}. Prix
+        indicatifs en FCFA, projet pédagogique sans vente réelle.
       </p>
       <nav aria-label="Catégories de la boutique" className="mt-7 flex flex-wrap gap-2">
         {categories.map((category) => (
