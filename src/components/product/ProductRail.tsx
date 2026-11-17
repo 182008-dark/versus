@@ -84,7 +84,7 @@ export function ProductRail({
   }
 
   const arrow =
-    "grid size-11 place-items-center rounded-full border border-line text-ink aria-disabled:cursor-default aria-disabled:opacity-35 state-hover:bg-surface";
+    "grid size-11 place-items-center rounded-full border border-line-control text-ink aria-disabled:cursor-default aria-disabled:opacity-35 state-hover:bg-surface";
 
   return (
     <div>
@@ -141,7 +141,7 @@ export function ProductRail({
           role="list"
           tabIndex={0}
           aria-label={label}
-          className="-mx-6 mt-7 grid snap-x snap-mandatory scroll-px-6 auto-cols-[300px] grid-flow-col gap-[18px] overflow-x-auto px-6 pt-1.5 pb-6"
+          className="-mx-gutter mt-7 grid snap-x snap-mandatory scroll-px-gutter auto-cols-[300px] grid-flow-col gap-[18px] overflow-x-auto px-gutter pt-1.5 pb-6"
         >
           {visible.map((item) => (
             <li key={item.key} className="flex snap-start">

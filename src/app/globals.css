@@ -16,22 +16,26 @@
  */
 
 :root {
-  /* 1. Primitives (maquette) */
+  /* 1. Primitives. Gris « pierre » légèrement verdis (refonte, lot 2) à la place des gris de la
+     maquette ; accent VERSUS inchangé (D1, ADR 002 et son avenant). */
   --white: #ffffff;
   --black: #000000;
-  --gray-950: #1d1d1f;
-  --gray-700: #424245;
-  --gray-600: #6d6d72;
-  --gray-500: #86868b;
-  --gray-400: #a1a1a6;
-  --gray-300: #d2d2d7;
-  --gray-200: #ededf0;
-  --gray-100: #eaeaee;
-  --gray-50: #f5f5f7;
-  --gray-25: #fbfbfd;
+  --gray-950: #1a1d1b;
+  --gray-700: #3f4542;
+  --gray-600: #5c635f;
+  /* 3,8:1 sur blanc : décoratif ou texte de 24 px et plus seulement. */
+  --gray-500: #7d847f;
+  /* 3,27:1 sur blanc : contour d'un contrôle non sélectionné (pas sur la surface grise, 2,99:1). */
+  --gray-450: #8a9089;
+  --gray-400: #a8ada9;
+  --gray-300: #d5d9d6;
+  --gray-200: #e6e9e7;
+  --gray-100: #eef0ee;
+  --gray-50: #f4f5f3;
+  --gray-25: #fafbfa;
   --night-950: #111113;
-  --night-900: #0b0b0c;
-  --night-800: #1c1c1e;
+  --night-900: #0b0d0c;
+  --night-800: #141715;
   --night-700: #2c2c2e;
   /* Accent VERSUS (D1, ADR 002) : remplace les bleus Apple de la maquette. */
   --green-700: #006b4b;
@@ -54,18 +58,28 @@
   --line: var(--gray-300);
   --line-soft: var(--gray-200);
   --line-strong: rgb(0 0 0 / 0.2);
+  /* Contour des pastilles et contrôles non sélectionnés (≥ 3:1 sur --bg et --surface-2). */
+  --line-control: var(--gray-450);
   --muted: var(--gray-600);
   --muted-strong: var(--gray-700);
   --muted-on-dark: var(--gray-400);
   --eyebrow-on-dark: var(--gray-500);
   --accent: var(--green-600);
   --accent-hover: var(--green-700);
+  /* Tout texte ou lien vert posé sur un gris clair (--surface, --surface-hover…). */
+  --accent-ink: var(--green-700);
   --accent-on-dark: var(--green-300);
   --accent-soft: var(--green-50);
   --on-accent: var(--white);
+  /* Badge « Nouveau » : texte vert foncé sur --accent-soft. */
+  --badge-new-ink: var(--green-700);
+  --price: var(--ink-strong);
   --danger: var(--red-700);
   --warning: var(--amber-800);
   --focus-ring: var(--accent);
+  /* Voile au survol des photos produit ; contour intérieur de 1 px des zones photo. */
+  --scrim: rgb(0 0 0 / 0.04);
+  --outline-image: rgb(0 0 0 / 0.06);
   /* Gabarit */
   --notice-bg: var(--gray-950);
   --notice-ink: var(--gray-300);
@@ -75,50 +89,79 @@
   --icon-hover: rgb(0 0 0 / 0.05);
   --header-height: 56px;
 
-  /* Échelle typographique, mobile d'abord (maquette : ≤ 640 px) */
-  --text-hero: 48px;
-  --text-tile: 40px;
-  --text-h2: 36px;
+  /* Mouvement : clic et sortie, survol, changement de diapositive. */
+  --dur-fast: 150ms;
+  --dur-base: 220ms;
+  --dur-slow: 400ms;
+
+  /* Espacements : un seul espacement entre sections, une marge latérale. */
+  --space-section: 64px;
+  --gutter: 16px;
+
+  /* Échelle typographique, mobile d'abord (≤ 640 px) */
+  --text-hero: 44px;
+  --text-tile: 36px;
+  --text-h2: 32px;
+  --text-brand: 48px;
+  --text-name: 16px;
+  --text-price-card: 17px;
+  --text-price-lead: 22px;
   --text-quiz: 24px;
   --text-sub: 17px;
 }
 
 @media (min-width: 641px) {
   :root {
+    --gutter: 24px;
     --text-hero: 64px;
-    --text-tile: 58px;
-    --text-h2: 52px;
+    --text-tile: 48px;
+    --text-h2: 44px;
+    --text-brand: 72px;
+    --text-name: 18px;
+    --text-price-card: 20px;
+    --text-price-lead: 28px;
     --text-quiz: 30px;
-    --text-sub: 21px;
+    --text-sub: 19px;
+  }
+}
+
+@media (min-width: 901px) {
+  :root {
+    --space-section: 96px;
   }
 }
 
 @media (min-width: 1025px) {
   :root {
-    --text-hero: 88px;
+    --text-hero: 76px;
+    --text-tile: 56px;
+    --text-h2: 48px;
+    --text-brand: 88px;
   }
 }
 
-/* Thèmes de marque (mêmes valeurs que src/lib/brand-themes.ts, vérifiées par un test). */
+/*
+ * Thèmes de marque (mêmes valeurs que src/lib/brand-themes.ts, vérifiées par un test). Discrets :
+ * fond pastel, encre du texte, et --brand-mark pour la pastille et le filet de 3 px (décoratif,
+ * toujours accompagné du nom). Une couleur de marque ne sert jamais à une action : les anciens
+ * tokens d'action de marque et la variante de bouton `brand` sont retirés (refonte, lot 2).
+ */
 [data-brand="apple"] {
-  --brand-ground: #f5f5f7;
-  --brand-ink: #1d1d1f;
-  --brand-acc: #1d1d1f;
-  --brand-on-acc: #ffffff;
+  --brand-ground: #f1f2f0;
+  --brand-ink: #1a1d1b;
+  --brand-mark: #1a1d1b;
 }
 
 [data-brand="samsung"] {
   --brand-ground: #eef1fb;
   --brand-ink: #1428a0;
-  --brand-acc: #1428a0;
-  --brand-on-acc: #ffffff;
+  --brand-mark: #1428a0;
 }
 
 [data-brand="xiaomi"] {
-  --brand-ground: #fff1e6;
-  --brand-ink: #a84300;
-  --brand-acc: #ff6900;
-  --brand-on-acc: #1d1d1f;
+  --brand-ground: #fff4ec;
+  --brand-ink: #9a3d00;
+  --brand-mark: #ff6900;
 }
 
 /* Fond sombre : l'anneau de focus et l'accent passent en vert clair. */
@@ -133,6 +176,21 @@
   --breakpoint-md: 901px;
   --breakpoint-lg: 1025px;
   --breakpoint-xl: 1240px;
+
+  /*
+   * Arrondis : trois valeurs (refonte, lot 2). Emboîtement : zone photo de 12 px + marge de
+   * 8 px = carte de 20 px. Boutons, pastilles, badges et médaillon VS : `rounded-full`.
+   */
+  --radius-tile: 28px;
+  --radius-card: 20px;
+  --radius-control: 12px;
+  /* Alias temporaires de la migration (7 arrondis → 3), à retirer quand plus aucun composant ne
+     les utilise. Même valeur que leur cible, vérifiée par design-tokens.test.ts. */
+  --radius-box: 28px;
+  --radius-result: 20px;
+  --radius-option: 12px;
+  --radius-icon: 12px;
+  --radius-chip: 12px;
 }
 
 @theme inline {
@@ -150,17 +208,23 @@
   --color-line: var(--line);
   --color-line-soft: var(--line-soft);
   --color-line-strong: var(--line-strong);
+  --color-line-control: var(--line-control);
   --color-muted: var(--muted);
   --color-muted-strong: var(--muted-strong);
   --color-muted-on-dark: var(--muted-on-dark);
   --color-eyebrow-on-dark: var(--eyebrow-on-dark);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-ink: var(--accent-ink);
   --color-accent-on-dark: var(--accent-on-dark);
   --color-accent-soft: var(--accent-soft);
   --color-on-accent: var(--on-accent);
+  --color-badge-new-ink: var(--badge-new-ink);
+  --color-price: var(--price);
   --color-danger: var(--danger);
   --color-warning: var(--warning);
+  --color-scrim: var(--scrim);
+  --color-outline-image: var(--outline-image);
   --color-notice-bg: var(--notice-bg);
   --color-notice-ink: var(--notice-ink);
   --color-header-bg: var(--header-bg);
@@ -168,25 +232,20 @@
   --color-icon-hover: var(--icon-hover);
   --color-brand-ground: var(--brand-ground);
   --color-brand-ink: var(--brand-ink);
-  --color-brand-acc: var(--brand-acc);
-  --color-brand-on-acc: var(--brand-on-acc);
+  --color-brand-mark: var(--brand-mark);
 
   --font-sans: var(--font-inter), system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), sans-serif;
 
-  --radius-tile: 30px;
-  --radius-box: 28px;
-  --radius-card: 26px;
-  --radius-result: 18px;
-  --radius-option: 16px;
-  --radius-icon: 14px;
-  --radius-chip: 8px;
+  /* Espacements nommés : `py-section`, `px-gutter`, `gap-gutter`… */
+  --spacing-section: var(--space-section);
+  --spacing-gutter: var(--gutter);
 
-  --shadow-card: 0 30px 60px -30px rgb(0 0 0 / 0.35);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 12px 32px -16px rgb(0 0 0 / 0.18);
   --shadow-tray: 0 20px 40px -12px rgb(0 0 0 / 0.45);
 
+  /* Courbe unique (--ease-bounce n'est plus utilisée, refonte lot 2). */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --ease-bounce: cubic-bezier(0.3, 1.6, 0.5, 1);
 }
 
 /*
@@ -229,48 +288,127 @@
 @utility wrap {
   max-width: 1288px;
   margin-inline: auto;
-  padding-inline: 24px;
+  padding-inline: var(--gutter);
 }
 
+/* Seul espacement entre sections : 64 px, puis 96 px à partir de 901 px. */
 @utility section {
-  padding-block: 76px;
+  padding-block: var(--space-section);
+}
+
+/*
+ * Grille de page : 4 colonnes, 6 à partir de 641 px, 12 à partir de 901 px ; gouttière de 16 px,
+ * 24 px à partir de 1240 px.
+ */
+@utility grid-page {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
 
   @media (min-width: 641px) {
-    padding-block: 100px;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  @media (min-width: 901px) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1240px) {
+    gap: 24px;
   }
 }
 
+/*
+ * Grille de produits : liste sous 400 px (petits Android de 360 px), 2 colonnes dès 400 px,
+ * 3 dès 901 px, 4 dès 1240 px. Cartes de hauteur égale.
+ */
+@utility grid-products {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 12px;
+
+  @media (min-width: 400px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  @media (min-width: 901px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1240px) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 24px;
+  }
+}
+
+/*
+ * Surtitre (alias temporaire) : plus de petites capitales espacées (refonte, lot 2). Il prend le
+ * style « méta » et sera remplacé par la pastille de marque (BrandMark) page par page.
+ */
 @utility eyebrow {
   font-size: 13px;
   font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  line-height: 1.3;
   color: var(--muted);
 }
 
-/* Titres d'affichage (§4.1) */
+/* Méta (marque, catégorie) : 13 px, Inter 600. */
+@utility text-meta {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Titres d'affichage (§4.6 du plan de refonte) : équilibrés sur leurs lignes, sans point final. */
 @utility text-display-hero {
   font-family: var(--font-display);
   font-size: var(--text-hero);
-  line-height: 0.95;
-  letter-spacing: -0.05em;
+  line-height: 1;
+  letter-spacing: -0.03em;
   font-weight: 800;
+  text-wrap: balance;
 }
 
 @utility text-display-tile {
   font-family: var(--font-display);
   font-size: var(--text-tile);
   line-height: 1.05;
-  letter-spacing: -0.035em;
-  font-weight: 800;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-wrap: balance;
 }
 
 @utility text-display-h2 {
   font-family: var(--font-display);
   font-size: var(--text-h2);
-  line-height: 1.05;
-  letter-spacing: -0.035em;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+/* Nom de marque du bandeau et des pages marque. */
+@utility text-display-brand {
+  font-family: var(--font-display);
+  font-size: var(--text-brand);
+  line-height: 1;
+  letter-spacing: -0.03em;
   font-weight: 800;
+}
+
+/* Nom sur une carte produit : 2 lignes au plus. */
+@utility text-card-name {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-family: var(--font-display);
+  font-size: var(--text-name);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
 /* Texte long des pages d'information (mentions, CGV…) */
@@ -388,8 +526,9 @@
     font-family: var(--font-display);
     font-size: var(--text-hero);
     font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -0.05em;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    text-wrap: balance;
   }
 
   .hero-sub {
@@ -737,11 +876,6 @@
   }
 
   /* Cartes de marque (maquette : .brands, .brand) */
-  /* Maquette : #marques n'a qu'une marge basse (la section Nouveautés la précède). */
-  .brand-section {
-    padding-bottom: 76px;
-  }
-
   .brand-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -917,10 +1051,6 @@
     .promo-tile-art {
       height: 240px;
       flex-basis: 240px;
-    }
-
-    .brand-section {
-      padding-bottom: 110px;
     }
   }
 

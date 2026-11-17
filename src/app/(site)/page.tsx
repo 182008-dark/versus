@@ -78,7 +78,7 @@ export default async function HomePage() {
       </section>
 
       {shop ? (
-        <section id="marques" aria-labelledby="marques-titre" className="brand-section">
+        <section id="marques" aria-labelledby="marques-titre" className="pb-section">
           <div className="wrap mb-9">
             <SectionHeader
               eyebrow="Univers de marque"
