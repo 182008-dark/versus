@@ -1,4 +1,4 @@
-import { site } from "@/config/site";
+import { notice } from "@/config/notice";
 
 /**
  * Bandeau permanent « Projet pédagogique » (principe 7 du plan : le caractère fictif est
@@ -16,8 +16,7 @@ export function AnnouncementBar() {
       className="bg-notice-bg px-4 py-[9px] text-center text-xs leading-[normal] text-notice-ink"
     >
       <p>
-        <strong className="font-semibold text-on-dark">{site.notice.lead}</strong> ·{" "}
-        {site.notice.rest}
+        <strong className="font-semibold text-on-dark">{notice.lead}</strong> · {notice.rest}
       </p>
     </section>
   );

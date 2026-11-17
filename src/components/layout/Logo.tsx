@@ -5,10 +5,10 @@ import { routeFor, site } from "@/config/site";
 /**
  * Logo VERSUS (maquette : `.logo` + `.mono`) : monogramme « VS » dont les lettres sont séparées
  * par une barre oblique en accent (signature VERSUS, §4.2), puis le nom espacé.
- * Lien vers l'accueil quand la route est livrée, simple texte sinon. `onClick` sert au menu
- * mobile, qui se ferme quand on suit le lien.
+ * Lien vers l'accueil quand la route est livrée, simple texte sinon (le menu mobile se ferme
+ * quand on le suit, par délégation de clic).
  */
-export function Logo({ className, onClick }: { className?: string; onClick?: () => void }) {
+export function Logo({ className }: { className?: string }) {
   const home = routeFor("accueil");
   const content = (suffix?: string) => (
     <>
@@ -37,7 +37,7 @@ export function Logo({ className, onClick }: { className?: string; onClick?: () 
   if (!home) return <span className={classes}>{content()}</span>;
   // Nom accessible « VERSUS, accueil » : le texte visible en tête du nom (WCAG 2.5.3).
   return (
-    <Link href={home} className={classes} onClick={onClick}>
+    <Link href={home} className={classes}>
       {content(", accueil")}
     </Link>
   );

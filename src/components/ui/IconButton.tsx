@@ -4,6 +4,7 @@ import type { ComponentProps, Ref } from "react";
 import { countLabel } from "./count-label";
 import { CountBadge } from "./CountBadge";
 import { Icon, type IconName } from "./Icon";
+import { iconButtonClasses as classes } from "./icon-button-styles";
 
 type CommonProps = {
   /** Nom accessible (« Panier »), complété par le compteur (« Panier, 3 articles »). */
@@ -23,9 +24,6 @@ type IconNativeButtonProps = CommonProps &
   };
 
 export type IconButtonProps = IconLinkProps | IconNativeButtonProps;
-
-const classes =
-  "relative grid size-11 shrink-0 place-items-center rounded-full text-ink transition-colors state-hover:bg-icon-hover";
 
 /**
  * Bouton ou lien rond de 44 px portant une icône (maquette : `.ibtn`), avec un compteur

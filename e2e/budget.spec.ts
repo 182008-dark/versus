@@ -1,6 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
-const MAX_JAVASCRIPT_BYTES = 180 * 1024;
+/**
+ * Budgets de l'étape 3 (§4.5 et §7.1 du plan), mesurés sur `next build && next start`
+ * (compression gzip du serveur Next), dans un contexte neuf et sans cache.
+ */
+const MAX_JAVASCRIPT_BYTES = 150 * 1024;
+const MAX_TOTAL_BYTES = 1024 * 1024;
 
 async function loadWholePage(page: Page, path = "/") {
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -12,9 +17,10 @@ async function loadWholePage(page: Page, path = "/") {
     await page.waitForTimeout(20);
   }
   await page.evaluate(() => window.scrollTo(0, 0));
-  await page.waitForTimeout(250);
+  await page.waitForLoadState("networkidle");
 }
 
+/** Somme des `transferSize` des scripts de l'application, préchargements de liens compris. */
 async function getJavaScriptTransferSize(page: Page) {
   return page.evaluate(() =>
     performance
@@ -25,29 +31,29 @@ async function getJavaScriptTransferSize(page: Page) {
 }
 
 test.describe("budget d'accueil", () => {
-  test("le JavaScript compressé de l'accueil reste sous 180 Ko", async ({ page }) => {
-    await loadWholePage(page);
-    const bytes = await getJavaScriptTransferSize(page);
-    expect(bytes, `JavaScript transféré sur l'accueil : ${bytes} octets`).toBeLessThan(
-      MAX_JAVASCRIPT_BYTES,
-    );
-  });
+  for (const path of ["/", "/produit/iphone-18-pro"]) {
+    test(`le JavaScript compressé de ${path} reste sous 150 Ko`, async ({ page }) => {
+      await loadWholePage(page, path);
+      const bytes = await getJavaScriptTransferSize(page);
+      expect(bytes, `JavaScript transféré sur ${path} : ${bytes} octets`).toBeLessThan(
+        MAX_JAVASCRIPT_BYTES,
+      );
+    });
+  }
 
-  test("le JavaScript compressé d'une fiche produit reste sous 180 Ko", async ({ page }) => {
-    await loadWholePage(page, "/produit/iphone-18-pro");
-    const bytes = await getJavaScriptTransferSize(page);
-    expect(bytes, `JavaScript transféré sur la fiche : ${bytes} octets`).toBeLessThan(
-      MAX_JAVASCRIPT_BYTES,
-    );
-  });
-
-  test("les ressources et le document restent sous 1 Mo", async ({ page }) => {
+  test("les ressources et le document de l'accueil restent sous 1 Mo", async ({ page }) => {
     await loadWholePage(page);
-    const bytes = await page.evaluate(() =>
-      performance
+    const { resources, document } = await page.evaluate(() => ({
+      resources: performance
         .getEntriesByType("resource")
         .reduce((sum, entry) => sum + (entry as PerformanceResourceTiming).transferSize, 0),
+      document: (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)
+        .transferSize,
+    }));
+    expect(document, "le document HTML est mesuré").toBeGreaterThan(0);
+    const total = resources + document;
+    expect(total, `Transfert total : ${total} octets (document ${document})`).toBeLessThan(
+      MAX_TOTAL_BYTES,
     );
-    expect(bytes, `Transfert total : ${bytes} octets`).toBeLessThan(1024 * 1024);
   });
 });
