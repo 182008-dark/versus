@@ -35,30 +35,51 @@ export type ProductSpecs = {
   specs_note: string;
 };
 
-export type CatalogProduct = {
+export type Compat = "ios" | "android";
+
+/**
+ * Une ligne de la future vue `catalog_products` (§5.4), colonne pour colonne. Les colonnes
+ * issues d'un LEFT JOIN (image principale) ou d'un agrégat filtré (prix minimal) peuvent valoir
+ * `null` : le compilateur oblige à traiter ce cas dès l'étape 3, avant le passage à Supabase.
+ */
+export type CatalogProductRow = {
   id: string;
   code: string;
   slug: string;
   name: string;
   tagline: string;
-  description: string;
   brand_slug: Brand;
   brand_name: string;
   category_slug: CategorySlug;
   compare_group: CompareGroup;
   visual_kind: DeviceKind;
   release_date: string;
-  new_until: string;
+  /** Colonne `date` nullable (le trigger `products_defaults` la renseigne). */
+  new_until: string | null;
   warranty_months: number;
-  compat: readonly ("ios" | "android")[];
-  min_price_fcfa: number;
+  compat: readonly Compat[];
+  /** `min(price_fcfa) filter (where is_active)` : null sans variante active. */
+  min_price_fcfa: number | null;
   in_stock: boolean;
-  image_src: string;
-  image_width: number;
-  image_height: number;
-  image_alt: string;
+  /** Image principale (LEFT JOIN `product_images … and is_primary`). */
+  image_src: string | null;
+  image_width: number | null;
+  image_height: number | null;
+  image_alt: string | null;
+};
+
+/** Fiche complète : la ligne de la vue, plus la description, les variantes et les specs. */
+export type ProductDetail = CatalogProductRow & {
+  description: string;
   variants: readonly ProductVariant[];
   specs: ProductSpecs;
+};
+
+export type CatalogBrand = {
+  slug: Brand;
+  name: string;
+  tagline: string;
+  position: number;
 };
 
 export type CatalogCategory = {
@@ -69,22 +90,19 @@ export type CatalogCategory = {
   position: number;
 };
 
+export type HomeSlotKind = "hero" | "tile" | "rail" | "compare";
+
 export type HomeSlot = {
-  slot: "hero" | "tile" | "rail" | "compare";
+  slot: HomeSlotKind;
   product_code: string;
   position: number;
-  theme_key: Brand | "default";
+  /** Clé d'un thème de `lib/brand-themes.ts` (`default` : thème de la marque du produit). */
+  theme_key: string;
   headline: string | null;
   subline: string | null;
 };
 
-export type HomeCatalog = {
-  hero: CatalogProduct[];
-  tiles: CatalogProduct[];
-  rail: CatalogProduct[];
-  compare: CatalogProduct[];
-};
+/** Un emplacement de l'accueil résolu avec son produit. */
+export type HomeEntry = Omit<HomeSlot, "product_code" | "slot"> & { product: ProductDetail };
 
-export type ProductCardData = CatalogProduct & {
-  is_new: boolean;
-};
+export type HomeCatalog = Record<HomeSlotKind, HomeEntry[]>;

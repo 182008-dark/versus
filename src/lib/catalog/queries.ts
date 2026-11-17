@@ -22,6 +22,13 @@ export async function getHome() {
   return staticCatalogRepository.getHome();
 }
 
+export async function getBrands() {
+  "use cache";
+  cacheLife("max");
+  cacheTag("catalog");
+  return staticCatalogRepository.listBrands();
+}
+
 export async function getCategories() {
   "use cache";
   cacheLife("max");

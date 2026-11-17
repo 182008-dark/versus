@@ -1,41 +1,51 @@
 import "server-only";
-import { categories, homeSlots, products } from "@/data/catalog";
+import { brands, categories, homeSlots, products } from "@/data/catalog";
 import type { CatalogRepository } from "./repository";
-import type { CatalogProduct, HomeCatalog } from "./types";
+import type { CatalogProductRow, HomeCatalog, HomeEntry, HomeSlotKind } from "./types";
 
 const byCode = new Map(products.map((product) => [product.code, product]));
 
-function slotProducts(slot: (typeof homeSlots)[number]["slot"]): CatalogProduct[] {
+/** Projection d'une fiche sur les colonnes de la vue `catalog_products`. */
+function toRow({
+  description: _description,
+  variants: _variants,
+  specs: _specs,
+  ...row
+}: (typeof products)[number]): CatalogProductRow {
+  void _description;
+  void _variants;
+  void _specs;
+  return row;
+}
+
+function slotEntries(slot: HomeSlotKind): HomeEntry[] {
   return homeSlots
     .filter((entry) => entry.slot === slot)
     .toSorted((a, b) => a.position - b.position)
-    .flatMap((entry) => {
-      const product = byCode.get(entry.product_code);
-      return product ? [product] : [];
+    .flatMap(({ product_code, slot: _slot, ...entry }) => {
+      void _slot;
+      const product = byCode.get(product_code);
+      return product ? [{ ...entry, product }] : [];
     });
 }
 
 export const staticCatalogRepository: CatalogRepository = {
   async listProducts() {
-    return products;
+    return products.map(toRow);
   },
   async getProductBySlug(slug) {
     return products.find((product) => product.slug === slug) ?? null;
   },
   async getHome(): Promise<HomeCatalog> {
     return {
-      hero: slotProducts("hero"),
-      tiles: slotProducts("tile"),
-      rail: slotProducts("rail"),
-      compare: slotProducts("compare"),
+      hero: slotEntries("hero"),
+      tile: slotEntries("tile"),
+      rail: slotEntries("rail"),
+      compare: slotEntries("compare"),
     };
   },
   async listBrands() {
-    return [
-      { slug: "apple", name: "Apple", tagline: "iPhone, AirPods et Apple Watch." },
-      { slug: "samsung", name: "Samsung", tagline: "Galaxy A, Galaxy Buds et Galaxy Watch." },
-      { slug: "xiaomi", name: "Xiaomi", tagline: "Redmi Note, Redmi Watch et Smart Band." },
-    ] as const;
+    return brands.toSorted((a, b) => a.position - b.position);
   },
   async listCategories() {
     return categories;

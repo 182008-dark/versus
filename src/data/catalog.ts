@@ -1,7 +1,8 @@
 import type {
+  CatalogBrand,
   CatalogCategory,
-  CatalogProduct,
   HomeSlot,
+  ProductDetail,
   ProductVariant,
 } from "@/lib/catalog/types";
 
@@ -28,6 +29,22 @@ const variant = (
   position,
   ...extras,
 });
+
+export const brands: readonly CatalogBrand[] = [
+  { slug: "apple", name: "Apple", tagline: "iPhone, AirPods et Apple Watch.", position: 0 },
+  {
+    slug: "samsung",
+    name: "Samsung",
+    tagline: "Galaxy A, Galaxy Buds et Galaxy Watch.",
+    position: 1,
+  },
+  {
+    slug: "xiaomi",
+    name: "Xiaomi",
+    tagline: "Redmi Note, Redmi Watch et Smart Band.",
+    position: 2,
+  },
+];
 
 export const categories: readonly CatalogCategory[] = [
   {
@@ -60,7 +77,7 @@ export const categories: readonly CatalogCategory[] = [
   },
 ];
 
-export const products: readonly CatalogProduct[] = [
+export const products: readonly ProductDetail[] = [
   {
     id: "00000000-0000-4000-8000-000000000001",
     code: "ip18",
@@ -425,7 +442,7 @@ export const homeSlots: readonly HomeSlot[] = [
     position: 0,
     theme_key: "apple",
     headline: null,
-    subline: null,
+    subline: "Puce A20 Pro. Ouverture variable. Quatre finitions, dont un nouveau bordeaux.",
   },
   {
     slot: "hero",
@@ -433,21 +450,21 @@ export const homeSlots: readonly HomeSlot[] = [
     position: 1,
     theme_key: "samsung",
     headline: null,
-    subline: null,
+    subline: "Puce Snapdragon Wear Elite et One UI 9 Watch. En 40 et 44 mm.",
   },
   {
     slot: "hero",
     product_code: "rn15",
     position: 2,
     theme_key: "xiaomi",
-    headline: null,
-    subline: null,
+    headline: "Redmi Note 15 Pro+",
+    subline: "Charge HyperCharge 100 W. Pensé pour durer, et pour tous les budgets.",
   },
   {
     slot: "tile",
     product_code: "a57",
     position: 0,
-    theme_key: "samsung",
+    theme_key: "samsung-dark",
     headline: "Galaxy A57 5G",
     subline: null,
   },
@@ -455,7 +472,7 @@ export const homeSlots: readonly HomeSlot[] = [
     slot: "tile",
     product_code: "ap5",
     position: 1,
-    theme_key: "apple",
+    theme_key: "apple-light",
     headline: null,
     subline: null,
   },
@@ -463,7 +480,7 @@ export const homeSlots: readonly HomeSlot[] = [
     slot: "tile",
     product_code: "gb4",
     position: 2,
-    theme_key: "samsung",
+    theme_key: "samsung-light",
     headline: null,
     subline: null,
   },
@@ -471,7 +488,7 @@ export const homeSlots: readonly HomeSlot[] = [
     slot: "tile",
     product_code: "aw12",
     position: 3,
-    theme_key: "apple",
+    theme_key: "apple-night",
     headline: null,
     subline: null,
   },
@@ -479,7 +496,7 @@ export const homeSlots: readonly HomeSlot[] = [
     slot: "tile",
     product_code: "rw6",
     position: 4,
-    theme_key: "xiaomi",
+    theme_key: "xiaomi-light",
     headline: null,
     subline: null,
   },
@@ -575,6 +592,46 @@ export const homeSlots: readonly HomeSlot[] = [
     slot: "compare",
     product_code: "rn15",
     position: 2,
+    theme_key: "xiaomi",
+    headline: null,
+    subline: null,
+  },
+  {
+    slot: "compare",
+    product_code: "ap5",
+    position: 3,
+    theme_key: "apple",
+    headline: null,
+    subline: null,
+  },
+  {
+    slot: "compare",
+    product_code: "gb4",
+    position: 4,
+    theme_key: "samsung",
+    headline: null,
+    subline: null,
+  },
+  {
+    slot: "compare",
+    product_code: "aw12",
+    position: 5,
+    theme_key: "apple",
+    headline: null,
+    subline: null,
+  },
+  {
+    slot: "compare",
+    product_code: "gw9",
+    position: 6,
+    theme_key: "samsung",
+    headline: null,
+    subline: null,
+  },
+  {
+    slot: "compare",
+    product_code: "rw6",
+    position: 7,
     theme_key: "xiaomi",
     headline: null,
     subline: null,

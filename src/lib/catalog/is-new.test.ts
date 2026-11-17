@@ -12,4 +12,8 @@ describe("isNew", () => {
   it("rejette une date de référence mal formée", () => {
     expect(isNew(product, "12/09/2026")).toBe(false);
   });
+
+  it("ne signale rien sans date de fin de nouveauté", () => {
+    expect(isNew({ new_until: null }, "2026-11-12")).toBe(false);
+  });
 });
