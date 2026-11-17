@@ -1,3 +1,5 @@
+import "server-only";
+
 import { cacheLife, cacheTag } from "next/cache";
 import { staticCatalogRepository } from "./static-repository";
 
