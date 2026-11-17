@@ -26,12 +26,15 @@ export type VisualProduct = Pick<
  *
  * - `decorative` : alternative vide quand un titre voisin nomme déjà le produit (cartes,
  *   tableau, cartes de marque) ; la fiche garde l'alternative complète.
+ * - `noUpscale` : l’image ne dépasse pas sa taille intrinsèque en pixels CSS (fiche produit, où le
+ *   cadre est plus grand que certaines sources officielles, comme les iPhone 17 et 17e).
  * - Image absente (LEFT JOIN de la vue `catalog_products`) : SVG de secours.
  */
 export function ProductVisual({
   product,
   priority = false,
   decorative = false,
+  noUpscale = false,
   sizes = "(max-width: 640px) 55vw, (max-width: 1024px) 35vw, 260px",
   className,
   style,
@@ -39,6 +42,7 @@ export function ProductVisual({
   product: VisualProduct;
   priority?: boolean;
   decorative?: boolean;
+  noUpscale?: boolean;
   sizes?: string;
   className?: string;
   style?: CSSProperties;
@@ -57,6 +61,7 @@ export function ProductVisual({
       preload: priority,
       loading: priority ? "eager" : "lazy",
       className: "h-full w-full object-contain",
+      style: noUpscale ? { maxWidth: width, maxHeight: height } : undefined,
     });
     if (priority && props.srcSet) {
       preload(props.src, {

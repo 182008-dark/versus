@@ -29,8 +29,9 @@ export function ProductView({
           <ProductVisual
             product={product}
             priority
+            noUpscale
             sizes="(max-width: 900px) 85vw, 46vw"
-            className={`mx-auto flex h-[min(70vw,520px)] max-h-[520px] w-full ${product.visual_kind === "band" ? "max-w-[120px]" : "max-w-[460px]"}`}
+            className={`mx-auto flex h-[min(70vw,520px)] max-h-[520px] w-full items-center justify-center ${product.visual_kind === "band" ? "max-w-[120px]" : "max-w-[460px]"}`}
           />
         </div>
         <div>
