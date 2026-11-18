@@ -1,4 +1,4 @@
-# Budget JavaScript et poids de l'accueil — étape 3
+# Budget JavaScript et poids de l'accueil — étape 3, lot 4 et panier
 
 Seuils du plan (§4.5 et §7.1), vérifiés par `e2e/budget.spec.ts` :
 
@@ -9,6 +9,52 @@ Seuils du plan (§4.5 et §7.1), vérifiés par `e2e/budget.spec.ts` :
 
 Le relèvement à 180 Ko fait dans le commit `ac1f2d9` n'avait pas été décidé par l'utilisateur : le
 seuil est revenu à 150 Ko et le code a été allégé pour le tenir.
+
+## Mesures du 18 novembre 2026 (lot 4 de l'accueil et panier, branche `panier`)
+
+Même procédure (build de production, `VS_TODAY=2026-11-12`, Chromium de Playwright, contexte neuf,
+1440 × 900 px, défilement complet).
+
+| Page                     | JavaScript transféré     | Total transféré | Seuil JS                 |
+| ------------------------ | ------------------------ | --------------- | ------------------------ |
+| `/`                      | **152 592 o** (149,0 Ko) | 473 370 o       | < 153 600 o : tenu       |
+| `/produit/iphone-18-pro` | **152 592 o** (149,0 Ko) | 319 830 o       | < 153 600 o : tenu       |
+| `/panier` (vide)         | 156 595 o (152,9 Ko)     | 320 437 o       | aucun seuil dans le plan |
+
+Marge sur `/` et la fiche : 1 008 octets (2 369 à l'étape 3, 895 sur `b744cd5`). Avant les
+réductions ci-dessous, la branche mesurait 157 192 octets sur `/` et 163 725 sur `/panier`.
+
+`/` et la fiche chargent les mêmes morceaux : le socle (React, routeur, exécution Next.js, environ
+137 Ko), le gabarit (6 723 o gzip -9 : `next/link`, menu mobile, icône du panier et magasin du
+panier), les trois limites d'erreur (3 805 o), les îlots de l'accueil (1 596 o : carrousel et
+flèches du rail) et l'îlot de la fiche (1 587 o : `VariantPicker`, `AddToCartButton`), préchargé
+par les liens des cartes. `/panier` y ajoute son îlot (environ 5,6 Ko) mais pas celui de la fiche.
+
+### Réductions appliquées (de 157 192 à 152 592 octets sur `/`)
+
+1. **Fiche** : les groupes d'options, le nom, le texte de stock et le prix de chaque variante sont
+   calculés par le serveur (`variantViews`, `<Price>` rendu en props) ; l'îlot ne garde que la
+   bascule et `matchSearch` ; classes du bouton passées par le serveur ; annonce d'ajout dans son
+   propre module (`add-outcome.ts`). Morceau de la fiche : de 4 008 à 1 872 octets transférés.
+2. **Filtres sans JavaScript** (refonte §4.7) : rail « Nouveautés » et familles du comparateur en
+   boutons radio et `:has()` (`RadioPills`) ; `PillGroup`, `Pill` et l'îlot `CompareFamilies`
+   retirés, seul `RailArrows` reste. Îlots de l'accueil : de 2 999 à 1 870 octets.
+3. **Magasin du panier** : `maxQuantityPerLine` dans `config/cart-limits.ts`, pour ne plus copier
+   les zones et frais de livraison (`policies.ts`) dans le gabarit.
+4. **Limites d'erreur** : `ErrorActions` écrit ses deux jeux de classes en toutes lettres (test de
+   parité avec `buttonClasses`) et `ErrorState` n'importe plus `Eyebrow` ni `clsx` : de 5 680 à
+   4 642 octets transférés pour les trois.
+5. **Page panier** : vignettes et adresses des fiches préparées par la Server Action (`media`) ;
+   `next/image` et `config/site.ts` ne partent plus dans l'îlot (environ 5 Ko de moins).
+
+### `/panier` au-dessus de 150 Ko
+
+Le plan fixe le seuil sur `/` et une fiche (§7.1) ; aucun n'est fixé pour `/panier`. La page
+dépasse 150 Ko de 3 Ko : son îlot (lignes, quantités, récapitulatif, devis, messages) s'ajoute à un
+socle commun déjà à 151 Ko. `e2e/budget.spec.ts` mesure son poids total (< 1 Mo) et joint son
+JavaScript au rapport (annotation), sans seuil. Fixer un seuil pour cette page (et les moyens de
+le tenir : par exemple un îlot panier chargé après le premier affichage) est une décision à
+prendre avec l'utilisateur.
 
 ## Mesures du 17 novembre 2026
 
