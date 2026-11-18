@@ -34,10 +34,10 @@ export const paymentWindowMinutes = 30;
 export const returnWindowDays = 7;
 
 /**
- * Quantité maximale d'une même variante dans le panier (`shop_settings.max_qty_per_line`, §5.5).
- * Le panier local la respecte, et le serveur la réapplique (`qty_capped`).
+ * Quantité maximale d'une même variante dans le panier : définie dans `cart-limits.ts`, un module
+ * sans les zones de livraison, pour ne pas les envoyer dans le JavaScript de chaque page.
  */
-export const maxQuantityPerLine = 5;
+export { maxQuantityPerLine } from "./cart-limits";
 
 /** Code d'une zone de livraison (`delivery_zones.code`, §5.5). */
 export type DeliveryZoneCode = "lome" | "maritime" | "plateaux" | "centrale" | "kara" | "savanes";

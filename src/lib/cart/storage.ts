@@ -1,4 +1,4 @@
-import { maxQuantityPerLine } from "@/config/policies";
+import { maxQuantityPerLine } from "@/config/cart-limits";
 import { MAX_CART_LINES, type CartLine } from "./cart-reducer";
 import { isCartSku, isZoneCode } from "./sku";
 

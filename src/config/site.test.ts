@@ -35,8 +35,8 @@ describe("routeFor", () => {
     expect(brandHref("xiaomi")).toBe("/marques/xiaomi");
   });
 
-  it("renvoie null pour une route prévue mais pas encore livrée", () => {
-    expect(routeFor("panier")).toBeNull();
+  it("livre la page panier et masque une route non livrée", () => {
+    expect(routeFor("panier")).toBe("/panier");
     expect(routeFor("faq")).toBeNull();
   });
 
@@ -55,7 +55,7 @@ describe("deliveredLinks et deliveredGroups", () => {
     expect(
       deliveredLinks([
         { label: "Accueil", route: "accueil" },
-        { label: "Panier", route: "panier" },
+        { label: "FAQ", route: "faq" },
       ]),
     ).toEqual([{ label: "Accueil", href: "/" }]);
   });
@@ -63,7 +63,7 @@ describe("deliveredLinks et deliveredGroups", () => {
   it("retirent un groupe devenu vide", () => {
     expect(
       deliveredGroups([
-        { label: "Boutique", links: [{ label: "Panier", route: "panier" }] },
+        { label: "Boutique", links: [{ label: "FAQ", route: "faq" }] },
         { label: "Aide", links: [{ label: "Garantie", route: "garantie" }] },
       ]),
     ).toEqual([{ label: "Aide", links: [{ label: "Garantie", href: "/garantie" }] }]);
@@ -71,8 +71,8 @@ describe("deliveredLinks et deliveredGroups", () => {
 });
 
 describe("gabarit du lot 3 de la refonte", () => {
-  it("masque toutes les icônes de l'en-tête (aucune route livrée)", () => {
-    expect(headerActions).toEqual([]);
+  it("affiche le panier maintenant que sa page existe", () => {
+    expect(headerActions).toContainEqual({ key: "cart", label: "Panier", href: "/panier" });
   });
 
   it("mène chaque marque à sa page et les catégories aux ancres de la boutique", () => {

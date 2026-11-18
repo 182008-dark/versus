@@ -12,6 +12,7 @@ const PAGES = [
   "/marques/samsung",
   "/produit/iphone-18-pro",
   "/produit/galaxy-buds4",
+  "/panier",
 ];
 const HYDRATION = /hydrat|did not match|server rendered|#418|#423|#425/i;
 
@@ -44,7 +45,7 @@ test("le test détecte bien une erreur d'hydratation (contrôle du contrôle)", 
   await page.route("/", async (route) => {
     const response = await route.fetch();
     // Premier titre seulement (le HTML précède la charge utile RSC, qui garde le texte d'origine).
-    const html = (await response.text()).replace(">Les derniers arrivés.<", ">Texte modifié<");
+    const html = (await response.text()).replace(">Parcourir par marque<", ">Texte modifié<");
     await route.fulfill({ response, body: html });
   });
   await page.goto("/");

@@ -29,15 +29,15 @@ describe("cartReducer : ajout", () => {
   });
 
   it("plafonne aussi au stock connu, et n'ajoute rien quand il est épuisé", () => {
-    expect(cartReducer([], { type: "add", sku: "A", qty: 4, max: 2 })).toEqual([
-      { sku: "A", qty: 2 },
+    expect(cartReducer([], { type: "add", sku: "AAAA-1", qty: 4, max: 2 })).toEqual([
+      { sku: "AAAA-1", qty: 2 },
     ]);
     expect(cartReducer(two, { type: "add", sku: "IP18-BOR-256", max: 0 })).toBe(two);
   });
 
   it("renvoie le même état quand la ligne est déjà au plafond", () => {
-    const full: CartLine[] = [{ sku: "A", qty: 5 }];
-    expect(cartReducer(full, { type: "add", sku: "A" })).toBe(full);
+    const full: CartLine[] = [{ sku: "AAAA-1", qty: 5 }];
+    expect(cartReducer(full, { type: "add", sku: "AAAA-1" })).toBe(full);
   });
 
   it(`n'ajoute pas de ${MAX_CART_LINES + 1}e ligne`, () => {
@@ -48,8 +48,8 @@ describe("cartReducer : ajout", () => {
   });
 
   it("ignore une quantité non entière ou négative", () => {
-    expect(cartReducer(two, { type: "add", sku: "A", qty: 1.5 })).toBe(two);
-    expect(cartReducer(two, { type: "add", sku: "A", qty: -1 })).toBe(two);
+    expect(cartReducer(two, { type: "add", sku: "AAAA-1", qty: 1.5 })).toBe(two);
+    expect(cartReducer(two, { type: "add", sku: "AAAA-1", qty: -1 })).toBe(two);
   });
 });
 
@@ -85,10 +85,18 @@ describe("cartReducer : retrait, vidage, remplacement", () => {
   it("vide le panier", () => {
     expect(cartReducer(two, { type: "clear" })).toEqual([]);
   });
+});
 
-  it("remplace l'état (autre onglet, relecture du stockage)", () => {
-    const next = [{ sku: "A57-NOI-128", qty: 1 }];
-    expect(cartReducer(two, { type: "replace", lines: next })).toEqual(next);
+describe("cartReducer : SKU invalides", () => {
+  it.each(["bad sku", "", "iP18-bor", "<script>", "A".repeat(41)])(
+    "ignore l'ajout du SKU mal formé %j (même règle que le stockage et le serveur)",
+    (sku) => {
+      expect(cartReducer(two, { type: "add", sku })).toBe(two);
+    },
+  );
+
+  it("ignore aussi un SKU mal formé pour une quantité", () => {
+    expect(cartReducer(two, { type: "setQty", sku: "bad sku", qty: 2 })).toBe(two);
   });
 });
 

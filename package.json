@@ -26,6 +26,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "capture:refonte": "tsx scripts/capture-refonte.ts",
+    "capture:panier": "tsx scripts/capture-panier.ts",
     "capture:comparaison": "tsx scripts/planche-avant-apres.ts"
   },
   "dependencies": {

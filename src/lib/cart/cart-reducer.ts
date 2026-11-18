@@ -1,4 +1,5 @@
-import { maxQuantityPerLine } from "@/config/policies";
+import { maxQuantityPerLine } from "@/config/cart-limits";
+import { isCartSku } from "./sku";
 
 /**
  * Panier local (§6, étape 5) : seulement des SKU et des quantités. Aucun prix n'est conservé dans
@@ -15,9 +16,7 @@ export type CartAction =
   /** Fixe la quantité (bornée de 1 au plafond) ; `max` à 0 retire la ligne (rupture). */
   | { type: "setQty"; sku: string; qty: number; max?: number }
   | { type: "remove"; sku: string }
-  | { type: "clear" }
-  /** Remplace tout (relecture du stockage, autre onglet). */
-  | { type: "replace"; lines: readonly CartLine[] };
+  | { type: "clear" };
 
 /** Plafond d'une ligne : la limite par ligne, ou le stock connu s'il est plus bas. */
 function ceiling(max: number | undefined): number {
@@ -30,11 +29,13 @@ function withQty(state: readonly CartLine[], sku: string, qty: number): CartLine
 
 /**
  * Réducteur pur du panier. Il renvoie le même tableau quand rien ne change, pour éviter une
- * écriture et un rendu inutiles.
+ * écriture et un rendu inutiles. Un SKU mal formé (`isCartSku`, même motif que le stockage et le
+ * schéma zod du serveur) n'entre jamais dans le panier : sinon tout le devis serait refusé.
  */
 export function cartReducer(state: readonly CartLine[], action: CartAction): readonly CartLine[] {
   switch (action.type) {
     case "add": {
+      if (!isCartSku(action.sku)) return state;
       const qty = action.qty ?? 1;
       const limit = ceiling(action.max);
       if (!Number.isInteger(qty) || qty < 1 || limit === 0) return state;
@@ -47,6 +48,7 @@ export function cartReducer(state: readonly CartLine[], action: CartAction): rea
       return next === current.qty ? state : withQty(state, action.sku, next);
     }
     case "setQty": {
+      if (!isCartSku(action.sku)) return state;
       const current = state.find((line) => line.sku === action.sku);
       if (!current || !Number.isInteger(action.qty)) return state;
       const limit = ceiling(action.max);
@@ -60,8 +62,6 @@ export function cartReducer(state: readonly CartLine[], action: CartAction): rea
         : state;
     case "clear":
       return state.length === 0 ? state : [];
-    case "replace":
-      return action.lines;
   }
 }
 

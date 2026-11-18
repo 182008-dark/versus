@@ -67,9 +67,23 @@ export type CartQuote = {
 /** Erreurs de la RPC (`raise exception … message = 'VS_…'`). */
 export type QuoteErrorCode = "VS_INVALID" | "VS_INVALID_ZONE";
 
-/** Résultat de la Server Action `priceCart` (gabarit du §3.4). */
+/**
+ * Adresse de la fiche et vignette d'une ligne, préparées par la Server Action (hors contrat de la
+ * RPC) : le navigateur n'a ainsi à charger ni la table des routes (`routeFor`) ni l'optimiseur
+ * d'images de `next/image` (budget JavaScript de la page panier).
+ */
+export type CartLineMedia = {
+  /** `null` si la variante est inconnue ou la route des fiches non livrée. */
+  href: string | null;
+  /** Image optimisée (64 px, 128 px en densité 2), `null` sans visuel. */
+  src: string | null;
+  srcSet: string | null;
+};
+
+/** Résultat de la Server Action `priceCart` (gabarit du §3.4) : `media` est indexé par SKU. */
 export type PriceCartResult =
-  { ok: true; data: CartQuote } | { ok: false; code: QuoteErrorCode | "VS_UNAVAILABLE" };
+  | { ok: true; data: CartQuote; media: Record<string, CartLineMedia> }
+  | { ok: false; code: QuoteErrorCode | "VS_UNAVAILABLE" };
 
 /**
  * Point d'accès unique au calcul du panier (côté serveur). Implémenté par `staticCartQuoter`

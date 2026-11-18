@@ -1,13 +1,18 @@
 import { BrandMark } from "@/components/ui/BrandMark";
 import { Price } from "@/components/ui/Price";
-import { brandHref } from "@/config/site";
+import { buttonClasses } from "@/components/ui/button-styles";
+import { brandHref, routeFor } from "@/config/site";
 import type { ProductDetail } from "@/lib/catalog/types";
+import { initialVariant, variantViews } from "@/lib/catalog/variant-options";
 import { compareRows } from "@/lib/compare/rows";
 import { ProductVisual } from "./ProductVisual";
+import { VariantPicker } from "./VariantPicker";
 
 /**
- * Fiche produit minimale de l'étape 3 (§4.3) : visuel, nom, accroche, prix minimal, coloris et
- * prix des variantes, caractéristiques (lignes de `lib/compare/rows.ts`), garantie et mention
+ * Fiche produit (§4.3) : visuel, nom, accroche, prix minimal, choix de la variante et ajout au
+ * panier (îlot VariantPicker, étape 5 : seules les variantes actives comptent, et le serveur
+ * calcule pour chacune ses options, son texte et son prix rendu),
+ * caractéristiques (lignes de `lib/compare/rows.ts`), garantie et mention
  * « Prix indicatifs, aucune vente réelle ». Toutes les données arrivent en props : la même vue
  * servira à l'aperçu admin (étape 8). Le nom de la marque mène à sa page (refonte, lot 3).
  */
@@ -59,22 +64,17 @@ export function ProductView({
           <p className="mt-2 text-sm text-muted">
             Garantie indiquée : {product.warranty_months} mois
           </p>
-          <h2 id="coloris-titre" className="mt-8 text-base font-bold">
-            Coloris et prix
-          </h2>
-          <ul role="list" aria-labelledby="coloris-titre" className="mt-3 flex flex-wrap gap-2">
-            {variants.map((variant) => (
-              <li
-                key={variant.sku}
-                className="rounded-full border border-line px-3.5 py-2 text-sm leading-tight"
-              >
-                <span className="font-semibold">{variant.color_name}</span>
-                {" · "}
-                <Price amount={variant.price_fcfa} />
-                {variant.stock === 0 ? <span className="text-muted"> · Indisponible</span> : null}
-              </li>
-            ))}
-          </ul>
+          {variants.length > 0 ? (
+            <VariantPicker
+              initialSku={initialVariant(variants).sku}
+              cartHref={routeFor("panier")}
+              buttonClassName={buttonClasses({ size: "lg", className: "w-full sm:w-auto" })}
+              views={variantViews(product.name, variants).map((view) => ({
+                ...view,
+                price: <Price amount={view.price_fcfa} size="lead" />,
+              }))}
+            />
+          ) : null}
           <h2 className="mt-8 text-base font-bold">Caractéristiques</h2>
           <dl className="mt-3 grid grid-cols-2 gap-4 border-t border-line-soft pt-4">
             {specs.map((row) => (
