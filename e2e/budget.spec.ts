@@ -30,8 +30,8 @@ async function getJavaScriptTransferSize(page: Page) {
   );
 }
 
-test.describe("budget d'accueil", () => {
-  for (const path of ["/", "/produit/iphone-18-pro"]) {
+test.describe("budgets (accueil, fiche, pages marque)", () => {
+  for (const path of ["/", "/produit/iphone-18-pro", "/marques/samsung"]) {
     test(`le JavaScript compressé de ${path} reste sous 150 Ko`, async ({ page }) => {
       await loadWholePage(page, path);
       const bytes = await getJavaScriptTransferSize(page);
@@ -41,19 +41,21 @@ test.describe("budget d'accueil", () => {
     });
   }
 
-  test("les ressources et le document de l'accueil restent sous 1 Mo", async ({ page }) => {
-    await loadWholePage(page);
-    const { resources, document } = await page.evaluate(() => ({
-      resources: performance
-        .getEntriesByType("resource")
-        .reduce((sum, entry) => sum + (entry as PerformanceResourceTiming).transferSize, 0),
-      document: (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)
-        .transferSize,
-    }));
-    expect(document, "le document HTML est mesuré").toBeGreaterThan(0);
-    const total = resources + document;
-    expect(total, `Transfert total : ${total} octets (document ${document})`).toBeLessThan(
-      MAX_TOTAL_BYTES,
-    );
-  });
+  for (const path of ["/", "/marques/samsung", "/marques/xiaomi"]) {
+    test(`les ressources et le document de ${path} restent sous 1 Mo`, async ({ page }) => {
+      await loadWholePage(page, path);
+      const { resources, document } = await page.evaluate(() => ({
+        resources: performance
+          .getEntriesByType("resource")
+          .reduce((sum, entry) => sum + (entry as PerformanceResourceTiming).transferSize, 0),
+        document: (performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming)
+          .transferSize,
+      }));
+      expect(document, "le document HTML est mesuré").toBeGreaterThan(0);
+      const total = resources + document;
+      expect(total, `Transfert total : ${total} octets (document ${document})`).toBeLessThan(
+        MAX_TOTAL_BYTES,
+      );
+    });
+  }
 });

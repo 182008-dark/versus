@@ -87,10 +87,18 @@ test("liens internes, actions de formulaires et ancres", async ({ page, request,
     if (count === 0) errors.push(`${anchor.from} → ${anchor.target}#${anchor.id} : id introuvable`);
   }
 
-  // Accueil, styleguide et les 6 pages d'information (mentions, crédits, confidentialité, CGV,
-  // livraison, garantie).
+  // Accueil, styleguide, les 6 pages d'information (mentions, crédits, confidentialité, CGV,
+  // livraison, garantie) et les 3 pages marque (lot 3 de la refonte).
   expect(visited.size, "accueil, styleguide et pages d'information").toBeGreaterThanOrEqual(8);
-  for (const path of ["/confidentialite", "/cgv", "/livraison", "/garantie"]) {
+  for (const path of [
+    "/confidentialite",
+    "/cgv",
+    "/livraison",
+    "/garantie",
+    "/marques/apple",
+    "/marques/samsung",
+    "/marques/xiaomi",
+  ]) {
     expect(visited.has(path), `${path} est atteinte par un lien`).toBe(true);
   }
   expect(errors).toEqual([]);

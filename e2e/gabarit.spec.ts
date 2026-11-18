@@ -11,6 +11,7 @@ const PAGES = [
   "/",
   "/boutique",
   "/produit/iphone-18-pro",
+  "/marques/samsung",
   "/mentions-legales",
   "/credits",
   "/confidentialite",
@@ -66,15 +67,23 @@ test.describe("landmarks", () => {
   });
 });
 
-test.describe("en-tête de l'étape 3", () => {
-  test("les icônes non livrées sont absentes et la navigation mène à la boutique", async ({
-    page,
-  }) => {
+test.describe("en-tête (lot 3 de la refonte)", () => {
+  test("les icônes non livrées sont absentes, les marques mènent à leur page", async ({ page }) => {
     await page.goto("/");
     const header = page.getByRole("banner");
     for (const name of ["Rechercher", "Comparateur", "Mon compte", "Panier"]) {
       await expect(header.getByRole("link", { name })).toHaveCount(0);
       await expect(header.getByRole("button", { name })).toHaveCount(0);
+    }
+    for (const [name, href] of [
+      ["Apple", "/marques/apple"],
+      ["Samsung", "/marques/samsung"],
+      ["Xiaomi", "/marques/xiaomi"],
+    ] as const) {
+      await expect(header.getByRole("link", { name, exact: true }).first()).toHaveAttribute(
+        "href",
+        href,
+      );
     }
     await expect(header.getByRole("link", { name: "Smartphones" })).toHaveAttribute(
       "href",
