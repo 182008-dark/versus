@@ -46,8 +46,22 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 - Budget JavaScript : 152 592 octets sur `/` et la fiche (sous 150 Ko), après réductions
   (docs/audits/budget.md) ; Lighthouse mobile mesuré (docs/audits/lighthouse-lot-4.md : LCP
   simulé toujours au-dessus de 2,5 s sur une machine lente, critère ouvert).
-- Captures dans `docs/refonte/lot-4/`. Les références de `e2e/visuel.spec.ts` restent celles d'avant
-  le lot 4 jusqu'à la revue visuelle (écarts E23, E24 et E27 proposés).
+- Captures dans `docs/refonte/lot-4/` et références de `e2e/visuel.spec.ts` régénérées après la
+  revue de cohérence (écarts E23, E24 et E27 proposés, à relire visuellement).
+
+### Revue de cohérence du lot 4 et du panier (branche `panier`)
+
+- « Nouveautés » sur téléphone : flèches masquées sous 641 px (défilement au doigt), pastilles
+  resserrées, les quatre entières dès 360 px (test e2e à 360 et 390 px).
+- Comparateur sur téléphone : valeurs toujours alignées à droite, même sous le nom du modèle ;
+  liens empilés qui nomment le modèle à l'écran (« Voir le produit Galaxy S26 Ultra »).
+- Fiche : un coloris n'est « Indisponible » (gris barré, refonte §3.4) que si toutes ses variantes
+  sont épuisées, sinon « Bordeaux · 512 Go seulement » ; prix et stock de la variante annoncés
+  dans une région `role="status"` ; bouton d'ajout jamais remonté ; « Photo d'un seul coloris ».
+- Panier : sur `/panier`, l'icône de l'en-tête est un lien `aria-current="page"` (plus de dialogue
+  annoncé) ; même ligne « zone · délai » sous « Livraison » dans le tiroir et la page
+  (`zone_label` ajouté au devis) ; « (2 articles) » insécable ; pastille du coloris sur la
+  vignette (`color_hex` ajouté aux lignes du devis, ADR 003).
 
 ### Refonte, lot 3 : pages marque et liens (branche `refonte-lot-3-marques`)
 

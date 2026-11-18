@@ -17,11 +17,13 @@ Même procédure (build de production, `VS_TODAY=2026-11-12`, Chromium de Playwr
 
 | Page                     | JavaScript transféré     | Total transféré | Seuil JS                 |
 | ------------------------ | ------------------------ | --------------- | ------------------------ |
-| `/`                      | **152 592 o** (149,0 Ko) | 473 370 o       | < 153 600 o : tenu       |
-| `/produit/iphone-18-pro` | **152 592 o** (149,0 Ko) | 319 830 o       | < 153 600 o : tenu       |
-| `/panier` (vide)         | 156 595 o (152,9 Ko)     | 320 437 o       | aucun seuil dans le plan |
+| `/`                      | **152 669 o** (149,1 Ko) | 474 220 o       | < 153 600 o : tenu       |
+| `/produit/iphone-18-pro` | **152 669 o** (149,1 Ko) | 320 230 o       | < 153 600 o : tenu       |
+| `/panier` (vide)         | 156 733 o (153,1 Ko)     | 320 788 o       | aucun seuil dans le plan |
 
-Marge sur `/` et la fiche : 1 008 octets (2 369 à l'étape 3, 895 sur `b744cd5`). Avant les
+Marge sur `/` et la fiche : 931 octets (2 369 à l'étape 3, 895 sur `b744cd5`, 1 008 avant les
+corrections de la revue : icône du panier en lien sur `/panier`, région d'annonce du prix de la
+variante, pastilles « Indisponible » et « 512 Go seulement », soit 77 octets). Avant les
 réductions ci-dessous, la branche mesurait 157 192 octets sur `/` et 163 725 sur `/panier`.
 
 `/` et la fiche chargent les mêmes morceaux : le socle (React, routeur, exécution Next.js, environ
