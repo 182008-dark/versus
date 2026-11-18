@@ -32,6 +32,16 @@ du plan (`v0.N.0`), puis `v1.0.0`.
   étendus aux pages marque ; références visuelles de l'accueil régénérées. Captures dans
   `docs/refonte/lot-3/`.
 
+- Après revue : cartes compactes de 400 à 640 px (accroche masquée, environ 330 px de haut au
+  lieu de 635 à 412 px) ; catégorie et pastilles de coloris dans les cartes des pages marque
+  (`colorSwatches()`) ; produit phare de chaque section en grande carte de 2 colonnes dès 901 px ;
+  « Voir le produit » au lieu de « Acheter » sur les pages marque (E27 pour le rail, le hero, les
+  tuiles et la boutique) ; sélecteur « Apple vs Samsung vs Xiaomi » sur une ligne dès 360 px ;
+  marge de défilement des liens sous la barre de catégories collante (WCAG 2.4.11). Tests :
+  `colorSwatches`, `ProductCard` (libellé, coloris, phare) ; e2e de hauteur des cartes à 360, 390
+  et 412 px, catégorie et coloris à 375 px, grande carte à 1440 px, sélecteur sur une ligne,
+  Maj+Tab sous la barre collante. Captures de `docs/refonte/lot-3/` régénérées.
+
 ### Refonte, lot 2 : fondations du design (branche `refonte-lot-2-fondations`)
 
 - Gris « pierre » légèrement verdis (`--gray-950` `#1A1D1B` … `--gray-25` `#FAFBFA`, nuit

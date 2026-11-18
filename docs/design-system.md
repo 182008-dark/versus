@@ -236,9 +236,21 @@ Tous composants serveur, sans JavaScript ; données calculées par `src/lib/cata
 | `BrandCompare`  | « Comparer avec » : deux raccourcis vers le comparateur (accueil `#comparer` tant que `/comparer` n'existe pas), nom lu « Samsung Galaxy A57 5G contre Apple iPhone 18 Pro »                                                                                                                                                        |
 | `BrandSeeAlso`  | « Voir aussi » : les deux autres marques sur leur fond pastel, avec leur nombre de produits calculé                                                                                                                                                                                                                                 |
 
-`ProductCard` prend `layout="adaptive"` dans `grid-products` : **liste sous 400 px** (photo de
-88 px à gauche ; marque, nom, prix et action à droite ; accroche masquée), verticale au-delà. La
-disposition par défaut (`stack`) reste celle du rail et de la boutique.
+`ProductCard` prend `layout="adaptive"` dans `grid-products` (pages marque) : **liste sous 400 px**
+(photo de 88 px à gauche ; marque, nom, catégorie, pastilles de coloris, prix et action à droite),
+**compacte de 400 à 640 px** (2 colonnes étroites : accroche masquée, photo de 120 px, nom en
+17 px sur 2 lignes au plus, environ 330 px de haut à 412 px), verticale au-delà. `category`
+(`categoryLabel()`) et `swatches` (`colorSwatches()` : un coloris par `color_slug`, 4 pastilles au
+plus puis « +N », noms lus par les lecteurs d'écran) sont optionnels. `featured` : produit phare
+de la section, grande carte horizontale sur 2 colonnes dès 901 px (`md:col-span-2` posé par la
+page). Le bouton dit « Voir le produit » (règle 4 de la direction) ; la disposition par défaut
+(`stack`) reste celle du rail et de la boutique, avec « Acheter » jusqu'aux lots 4 et 5 (E27).
+
+`BrandSwitcher` se resserre sous 420 px (noms en 14 px, « VS » de 28 px, espacements de 4 px) pour
+tenir sur une ligne dès 360 px : un « VS » ne commence jamais une ligne. `CategoryBar` collante
+(dès 901 px, environ 69 px sous l'en-tête de 56 px) : les liens des grilles de la page marque ont
+`scroll-mt-[76px]`, qui s'ajoute au `scroll-padding-top` de `<html>`, pour qu'un lien atteint au
+clavier ne passe jamais sous la barre (WCAG 2.4.11, test Maj+Tab).
 
 Pièges de mise en page : un `sr-only` (position absolue) dans un conteneur à défilement horizontal
 doit avoir un ancêtre positionné **dans** ce conteneur (`relative` sur le lien), sinon il déborde
