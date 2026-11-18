@@ -4,7 +4,7 @@ import { plannedPathFor, routeFor, routeKeys } from "../src/config/site";
 import { products } from "../src/data/catalog";
 import { isNew } from "../src/lib/catalog/is-new";
 
-/** Pages publiques livrées (étapes 1 à 3). */
+/** Pages publiques livrées (étapes 1 à 3, refonte, panier). */
 const PAGES = [
   "/",
   "/boutique",
@@ -18,6 +18,7 @@ const PAGES = [
   "/cgv",
   "/livraison",
   "/garantie",
+  "/panier",
 ];
 
 /** Pages d'information de l'étape 2 et leur titre de niveau 1. */
@@ -125,7 +126,10 @@ test.describe("accueil de l'étape 3", () => {
     await expect(page).toHaveURL(/\/boutique#smartphones$/);
     await expect(page.getByRole("heading", { level: 2, name: "Smartphones" })).toBeVisible();
     await page.goto("/");
-    await page.locator(".hero-slide-active").getByRole("link", { name: "Acheter" }).click();
+    await page
+      .locator(".hero-slide-active")
+      .getByRole("link", { name: "Voir l'iPhone 18 Pro" })
+      .click();
     await expect(page).toHaveURL(/\/produit\/iphone-18-pro$/);
     await expect(page.getByRole("heading", { level: 1, name: "iPhone 18 Pro" })).toBeVisible();
   });
@@ -241,11 +245,11 @@ test("chaque élément « masqué » de la table de l'étape 3 est absent du DOM
   }
   // QuizTeaser (#aide) et son formulaire GET.
   await expect(page.locator("#aide, form[action='/aide-au-choix']")).toHaveCount(0);
-  // Hero et tuiles : « Comparer » masqué.
-  for (const zone of [page.locator(".hero-carousel"), page.locator(".promo-grid")]) {
-    await expect(zone.getByRole("link", { name: /comparer/i })).toHaveCount(0);
-    await expect(zone.getByRole("button", { name: /comparer/i })).toHaveCount(0);
-  }
+  // Le hero ouvre le comparateur de l'accueil ; aucune tuile n'a de lien concurrent.
+  await expect(
+    page.locator(".hero-slide-active").getByRole("link", { name: "Comparer" }),
+  ).toHaveAttribute("href", routeFor("comparerAccueil")!);
+  await expect(page.locator(".promo-grid").getByRole("link", { name: /comparer/i })).toHaveCount(0);
   // Cartes : « + Comparer » ; comparateur : panier et lien complet ; CategoryNav : aide au choix.
   for (const name of [
     /\+ ?Comparer/,
@@ -256,21 +260,42 @@ test("chaque élément « masqué » de la table de l'étape 3 est absent du DOM
     await expect(page.getByRole("link", { name })).toHaveCount(0);
     await expect(page.getByRole("button", { name })).toHaveCount(0);
   }
-  // En-tête : Rechercher, Comparateur, Mon compte, Panier.
+  // En-tête : Rechercher, Comparateur et Mon compte restent masqués ; le panier est livré.
   const header = page.getByRole("banner");
-  for (const name of ["Rechercher", "Comparateur", "Mon compte", "Panier"]) {
+  for (const name of ["Rechercher", "Comparateur", "Mon compte"]) {
     await expect(header.getByRole("link", { name })).toHaveCount(0);
   }
+  await expect(header.getByRole("button", { name: "Panier" })).toHaveAttribute(
+    "aria-haspopup",
+    "dialog",
+  );
   // Pied de page : FAQ, Contact, À propos.
   const footer = page.getByRole("contentinfo");
   for (const name of ["FAQ", "Contact", "À propos"]) {
     await expect(footer.getByRole("link", { name, exact: true })).toHaveCount(0);
   }
-  // Ce qui est livré reste là : « Comparer » de la navigation par catégories mène à #comparer.
-  await expect(
-    page.getByRole("navigation", { name: "Catégories" }).getByRole("link", { name: "Comparer" }),
-  ).toHaveAttribute("href", "/#comparer");
+  // La navigation par catégories ne contient que les familles disponibles.
+  await expect(page.getByRole("navigation", { name: "Catégories" }).getByRole("link")).toHaveCount(
+    4,
+  );
   await expect(page.locator("#comparer")).toHaveCount(1);
+});
+
+test("l'accueil présente le catalogue avec des prix, des comptes et des liens uniques", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator(".promo-tile")).toHaveCount(3);
+  await expect(page.locator(".promo-tile-price")).toHaveCount(3);
+  await expect(
+    page.locator(".promo-tile").getByRole("link", { name: /^Voir le produit/ }),
+  ).toHaveCount(3);
+  await expect(page.getByRole("navigation", { name: "Catégories" }).getByText(/^\d+$/)).toHaveCount(
+    4,
+  );
+  await expect(page.locator(".brand-card-products .brand-card-art")).toHaveCount(9);
+  await expect(page.locator(".product-card-whole-link")).not.toHaveCount(0);
+  await expect(page.locator(".product-card-whole-link button")).toHaveCount(0);
 });
 
 test("une fiche produit inconnue répond 404 dès la première visite", async ({ request }) => {

@@ -2,7 +2,11 @@ import { expect, test, type Page } from "@playwright/test";
 
 /**
  * Budgets de l'étape 3 (§4.5 et §7.1 du plan), mesurés sur `next build && next start`
- * (compression gzip du serveur Next), dans un contexte neuf et sans cache.
+ * (compression gzip du serveur Next), dans un contexte neuf et sans cache :
+ * - JavaScript < 150 Ko sur `/` et une fiche (seuil du plan), ainsi que sur une page marque ;
+ * - poids total < 1 Mo sur `/`, les pages marque et la page panier.
+ * Le JavaScript de `/panier` est mesuré et joint au rapport (annotation) sans seuil : le plan n'en
+ * fixe pas pour cette page, et il dépasse aujourd'hui 150 Ko (docs/audits/budget.md).
  */
 const MAX_JAVASCRIPT_BYTES = 150 * 1024;
 const MAX_TOTAL_BYTES = 1024 * 1024;
@@ -30,7 +34,7 @@ async function getJavaScriptTransferSize(page: Page) {
   );
 }
 
-test.describe("budgets (accueil, fiche, pages marque)", () => {
+test.describe("budgets (accueil, fiche, pages marque, panier)", () => {
   for (const path of ["/", "/produit/iphone-18-pro", "/marques/samsung"]) {
     test(`le JavaScript compressé de ${path} reste sous 150 Ko`, async ({ page }) => {
       await loadWholePage(page, path);
@@ -41,9 +45,13 @@ test.describe("budgets (accueil, fiche, pages marque)", () => {
     });
   }
 
-  for (const path of ["/", "/marques/samsung", "/marques/xiaomi"]) {
+  for (const path of ["/", "/marques/samsung", "/marques/xiaomi", "/panier"]) {
     test(`les ressources et le document de ${path} restent sous 1 Mo`, async ({ page }) => {
       await loadWholePage(page, path);
+      test.info().annotations.push({
+        type: "JavaScript transféré",
+        description: `${path} : ${await getJavaScriptTransferSize(page)} octets`,
+      });
       const { resources, document } = await page.evaluate(() => ({
         resources: performance
           .getEntriesByType("resource")

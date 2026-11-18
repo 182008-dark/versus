@@ -5,6 +5,64 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+### Panier (étape 5 avancée, branche `panier`)
+
+- Panier local versionné (`versus.cart.v1`) : réducteur pur, stockage réparé à la relecture,
+  synchronisé entre onglets, magasin lu par `useSyncExternalStore` (aucun écart d'hydratation).
+- Devis calculé par le serveur : interface `CartQuoter` au contrat de la RPC `quote_cart`
+  (catalogue statique aujourd'hui, Supabase à l'étape 4, ADR 003) ; Server Action `priceCart`
+  validée par zod (un prix envoyé est refusé) ; corrections expliquées (variante retirée, quantité
+  ramenée au stock) ; vignettes et adresses des fiches préparées par le serveur.
+- Fiche : `VariantPicker` (radios Coloris / Capacité / Taille, combinaison épuisée grisée et
+  expliquée, adresse `?couleur=&stockage=&taille=`) et `AddToCartButton` (ajout sans quitter la
+  fiche, annonce du résultat réel : ajouté, quantité maximale, panier plein, épuisé).
+- En-tête : icône « Panier, 3 articles » avec `CountBadge`, tiroir mini-panier (`Drawer` sur
+  `<dialog>`, chargé à la demande). Page `/panier` : quantités de 1 à min(5, stock), retrait (focus
+  sur la ligne suivante ou le titre), « Vider le panier » avec confirmation, zone de livraison
+  (zones lues côté serveur), livraison offerte à Lomé dès 300 000 FCFA, totaux du serveur, état
+  vide. Aucune commande ni paiement : « La commande simulée arrive bientôt » (route `commande`
+  non livrée).
+- Tests : réducteur, stockage, devis, schéma, Server Action, messages, `useCartQuote`,
+  `QuantityStepper`, `CartLines`, `CartButton`, `Drawer`, `VariantPicker` ; `e2e/panier.spec.ts`
+  (ajout depuis la fiche, rechargement, faux prix ignoré, stock, variante retirée, zones et
+  frais, vider, focus, axe sur la page et le tiroir) ; `/panier` ajouté à `hydratation.spec` et
+  `budget.spec`. Captures dans `docs/panier/` (`npm run capture:panier`) ; section « Panier » du
+  styleguide (tiroir, quantités, récapitulatif).
+
+### Refonte, lot 4 : accueil (branche `panier`)
+
+- Hero manuel (aucune rotation automatique) : iPhone 18 Pro, Galaxy S26 Ultra, Xiaomi 17 Ultra ;
+  barre ‹ › ● ○ ○ de 44 px sous le texte (sous la photo sur téléphone) ; prix « Dès 970 000 FCFA »
+  en 28 / 22 px ; « Voir l'iPhone 18 Pro », « Tout Apple », « Comparer » ; marque cliquable ; halo
+  flouté et animations infinies retirés, fondu de 400 ms.
+- Catégories en pastilles avec compteur ; 3 tuiles (A57, AirPods Pro 3, Redmi Watch 6) avec prix,
+  un bouton et marque cliquable ; « Nouveautés » avec filtre par marque **sans JavaScript**
+  (`RadioPills` et `:has()`) et lien d'en-tête qui suit le filtre ; « Parcourir par marque »
+  (cartes pastel vers `/marques/<slug>`, médaillons VS, rangées de 112 px sur téléphone) ;
+  comparateur par critère sur téléphone, familles sans JavaScript, groupes de la refonte ;
+  réassurance en 3 éléments simulés ou indicatifs ; titres sans surtitre ni point final.
+- `Pill` et `PillGroup` remplacés par `RadioPills` ; `useCarouselPause`, icônes lecture/pause et
+  champ `visual` des thèmes de marque supprimés ; `ProductCard` scindée (`ProductCardContent`).
+- Budget JavaScript : 152 592 octets sur `/` et la fiche (sous 150 Ko), après réductions
+  (docs/audits/budget.md) ; Lighthouse mobile mesuré (docs/audits/lighthouse-lot-4.md : LCP
+  simulé toujours au-dessus de 2,5 s sur une machine lente, critère ouvert).
+- Captures dans `docs/refonte/lot-4/` et références de `e2e/visuel.spec.ts` régénérées après la
+  revue de cohérence (écarts E23, E24 et E27 proposés, à relire visuellement).
+
+### Revue de cohérence du lot 4 et du panier (branche `panier`)
+
+- « Nouveautés » sur téléphone : flèches masquées sous 641 px (défilement au doigt), pastilles
+  resserrées, les quatre entières dès 360 px (test e2e à 360 et 390 px).
+- Comparateur sur téléphone : valeurs toujours alignées à droite, même sous le nom du modèle ;
+  liens empilés qui nomment le modèle à l'écran (« Voir le produit Galaxy S26 Ultra »).
+- Fiche : un coloris n'est « Indisponible » (gris barré, refonte §3.4) que si toutes ses variantes
+  sont épuisées, sinon « Bordeaux · 512 Go seulement » ; prix et stock de la variante annoncés
+  dans une région `role="status"` ; bouton d'ajout jamais remonté ; « Photo d'un seul coloris ».
+- Panier : sur `/panier`, l'icône de l'en-tête est un lien `aria-current="page"` (plus de dialogue
+  annoncé) ; même ligne « zone · délai » sous « Livraison » dans le tiroir et la page
+  (`zone_label` ajouté au devis) ; « (2 articles) » insécable ; pastille du coloris sur la
+  vignette (`color_hex` ajouté aux lignes du devis, ADR 003).
+
 ### Refonte, lot 3 : pages marque et liens (branche `refonte-lot-3-marques`)
 
 - Pages `/marques/apple`, `/marques/samsung`, `/marques/xiaomi` générées à l'avance

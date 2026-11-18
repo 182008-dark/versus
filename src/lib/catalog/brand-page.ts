@@ -144,3 +144,23 @@ export function colorSwatches(variants: readonly Colored[]): ColorSwatch[] {
   }
   return [...seen.values()];
 }
+
+/**
+ * Vignettes d'une carte « Parcourir par marque » de l'accueil (refonte, §3.1) : le produit le plus
+ * cher de chaque catégorie de la marque, dans l'ordre des catégories, sans les produits déjà mis
+ * en avant plus haut sur la page (`exclude` : hero et tuiles). Calculé, jamais écrit en dur.
+ */
+export function brandShowcase<T extends Priced & Pick<CatalogProductRow, "code" | "category_slug">>(
+  products: readonly T[],
+  categories: readonly CatalogCategory[],
+  brand: Brand,
+  exclude: ReadonlySet<string>,
+  count = 3,
+): T[] {
+  const candidates = productsOfBrand(products, brand).filter(
+    (product) => !exclude.has(product.code),
+  );
+  return groupByCategory(candidates, categories)
+    .map((group) => group.products[0]!)
+    .slice(0, count);
+}

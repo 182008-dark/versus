@@ -5,7 +5,8 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 /**
  * Gabarit public (§3.1) : bandeau fictif, en-tête, <main id="contenu">, pied de page, dans cet
  * ordre. `banner` (header) et `contentinfo` (footer) restent au premier niveau, hors du <main>.
- * CompareTray, CartDrawer et Toaster s'ajouteront ici à l'étape 5.
+ * Le mini-panier (CartDrawer) n'est pas posé ici : l'icône de l'en-tête (CartButton) le charge
+ * à la première ouverture. CompareTray et Toaster arriveront avec le comparateur.
  */
 export default function SiteLayout({ children }: LayoutProps<"/">) {
   return (

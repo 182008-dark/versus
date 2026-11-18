@@ -1,20 +1,11 @@
 import { QuizTeaser } from "@/components/home/QuizTeaser";
 import { ProductCard } from "@/components/product/ProductCard";
-import { Pill } from "@/components/ui/Pill";
-import { PillGroup } from "@/components/ui/PillGroup";
 import { Price } from "@/components/ui/Price";
+import { RadioPills } from "@/components/ui/RadioPills";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { products } from "@/data/catalog";
 import { StyleguideSection } from "./StyleguideSection";
-
-/** États de Pill montrés sans interaction : data-state force survol et focus (globals.css). */
-const pillStates = [
-  { label: "Non sélectionnée", text: "Apple", props: {} },
-  { label: "Sélectionnée (aria-pressed)", text: "Toutes", props: { selected: true } },
-  { label: "Survol", text: "Samsung", props: { "data-state": "hover" } },
-  { label: "Focus clavier", text: "Xiaomi", props: { "data-state": "focus" } },
-] as const;
 
 export function CatalogSection() {
   const sample = products[0];
@@ -30,20 +21,14 @@ export function CatalogSection() {
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="space-y-6">
           <div>
-            <h3 className="mb-3 text-base font-bold">Pill · pastille bascule</h3>
-            <div className="flex flex-wrap items-end gap-4">
-              {pillStates.map((state) => (
-                <figure key={state.label} className="flex flex-col items-start gap-2">
-                  <figcaption className="text-xs text-muted">{state.label}</figcaption>
-                  <Pill {...state.props}>{state.text}</Pill>
-                </figure>
-              ))}
-            </div>
-          </div>
-          <div>
-            <h3 className="mb-3 text-base font-bold">PillGroup · filtres de marque</h3>
-            <PillGroup
-              label="Exemple de filtres"
+            <h3 className="mb-3 text-base font-bold">RadioPills · filtres sans JavaScript</h3>
+            <p className="mb-3 text-sm text-muted">
+              Boutons radio natifs (flèches du clavier) ; ce que le choix affiche est décidé en CSS
+              par <code>:has()</code>. Pastille cochée : fond encre ; focus : anneau vert.
+            </p>
+            <RadioPills
+              legend="Exemple de filtres"
+              name="styleguide-filtres"
               defaultValue="all"
               options={[
                 { value: "all", label: "Toutes" },
@@ -59,7 +44,7 @@ export function CatalogSection() {
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">SectionHeader · en-tête de section</h3>
-            <SectionHeader eyebrow="Nouveautés" title="Les derniers arrivés" />
+            <SectionHeader title="Nouveautés" intro="Titre simple, sans surtitre ni point final." />
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">Reveal · mouvement progressif</h3>

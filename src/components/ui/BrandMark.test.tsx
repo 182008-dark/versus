@@ -40,3 +40,13 @@ describe("BrandMark", () => {
     expect((container.firstElementChild as HTMLElement).className).toContain("text-on-dark");
   });
 });
+
+describe("BrandMark sur un fond coloré", () => {
+  it("prend la couleur du texte voisin avec tone=inherit (hero)", () => {
+    const { container } = render(<BrandMark brand="xiaomi" tone="inherit" />);
+    const mark = container.firstElementChild as HTMLElement;
+    expect(mark.className).toContain("text-current");
+    expect(mark.className).not.toContain("text-brand-ink");
+    expect(container.querySelector("[data-brand-dot]")?.className).toContain("bg-current");
+  });
+});

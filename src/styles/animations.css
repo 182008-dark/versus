@@ -43,43 +43,6 @@
   }
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-16px);
-  }
-}
-
-@keyframes glow {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  50% {
-    transform: scale(1.18);
-    opacity: 0.8;
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
 @keyframes bump {
   0% {
     transform: scale(1);
@@ -110,6 +73,16 @@
   }
   to {
     opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* Tiroir du mini-panier : glisse depuis le bord droit (le panneau reste visible sans mouvement). */
+@keyframes drawer-in {
+  from {
+    translate: 100% 0;
+  }
+  to {
     translate: 0 0;
   }
 }
@@ -157,6 +130,10 @@
       animation: tray-in 0.5s var(--ease-out) both;
     }
 
+    .anim-drawer-in {
+      animation: drawer-in 0.32s var(--ease-out) both;
+    }
+
     .anim-q-in {
       animation: q-in 0.45s var(--ease-out) both;
     }
@@ -174,19 +151,6 @@
     :is(a, button):is(:hover, :focus-visible, [data-state~="hover"], [data-state~="focus"])
       .vs-arrow {
       translate: 5px 0;
-    }
-
-    /* Boucles décoratives du hero */
-    .anim-float {
-      animation: float 7s ease-in-out infinite;
-    }
-
-    .anim-glow {
-      animation: glow 8s ease-in-out infinite;
-    }
-
-    .anim-spin {
-      animation: spin 60s linear infinite;
     }
   }
 

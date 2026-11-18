@@ -10,6 +10,9 @@ const variants = {
     "m-auto w-[min(100%-32px,480px)] max-w-none rounded-box border-0 bg-bg p-8 text-ink shadow-tray",
   /** Plein écran (menu mobile). */
   fullscreen: "m-0 h-dvh max-h-none w-full max-w-none border-0 bg-bg p-0 text-ink",
+  /** Panneau latéral droit (tiroir du mini-panier, `Drawer`) : pleine largeur sous 440 px. */
+  drawer:
+    "anim-drawer-in inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-[min(100%,440px)] max-w-none border-0 bg-bg p-0 text-ink shadow-tray",
 } as const;
 
 export type DialogProps = {

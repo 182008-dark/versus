@@ -44,6 +44,8 @@ const plannedRoutes = {
   aideAccueil: "/#aide",
   recherche: "/recherche",
   panier: "/panier",
+  /** Commande simulée (étape 6) : tant qu'elle n'est pas livrée, le panier l'annonce sans lien. */
+  commande: "/commande",
   suivi: "/suivi",
   compte: "/compte",
   connexion: "/connexion",
@@ -79,6 +81,7 @@ const deliveredRoutes: ReadonlySet<RouteKey> = new Set<RouteKey>([
   "cgv",
   "livraison",
   "garantie",
+  "panier",
 ]);
 
 /** Chemin de la route si elle est livrée, sinon `null` (le lien doit alors être masqué). */

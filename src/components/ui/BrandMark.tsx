@@ -18,7 +18,9 @@ const sizes: Record<BrandMarkSize, { text: string; dot: string }> = {
  * le nom porte l'information, à l'encre de la marque (AA sur son fond, sur blanc et sur la
  * surface). Pose son propre `data-brand` : utilisable sur n'importe quel fond clair.
  *
- * `href` en fait un lien (page de la marque, lot 3) ; `tone="onDark"` pour un fond sombre.
+ * `href` en fait un lien (page de la marque, lot 3) ; `tone="onDark"` pour un fond sombre ;
+ * `tone="inherit"` reprend la couleur du texte voisin, pastille comprise (hero de l'accueil, dont
+ * le fond est à la couleur de la marque : la pastille de marque y serait invisible).
  */
 export function BrandMark({
   brand,
@@ -29,14 +31,14 @@ export function BrandMark({
 }: {
   brand: Brand;
   size?: BrandMarkSize;
-  tone?: "light" | "onDark";
+  tone?: "light" | "onDark" | "inherit";
   href?: string;
   className?: string;
 }) {
   const classes = clsx(
     "inline-flex items-center",
     sizes[size].text,
-    tone === "onDark" ? "text-on-dark" : "text-brand-ink",
+    { light: "text-brand-ink", onDark: "text-on-dark", inherit: "text-current" }[tone],
     href && "min-h-11 underline-offset-4 state-hover:underline",
     className,
   );
@@ -45,7 +47,11 @@ export function BrandMark({
       <span
         aria-hidden="true"
         data-brand-dot=""
-        className={clsx("shrink-0 rounded-full bg-brand-mark", sizes[size].dot)}
+        className={clsx(
+          "shrink-0 rounded-full",
+          tone === "inherit" ? "bg-current" : "bg-brand-mark",
+          sizes[size].dot,
+        )}
       />
       {brandThemes[brand].label}
     </>

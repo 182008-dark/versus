@@ -123,18 +123,32 @@ describe("catalogue de démonstration", () => {
     }
   });
 
-  it("définit les sélections de la maquette et un ordre unique par emplacement", () => {
-    expect(
-      homeSlots.filter((slot) => slot.slot === "hero").map((slot) => slot.product_code),
-    ).toEqual(["ip18", "gw9", "rn15"]);
-    expect(
-      homeSlots.filter((slot) => slot.slot === "tile").map((slot) => slot.product_code),
-    ).toEqual(["a57", "ap5", "gb4", "aw12", "rw6"]);
+  it("définit les sélections de l'accueil (refonte, §3.1 et §5) et un ordre unique par emplacement", () => {
+    const codes = (kind: string) =>
+      homeSlots.filter((slot) => slot.slot === kind).map((slot) => slot.product_code);
+    expect(codes("hero")).toEqual(["ip18", "s26u", "x17u"]);
+    expect(codes("tile")).toEqual(["a57", "app3", "rw6"]);
+    // Comparateur : trois familles de trois produits, une marque par colonne.
+    expect(codes("compare")).toEqual([
+      ...["ip18", "s26u", "x17u"],
+      ...["app3", "gb4p", "xb6"],
+      ...["aw12", "gw9", "xws5"],
+    ]);
+    // Nouveautés : les 10 sorties les plus récentes, de la plus récente à la plus ancienne.
+    const latest = products
+      .toSorted((a, b) => b.release_date.localeCompare(a.release_date))
+      .slice(0, 10)
+      .map((product) => product.code);
+    expect(codes("rail").toSorted()).toEqual(latest.toSorted());
+    const railDates = codes("rail").map(
+      (code) => products.find((product) => product.code === code)!.release_date,
+    );
+    expect(railDates).toEqual(railDates.toSorted().reverse());
     expect(new Set(homeSlots.map((slot) => `${slot.slot}:${slot.position}`)).size).toBe(
       homeSlots.length,
     );
-    const codes = new Set(products.map((product) => product.code));
+    const known = new Set(products.map((product) => product.code));
     for (const slot of homeSlots)
-      expect(codes.has(slot.product_code), slot.product_code).toBe(true);
+      expect(known.has(slot.product_code), slot.product_code).toBe(true);
   });
 });

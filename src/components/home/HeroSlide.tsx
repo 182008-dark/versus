@@ -1,13 +1,20 @@
 import { ProductVisual } from "@/components/product/ProductVisual";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { Button } from "@/components/ui/Button";
-import { productHref } from "@/config/site";
-import { formatFCFA } from "@/lib/format/fcfa";
+import { Price } from "@/components/ui/Price";
+import { brandHref, productHref, routeFor } from "@/config/site";
+import { brandThemes } from "@/lib/brand-themes";
 import type { HomeEntry } from "@/lib/catalog/types";
+import { seeLabel } from "@/lib/format/see-label";
 
 /**
- * Contenu d'une diapositive du hero (maquette : `.slide-in`), composant serveur : texte, prix,
- * « Acheter » et visuel ne pèsent rien dans le JavaScript. Le badge « Nouveau » est retiré des
- * puces du hero (§4.5) ; « Comparer » reste masqué jusqu'à l'étape 5.
+ * Contenu d'une diapositive du hero (refonte, §3.1), composant serveur : rien de ce texte ni du
+ * visuel ne pèse dans le JavaScript.
+ * - pastille de marque cliquable au-dessus du titre (page de la marque) ;
+ * - prix grand juste après le nom (`<Price size="lead">` : 22 px, 28 px dès 641 px, « Dès ») ;
+ * - deux actions : « Voir l'iPhone 18 Pro » (bouton vert, la fiche) et « Tout Apple » (la page
+ *   de la marque), plus « Comparer » en lien discret vers le comparateur de l'accueil.
+ * Le badge « Nouveau » est retiré des diapositives (§4.5).
  */
 export function HeroSlide({
   entry: { product, headline, subline },
@@ -18,39 +25,57 @@ export function HeroSlide({
   tone: "dark" | "light";
   priority: boolean;
 }) {
+  const compareHref = routeFor("comparerAccueil");
+  const brandPage = brandHref(product.brand_slug);
+  const name = headline ?? product.name;
+
   return (
     <div className="hero-slide-inner wrap">
       <div className="hero-text">
-        <p className="hero-eyebrow">{product.brand_name}</p>
-        <h2 className="hero-title">{headline ?? product.name}</h2>
+        <BrandMark
+          brand={product.brand_slug}
+          size="lead"
+          tone="inherit"
+          href={brandPage ?? undefined}
+          className="hero-brand"
+        />
+        <h2 className="hero-title">{name}</h2>
         <p className="hero-sub">{subline ?? product.tagline}</p>
         {product.min_price_fcfa !== null ? (
-          <p className="hero-price">À partir de {formatFCFA(product.min_price_fcfa)}</p>
+          <p className="hero-price">
+            <Price
+              amount={[product.min_price_fcfa, product.max_price_fcfa ?? product.min_price_fcfa]}
+              size="lead"
+            />
+          </p>
         ) : null}
         <div className="hero-cta">
-          <Button
-            href={productHref(product.slug)}
-            variant={tone === "dark" ? "light" : "dark"}
-            size="lg"
-            aria-label={`Acheter ${product.name}`}
-          >
-            Acheter
+          <Button href={productHref(product.slug)} variant="primary" size="lg">
+            {seeLabel(product.name)}
           </Button>
+          {brandPage ? (
+            <Button href={brandPage} variant={tone === "dark" ? "onDark" : "secondary"} size="lg">
+              Tout {brandThemes[product.brand_slug].label}
+            </Button>
+          ) : null}
+          {compareHref ? (
+            <a className="hero-compare-link" href={compareHref}>
+              Comparer
+            </a>
+          ) : null}
         </div>
       </div>
       <div className="hero-art">
         <span aria-hidden="true" className="hero-halo" />
         <span aria-hidden="true" className="hero-ring" />
         <div className="hero-art-in">
-          <div className="hero-float">
-            <ProductVisual
-              product={product}
-              decorative
-              priority={priority}
-              sizes="(max-width: 900px) 300px, 36vw"
-              className="h-full w-full"
-            />
-          </div>
+          <ProductVisual
+            product={product}
+            decorative
+            priority={priority}
+            sizes="(max-width: 900px) 240px, 36vw"
+            className="h-full w-full"
+          />
         </div>
       </div>
     </div>

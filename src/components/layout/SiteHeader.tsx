@@ -1,5 +1,7 @@
-import { headerActions, mainNav, mobileNav, type HeaderActionKey } from "@/config/site";
+import { headerActions, mainNav, mobileNav, routeFor, type HeaderActionKey } from "@/config/site";
 import { IconButton } from "@/components/ui/IconButton";
+import { CartButton } from "@/components/cart/CartButton";
+import { Icon } from "@/components/ui/Icon";
 import type { IconName } from "@/components/ui/Icon";
 import { Logo } from "./Logo";
 import { MainNav } from "./MainNav";
@@ -27,14 +29,23 @@ export function SiteHeader() {
         <Logo />
         <MainNav groups={mainNav} />
         <div className="flex items-center gap-0.5">
-          {headerActions.map((action) => (
-            <IconButton
-              key={action.key}
-              href={action.href}
-              label={action.label}
-              icon={actionIcons[action.key]}
-            />
-          ))}
+          {headerActions.map((action) =>
+            action.key === "cart" ? (
+              <CartButton
+                key={action.key}
+                href={action.href}
+                shopHref={routeFor("boutique")}
+                icon={<Icon name="cart" />}
+              />
+            ) : (
+              <IconButton
+                key={action.key}
+                href={action.href}
+                label={action.label}
+                icon={actionIcons[action.key]}
+              />
+            ),
+          )}
           <MobileMenu groups={mobileNav} />
         </div>
       </div>

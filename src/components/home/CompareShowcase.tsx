@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { ProductVisual } from "@/components/product/ProductVisual";
+import { Price } from "@/components/ui/Price";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { VsMark } from "@/components/ui/VsMark";
 import { productHref } from "@/config/site";
 import { brandThemes } from "@/lib/brand-themes";
 import type { CatalogCategory, CompareGroup, HomeEntry } from "@/lib/catalog/types";
@@ -15,12 +17,24 @@ const FAMILY_LABELS: Record<CompareGroup, string> = {
 
 const MAX_PER_FAMILY = 3;
 
+/** « Apple iPhone 18 Pro », mais « Xiaomi 17 Ultra » (la marque n'est pas répétée). */
+function fullName(product: { brand_name: string; name: string }) {
+  return product.name.startsWith(product.brand_name)
+    ? product.name
+    : `${product.brand_name} ${product.name}`;
+}
+
 /**
- * Comparateur de l'accueil (§4.5, écart E19), section `#comparer` qui remplace la section
- * épinglée de la maquette (titre repris). Un vrai `<table>` par famille, 6 lignes clés déclarées
- * dans `lib/compare/rows.ts` (`home: true`), produits issus de `home_slots` (« compare »).
- * Onglets de famille : îlot client CompareFamilies, Smartphones par défaut. Étape 3 : « Voir le
- * produit » mène à la fiche ; « Ajouter au panier » et « Comparateur complet → » à l'étape 5.
+ * Comparateur de l'accueil (refonte, §3.1 et §4.7), section `#comparer`. Un vrai `<table>` par
+ * famille, lignes clés de `lib/compare/rows.ts` (`home: true`, le prix en premier), produits
+ * issus de `home_slots` (« compare ») : iPhone 18 Pro / Galaxy S26 Ultra / Xiaomi 17 Ultra, etc.
+ * - à partir de 641 px : tableau, colonne de produit avec photo et « Voir le produit » ;
+ * - en dessous : une carte par critère, les trois valeurs empilées (une ligne par produit, valeur
+ *   toujours alignée à droite, même quand elle passe sous le nom), puis une liste de liens vers
+ *   les fiches, chacun nommant son modèle à l'écran (« Voir le produit Galaxy S26 Ultra ») :
+ *   chaque colonne mène toujours à la fiche (D5). En CSS, sans JavaScript ; un montant n'est
+ *   jamais coupé (`<Price>`, `white-space: nowrap`).
+ * Médaillon « VS » dans l'en-tête. Onglets de famille : îlot client CompareFamilies.
  */
 export function CompareShowcase({
   entries,
@@ -66,7 +80,7 @@ export function CompareShowcase({
                       key={product.code}
                       className="compare-product"
                       // Nom de colonne court, sans le lien qu'elle contient (relu à chaque cellule).
-                      aria-label={`${product.brand_name} ${product.name}`}
+                      aria-label={fullName(product)}
                       style={
                         { "--compare-brand": brandThemes[product.brand_slug].ink } as CSSProperties
                       }
@@ -95,15 +109,38 @@ export function CompareShowcase({
                     {products.map((product) => (
                       <td
                         key={product.code}
+                        data-product-label={fullName(product)}
                         className={row.key === "price" ? "compare-price" : undefined}
                       >
-                        {row.format(product) ?? "—"}
+                        {row.key === "price" && product.min_price_fcfa !== null ? (
+                          <Price
+                            amount={[
+                              product.min_price_fcfa,
+                              product.max_price_fcfa ?? product.min_price_fcfa,
+                            ]}
+                          />
+                        ) : (
+                          // Élément (et non texte nu) : sur téléphone, il reste aligné à droite
+                          // même quand il passe sous le nom du modèle.
+                          <span className="compare-value">{row.format(product) ?? "—"}</span>
+                        )}
                       </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
+            <ul role="list" className="compare-mobile-links">
+              {products.map((product) => (
+                <li key={product.code}>
+                  <a className="compare-link" href={productHref(product.slug)}>
+                    <span>
+                      Voir le produit <strong className="compare-link-name">{product.name}</strong>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         ),
       },
@@ -111,14 +148,17 @@ export function CompareShowcase({
   });
 
   return (
-    <section id="comparer" className="bg-surface section">
+    <section id="comparer" aria-labelledby="comparer-titre" className="bg-surface section">
       <div className="wrap">
-        <SectionHeader
-          eyebrow="Comparateur"
-          title="iPhone, Galaxy ou Redmi ?"
-          intro="Comparez avant d’acheter. Caractéristiques et prix indicatifs."
-          stacked
-        />
+        <div className="flex items-start gap-4">
+          <VsMark className="mt-0.5 sm:mt-1.5" />
+          <SectionHeader
+            title="Comparer avant d’acheter"
+            titleId="comparer-titre"
+            intro="iPhone, Galaxy ou Xiaomi : caractéristiques et prix indicatifs, côte à côte."
+            stacked
+          />
+        </div>
         <div className="mt-7">
           <CompareFamilies families={families} />
         </div>

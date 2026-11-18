@@ -9,7 +9,7 @@
  *   CSS par `[data-brand="…"]` dans `globals.css` (un test vérifie qu'elles sont identiques).
  * - `heroThemes` : dégradés et couleurs des diapositives du hero, injectés en variables inline
  *   (`style={{ "--hero-from": … }}`) par HeroSlide (étape 3).
- * - `tileThemes`, `brandCardThemes` : couleurs des tuiles et des cartes de marque de la maquette.
+ * - `tileThemes`, `brandCardThemes` : couleurs des tuiles et des cartes de marque.
  * - `fallbackVisuals` : couleurs du SVG de secours de ProductVisual (repris de Device.dc.html).
  */
 
@@ -132,73 +132,37 @@ export function heroStyle(brand: Brand): Record<`--hero-${string}`, string> {
 }
 
 /**
- * Thèmes des tuiles promotionnelles (maquette : style en ligne de chaque `.tile`), désignés par
- * `home_slots.theme_key`. `eyebrow` : libellé de gamme affiché quand le produit n'est pas nouveau.
+ * Thèmes des tuiles promotionnelles, désignés par `home_slots.theme_key` : fond, titre, accroche
+ * et ton. Le badge de marque (BrandMark) et le bouton (toujours vert, règle 1) ne lisent pas de
+ * couleur ici.
  */
 export type TileTheme = {
   background: string;
   ink: string;
   sub: string;
-  eyebrow: string;
-  eyebrowInk: string;
-  /** Lien « En savoir plus ». */
-  link: string;
-  /** Bouton « Acheter » : variante de Button (anciens noms : alias temporaires de `primary`). */
-  button: "light" | "primary" | "brand";
   tone: "dark" | "light";
 };
 
 export const tileThemes: Record<string, TileTheme> = {
-  "samsung-dark": {
-    background: "#000000",
-    ink: "#F5F5F7",
-    sub: "#A1A1A6",
-    eyebrow: "Samsung Galaxy",
-    eyebrowInk: "#8AB4FF",
-    link: "#3DDC97",
-    button: "light",
-    tone: "dark",
-  },
-  // Tuiles claires : fond pastel et encre de la marque (brandThemes, §4.3) ; le vert posé sur un
-  // gris clair est le vert foncé (#006B4B, §4.2).
+  "samsung-dark": { background: "#000000", ink: "#F5F5F7", sub: "#A1A1A6", tone: "dark" },
+  // Tuiles claires : fond pastel et encre de la marque (brandThemes, §4.3).
   "apple-light": {
     background: brandThemes.apple.ground,
     ink: brandThemes.apple.ink,
     sub: brandThemes.apple.ink,
-    eyebrow: "Apple",
-    eyebrowInk: brandThemes.apple.ink,
-    link: "#006B4B",
-    button: "primary",
     tone: "light",
   },
   "samsung-light": {
     background: brandThemes.samsung.ground,
     ink: "#0B1A57",
     sub: "#3A4775",
-    eyebrow: "Samsung Galaxy",
-    eyebrowInk: brandThemes.samsung.ink,
-    link: brandThemes.samsung.ink,
-    button: "brand",
     tone: "light",
   },
-  "apple-night": {
-    background: "#111113",
-    ink: "#F5F5F7",
-    sub: "#A1A1A6",
-    eyebrow: "Apple",
-    eyebrowInk: "#F5F5F7",
-    link: "#3DDC97",
-    button: "light",
-    tone: "dark",
-  },
+  "apple-night": { background: "#111113", ink: "#F5F5F7", sub: "#A1A1A6", tone: "dark" },
   "xiaomi-light": {
     background: brandThemes.xiaomi.ground,
     ink: "#1A1D1B",
     sub: "#5C3A20",
-    eyebrow: "Xiaomi",
-    eyebrowInk: brandThemes.xiaomi.ink,
-    link: brandThemes.xiaomi.ink,
-    button: "brand",
     tone: "light",
   },
 };
@@ -214,28 +178,35 @@ export function tileStyle(theme: TileTheme): Record<`--tile-${string}`, string> 
     "--tile-bg": theme.background,
     "--tile-ink": theme.ink,
     "--tile-sub": theme.sub,
-    "--tile-eyebrow": theme.eyebrowInk,
-    "--tile-link": theme.link,
   };
 }
 
-/**
- * Cartes de marque (maquette : `.brand`) : fond, texte, accroche et « Découvrir », et le produit
- * qui les illustre (écart E17 : un visuel propre à chaque univers).
- */
+/** Cartes de marque : le même pastel discret que les fiches et les tuiles de marque. */
 export const brandCardThemes: Record<
   Brand,
-  { background: string; ink: string; sub: string; link: string; visual: string }
+  { background: string; ink: string; sub: string; link: string; mark: string }
 > = {
-  apple: { background: "#000000", ink: "#F5F5F7", sub: "#A1A1A6", link: "#3DDC97", visual: "aw12" },
-  samsung: {
-    background: "#1428A0",
-    ink: "#FFFFFF",
-    sub: "#DDE3FF",
-    link: "#FFFFFF",
-    visual: "gb4",
+  apple: {
+    background: brandThemes.apple.ground,
+    ink: brandThemes.apple.ink,
+    sub: brandThemes.apple.ink,
+    link: brandThemes.apple.ink,
+    mark: brandThemes.apple.mark,
   },
-  xiaomi: { background: "#FF6900", ink: "#1D1D1F", sub: "#3A1A00", link: "#1D1D1F", visual: "rw6" },
+  samsung: {
+    background: brandThemes.samsung.ground,
+    ink: brandThemes.samsung.ink,
+    sub: brandThemes.samsung.ink,
+    link: brandThemes.samsung.ink,
+    mark: brandThemes.samsung.mark,
+  },
+  xiaomi: {
+    background: brandThemes.xiaomi.ground,
+    ink: brandThemes.xiaomi.ink,
+    sub: brandThemes.xiaomi.ink,
+    link: brandThemes.xiaomi.ink,
+    mark: brandThemes.xiaomi.mark,
+  },
 };
 
 /** Variables CSS inline d'une carte de marque. */
@@ -246,6 +217,7 @@ export function brandCardStyle(brand: Brand): Record<`--card-${string}`, string>
     "--card-ink": t.ink,
     "--card-sub": t.sub,
     "--card-link": t.link,
+    "--card-mark": t.mark,
   };
 }
 

@@ -23,10 +23,17 @@ describe("ProductCard", () => {
     expect(card("ip18")?.replace(/\s/g, " ")).toBe("Dès 970 000 FCFA");
   });
 
-  it("garde « Acheter » en disposition stack (rail, boutique : lots 4 et 5)", () => {
+  it("garde « Acheter » pour les cartes qui n'ouvrent pas l'article entier", () => {
     const product = products.find((p) => p.code === "ap5")!;
     render(<ProductCard product={{ ...product, is_new: false }} />);
     expect(screen.getByRole("link", { name: `Acheter ${product.name}` })).toBeTruthy();
+  });
+
+  it("rend la carte du rail entièrement cliquable, sans CTA imbriqué", () => {
+    const product = products.find((p) => p.code === "ap5")!;
+    const { container } = render(<ProductCard product={{ ...product, is_new: false }} wholeCard />);
+    expect(screen.getByRole("link", { name: new RegExp(product.name) })).toBeTruthy();
+    expect(container.querySelector(".product-card-whole-link button")).toBeNull();
   });
 
   it("écrit « Voir le produit » en disposition adaptive (pages marque, pas de panier)", () => {

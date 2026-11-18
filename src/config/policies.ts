@@ -32,3 +32,59 @@ export const paymentWindowMinutes = 30;
 
 /** Délai de retour d'un produit non ouvert (simulation). */
 export const returnWindowDays = 7;
+
+/**
+ * Quantité maximale d'une même variante dans le panier : définie dans `cart-limits.ts`, un module
+ * sans les zones de livraison, pour ne pas les envoyer dans le JavaScript de chaque page.
+ */
+export { maxQuantityPerLine } from "./cart-limits";
+
+/** Code d'une zone de livraison (`delivery_zones.code`, §5.5). */
+export type DeliveryZoneCode = "lome" | "maritime" | "plateaux" | "centrale" | "kara" | "savanes";
+
+/**
+ * Zone de livraison choisie dans le panier, colonne pour colonne comme `delivery_zones` (§5.5) :
+ * frais en FCFA, seuil de gratuité (`null` : jamais gratuite) et délai affiché.
+ */
+export type DeliveryZoneOption = {
+  code: DeliveryZoneCode;
+  label: string;
+  fee_fcfa: number;
+  free_from_fcfa: number | null;
+  eta_label: string;
+};
+
+const [lome, southRegions, northRegions] = deliveryZones as [
+  DeliveryZone,
+  DeliveryZone,
+  DeliveryZone,
+];
+
+/**
+ * Les six zones du panier (une par région, Lomé à part), dérivées des trois tarifs ci-dessus :
+ * une valeur de D6 ne s'écrit qu'une fois. À l'étape 4, la table `delivery_zones` prend le relais.
+ */
+export const deliveryZoneOptions: readonly DeliveryZoneOption[] = [
+  {
+    code: "lome",
+    label: lome.name,
+    fee_fcfa: lome.feeFcfa,
+    free_from_fcfa: freeDeliveryLomeFromFcfa,
+    eta_label: lome.delay,
+  },
+  ...(
+    [
+      ["maritime", "Région Maritime", southRegions],
+      ["plateaux", "Région des Plateaux", southRegions],
+      ["centrale", "Région Centrale", northRegions],
+      ["kara", "Région de la Kara", northRegions],
+      ["savanes", "Région des Savanes", northRegions],
+    ] as const
+  ).map(([code, label, zone]) => ({
+    code,
+    label,
+    fee_fcfa: zone.feeFcfa,
+    free_from_fcfa: null,
+    eta_label: zone.delay,
+  })),
+];
