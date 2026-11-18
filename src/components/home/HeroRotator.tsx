@@ -2,10 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { CarouselControls, type CarouselIcons } from "./CarouselControls";
-import { useCarouselPause, usePageLoaded } from "./use-carousel-pause";
-
-/** Durée d'une diapositive : une seule valeur, transmise à l'animation CSS de la barre. */
-const INTERVAL_MS = 6000;
+import { usePageLoaded } from "./use-page-loaded";
 
 export type HeroRotatorSlide = {
   key: string;
@@ -16,13 +13,11 @@ export type HeroRotatorSlide = {
 };
 
 /**
- * Îlot client du hero (§4.5, modèle « carrousel » de l'APG) : diapositive active, pauses et
- * commandes. Les diapositives sont rendues par le serveur (`content`).
- * - une seule horloge : la barre de progression (voir CarouselControls) ;
- * - pause au survol, au focus, onglet caché et par le bouton de rotation ; aucune rotation
- *   sous mouvement réduit ;
- * - chaque diapositive est un `group` « diapositive » nommé « n sur N » ; la zone n'est
- *   annoncée (`aria-live="polite"`) que lorsque la rotation est suspendue.
+ * Îlot client du hero : diapositive active et commandes. Les diapositives sont rendues par le
+ * serveur (`content`).
+ * - aucune rotation automatique : le visiteur choisit la diapositive ;
+ * - chaque diapositive est un `group` « diapositive » nommé « n sur N » ; chaque changement
+ *   manuel est annoncé avec `aria-live="polite"`.
  * - les variables `--hero-*` de la diapositive active sont aussi posées sur la section, pour que
  *   les commandes (hors des diapositives) suivent son thème ;
  * - jusqu'à l'événement `load` (ou au premier changement), les diapositives cachées ne sont pas
@@ -36,14 +31,10 @@ export function HeroRotator({
   icons: CarouselIcons;
 }) {
   const [active, setActive] = useState(0);
-  const [stopped, setStopped] = useState(false);
   /** Faux jusqu'au premier changement : l'entrée animée ne rejoue pas au chargement (LCP). */
   const [changed, setChanged] = useState(false);
-  const { interacting, motionOk, handlers } = useCarouselPause();
   const loaded = usePageLoaded();
   const count = slides.length;
-  const canRotate = motionOk && count > 1;
-  const paused = !canRotate || stopped || interacting;
   const current = slides[active];
   if (!current) return null;
 
@@ -58,15 +49,12 @@ export function HeroRotator({
       aria-label="Produits à la une"
       className="hero-carousel"
       data-tone={current.tone}
-      data-autoplay={canRotate ? "" : undefined}
-      data-paused={paused ? "" : undefined}
-      data-stopped={stopped ? "" : undefined}
+      data-manual=""
       data-changed={changed ? "" : undefined}
       data-deferred={loaded || changed ? undefined : ""}
-      style={{ ...current.style, "--hero-interval": `${INTERVAL_MS}ms` } as CSSProperties}
-      {...handlers}
+      style={current.style as CSSProperties}
     >
-      <div className="hero-slides" aria-live={paused ? "polite" : "off"}>
+      <div className="hero-slides" aria-live="polite">
         {slides.map((slide, index) => {
           const selected = index === active;
           return (
@@ -90,12 +78,8 @@ export function HeroRotator({
       <CarouselControls
         names={slides.map((slide) => slide.name)}
         active={active}
-        rotating={!stopped}
-        canRotate={canRotate}
         icons={icons}
         onSelect={goTo}
-        onToggleRotation={() => setStopped((value) => !value)}
-        onProgressEnd={() => goTo(active + 1)}
       />
     </section>
   );

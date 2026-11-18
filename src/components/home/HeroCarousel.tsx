@@ -33,8 +33,6 @@ export function HeroCarousel({ entries }: { entries: readonly HomeEntry[] }) {
       icons={{
         previous: <Icon name="chevronLeft" size={16} stroke={2} />,
         next: <Icon name="chevronRight" size={16} stroke={2} />,
-        play: <Icon name="play" size={16} stroke={2} />,
-        pause: <Icon name="pause" size={16} stroke={2} />,
       }}
     />
   );

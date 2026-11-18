@@ -3,6 +3,7 @@ import { brands, categories, homeSlots, products } from "@/data/catalog";
 import type { Brand } from "@/lib/brand-themes";
 import {
   brandRangeLabel,
+  brandShowcase,
   colorSwatches,
   compareShortcuts,
   featuredProducts,
@@ -246,5 +247,34 @@ describe("colorSwatches", () => {
         { ...variant, color_slug: "b", color_name: "B", is_active: true, position: 1 },
       ]).map((swatch) => swatch.slug),
     ).toEqual(["b"]);
+  });
+});
+
+describe("brandShowcase", () => {
+  const featured = new Set(
+    homeSlots
+      .filter((slot) => slot.slot === "hero" || slot.slot === "tile")
+      .map((slot) => slot.product_code),
+  );
+  const codes = (brand: Brand) =>
+    brandShowcase(products, categories, brand, featured).map((product) => product.code);
+
+  it("prend le haut de gamme de chaque catégorie, hors hero et tuiles", () => {
+    expect(codes("apple")).toEqual(["ipd", "apm2", "awu4"]);
+    expect(codes("samsung")).toEqual(["zf8", "gb4p", "gwu2"]);
+    expect(codes("xiaomi")).toEqual(["x17", "xb6", "xws5"]);
+  });
+
+  it("ne montre que des produits de la marque, jamais un produit exclu", () => {
+    for (const brand of ["apple", "samsung", "xiaomi"] as const) {
+      for (const product of brandShowcase(products, categories, brand, featured)) {
+        expect(product.brand_slug).toBe(brand);
+        expect(featured.has(product.code)).toBe(false);
+      }
+    }
+  });
+
+  it("s'arrête au nombre demandé", () => {
+    expect(brandShowcase(products, categories, "samsung", new Set(), 2)).toHaveLength(2);
   });
 });

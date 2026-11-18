@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { primitives, tokenHex } from "@/data/design-tokens";
 import {
   BRANDS,
+  brandCardThemes,
   brandThemes,
   fallbackAccent,
   heroStyle,
@@ -60,13 +61,27 @@ describe("thèmes de marque", () => {
   it.each(BRANDS)("la tuile claire %s reprend le fond pastel et l'encre de la marque", (brand) => {
     const tile = tileThemes[`${brand}-light`];
     expect(tile?.background).toBe(brandThemes[brand].ground);
-    expect(tile?.eyebrowInk).toBe(brandThemes[brand].ink);
+    // Le badge de marque (BrandMark, encre de la marque) reste lisible sur la tuile claire.
+    expect(contrastRatio(brandThemes[brand].ink, tile!.background)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(BRANDS)("la carte d'univers %s reste pastel avec un texte contrasté", (brand) => {
+    const card = brandCardThemes[brand];
+    expect(card.background).toBe(brandThemes[brand].ground);
+    expect(card.mark).toBe(brandThemes[brand].mark);
+    for (const role of ["ink", "sub", "link"] as const) {
+      expect(contrastRatio(card[role], card.background), role).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it.each(Object.keys(tileThemes))("les textes de la tuile %s sont lisibles (AA)", (key) => {
     const tile = tileThemes[key]!;
-    for (const role of ["ink", "sub", "eyebrowInk", "link"] as const) {
+    for (const role of ["ink", "sub"] as const) {
       expect(contrastRatio(tile[role], tile.background), role).toBeGreaterThanOrEqual(4.5);
+    }
+    // Badge de marque blanc (BrandMark onDark) sur une tuile sombre.
+    if (tile.tone === "dark") {
+      expect(contrastRatio(tokenHex("on-dark"), tile.background)).toBeGreaterThanOrEqual(4.5);
     }
   });
 

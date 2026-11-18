@@ -1,85 +1,68 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { CarouselControls } from "./CarouselControls";
 
-const icons = { previous: "‹", next: "›", play: "▶", pause: "❚❚" };
-const names = ["iPhone 18 Pro", "Galaxy Watch9", "Redmi Note 15 Pro+ 5G"];
+const icons = { previous: "‹", next: "›" };
+const names = ["iPhone 18 Pro", "Galaxy S26 Ultra", "Xiaomi 17 Ultra"];
 
-function setup(overrides: Partial<Parameters<typeof CarouselControls>[0]> = {}) {
-  const props = {
-    names,
-    active: 1,
-    rotating: true,
-    canRotate: true,
-    icons,
-    onSelect: vi.fn(),
-    onToggleRotation: vi.fn(),
-    onProgressEnd: vi.fn(),
-    ...overrides,
-  };
-  render(<CarouselControls {...props} />);
-  return props;
-}
-
-/** Fin d'animation CSS (AnimationEvent : voir vitest.polyfills.ts). */
-function animationEnd(element: Element, animationName: string) {
-  fireEvent.animationEnd(element, { animationName });
+function setup(active = 1) {
+  const onSelect = vi.fn();
+  render(<CarouselControls names={names} active={active} icons={icons} onSelect={onSelect} />);
+  return onSelect;
 }
 
 describe("CarouselControls", () => {
-  it("nomme chaque commande sans glyphe et marque la diapositive affichée", () => {
+  it("nomme chaque commande sans glyphe et marque seulement la diapositive affichée", () => {
     setup();
+    expect(screen.getByRole("group", { name: "Commandes du carrousel" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Diapositive précédente" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "Diapositive suivante" })).toBeTruthy();
-    const current = screen.getByRole("button", { name: "Afficher Galaxy Watch9" });
-    expect(current.getAttribute("aria-current")).toBe("true");
     expect(
-      screen.getByRole("button", { name: "Afficher iPhone 18 Pro" }).hasAttribute("aria-current"),
-    ).toBe(false);
+      screen
+        .getByRole("button", { name: "Afficher Galaxy S26 Ultra" })
+        .getAttribute("aria-current"),
+    ).toBe("true");
+    for (const name of ["Afficher iPhone 18 Pro", "Afficher Xiaomi 17 Ultra"]) {
+      expect(screen.getByRole("button", { name }).hasAttribute("aria-current")).toBe(false);
+    }
+  });
+
+  it("n'a ni bouton de lecture ni barre de progression (aucun défilement automatique)", () => {
+    setup();
+    expect(screen.queryByRole("button", { name: /défilement|lecture|pause/i })).toBeNull();
+    expect(screen.getAllByRole("button")).toHaveLength(5);
+  });
+
+  it("ne remplit que le point actif (● ○ ○)", () => {
+    setup(0);
+    const dots = document.querySelectorAll(".hero-dot");
+    expect(dots[0]!.classList.contains("hero-dot-active")).toBe(true);
+    expect(document.querySelectorAll(".hero-dot-active")).toHaveLength(1);
   });
 
   it("change de diapositive avec les flèches, les points et les flèches du clavier", async () => {
     const user = userEvent.setup();
-    const props = setup();
+    const onSelect = setup();
     await user.click(screen.getByRole("button", { name: "Diapositive suivante" }));
-    expect(props.onSelect).toHaveBeenLastCalledWith(2);
+    expect(onSelect).toHaveBeenLastCalledWith(2);
     await user.click(screen.getByRole("button", { name: "Diapositive précédente" }));
-    expect(props.onSelect).toHaveBeenLastCalledWith(0);
-    await user.click(screen.getByRole("button", { name: "Afficher Redmi Note 15 Pro+ 5G" }));
-    expect(props.onSelect).toHaveBeenLastCalledWith(2);
+    expect(onSelect).toHaveBeenLastCalledWith(0);
+    await user.click(screen.getByRole("button", { name: "Afficher Xiaomi 17 Ultra" }));
+    expect(onSelect).toHaveBeenLastCalledWith(2);
 
-    screen.getByRole("button", { name: "Afficher Galaxy Watch9" }).focus();
+    screen.getByRole("button", { name: "Afficher Galaxy S26 Ultra" }).focus();
     await user.keyboard("{ArrowRight}");
-    expect(props.onSelect).toHaveBeenLastCalledWith(2);
+    expect(onSelect).toHaveBeenLastCalledWith(2);
     await user.keyboard("{ArrowLeft}");
-    expect(props.onSelect).toHaveBeenLastCalledWith(0);
+    expect(onSelect).toHaveBeenLastCalledWith(0);
   });
 
-  it("avance à la fin de l'animation « fill » de la barre active seulement", () => {
-    const props = setup();
-    const fills = document.querySelectorAll(".hero-dot-fill");
-    animationEnd(fills[0]!, "fill");
-    animationEnd(fills[1]!, "autre");
-    expect(props.onProgressEnd).not.toHaveBeenCalled();
-    animationEnd(fills[1]!, "fill");
-    expect(props.onProgressEnd).toHaveBeenCalledTimes(1);
-  });
-
-  it("propose d'arrêter puis de relancer le défilement (WCAG 2.2.2)", async () => {
+  it("ignore les autres touches", async () => {
     const user = userEvent.setup();
-    const props = setup();
-    await user.click(screen.getByRole("button", { name: "Mettre en pause le défilement" }));
-    expect(props.onToggleRotation).toHaveBeenCalledTimes(1);
-  });
-
-  it("affiche « Lancer le défilement » une fois le défilement arrêté", () => {
-    setup({ rotating: false });
-    expect(screen.getByRole("button", { name: "Lancer le défilement" })).toBeTruthy();
-  });
-
-  it("n'affiche pas le bouton de rotation quand la rotation est impossible", () => {
-    setup({ canRotate: false });
-    expect(screen.queryByRole("button", { name: /défilement/ })).toBeNull();
+    const onSelect = setup();
+    screen.getByRole("button", { name: "Afficher Galaxy S26 Ultra" }).focus();
+    await user.keyboard("{ArrowUp}");
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

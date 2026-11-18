@@ -63,8 +63,6 @@ const paths = {
   ),
   chevronLeft: <path d="M15 5l-7 7 7 7" />,
   chevronRight: <path d="M9 5l7 7-7 7" />,
-  play: <path d="M8 5l11 7-11 7z" />,
-  pause: <path d="M9 5v14M15 5v14" />,
   mobileMoney: (
     <>
       <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />

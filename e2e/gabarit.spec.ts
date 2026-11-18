@@ -67,14 +67,20 @@ test.describe("landmarks", () => {
   });
 });
 
-test.describe("en-tête (lot 3 de la refonte)", () => {
-  test("les icônes non livrées sont absentes, les marques mènent à leur page", async ({ page }) => {
+test.describe("en-tête", () => {
+  test("les icônes non livrées sont absentes, le panier et les marques sont accessibles", async ({
+    page,
+  }) => {
     await page.goto("/");
     const header = page.getByRole("banner");
-    for (const name of ["Rechercher", "Comparateur", "Mon compte", "Panier"]) {
+    for (const name of ["Rechercher", "Comparateur", "Mon compte"]) {
       await expect(header.getByRole("link", { name })).toHaveCount(0);
       await expect(header.getByRole("button", { name })).toHaveCount(0);
     }
+    await expect(header.getByRole("button", { name: "Panier" })).toHaveAttribute(
+      "aria-haspopup",
+      "dialog",
+    );
     for (const [name, href] of [
       ["Apple", "/marques/apple"],
       ["Samsung", "/marques/samsung"],
@@ -113,7 +119,8 @@ test.describe("menu mobile à 375 px", () => {
     await expect(button).toBeVisible();
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
-    // Atteindre le bouton au clavier : lien d'évitement, logo, puis menu.
+    // Atteindre le bouton au clavier : lien d'évitement, logo, panier, puis menu.
+    await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
     await page.keyboard.press("Tab");
@@ -274,28 +281,21 @@ test.describe("styleguide", () => {
     await expect(accentRow).toContainText("AA");
   });
 
-  test("chaque primitive de l'étape 3 a sa section, Pill avec ses états", async ({ page }) => {
+  test("chaque primitive de l'étape 3 a sa section, filtres radio compris", async ({ page }) => {
     await page.goto("/styleguide");
     for (const name of [
-      "Pill · pastille bascule",
-      "PillGroup · filtres de marque",
+      "RadioPills · filtres sans JavaScript",
       "Price · montant FCFA",
       "SectionHeader · en-tête de section",
       "Reveal · mouvement progressif",
     ]) {
       await expect(page.getByRole("heading", { level: 3, name })).toBeVisible();
     }
-    const pills = page.locator("figure", { has: page.locator("figcaption") });
-    await expect(
-      pills
-        .filter({ hasText: "Sélectionnée" })
-        .getByRole("button", { name: "Toutes", exact: true }),
-    ).toHaveAttribute("aria-pressed", "true");
-    await expect(
-      pills
-        .filter({ hasText: "Focus clavier" })
-        .getByRole("button", { name: "Xiaomi", exact: true }),
-    ).toHaveAttribute("data-state", "focus");
+    const filters = page.getByRole("group", { name: "Exemple de filtres" });
+    await expect(filters.getByRole("radio", { name: "Toutes" })).toBeChecked();
+    await filters.getByRole("radio", { name: "Xiaomi" }).check();
+    await expect(filters.getByRole("radio", { name: "Xiaomi" })).toBeChecked();
+    await expect(filters.getByRole("radio", { name: "Toutes" })).not.toBeChecked();
   });
 
   test("la boîte de dialogue se ferme avec Échap et rend le focus", async ({ page }) => {

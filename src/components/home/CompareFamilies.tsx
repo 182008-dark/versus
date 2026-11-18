@@ -1,30 +1,28 @@
-"use client";
-
-import { useState, type ReactNode } from "react";
-import { PillGroup } from "@/components/ui/PillGroup";
+import type { ReactNode } from "react";
+import { RadioPills } from "@/components/ui/RadioPills";
 
 export type CompareFamily = { value: string; label: string; panel: ReactNode };
 
 /**
- * Onglets de famille du comparateur d'accueil (maquette : `.pills` « Choisir une catégorie »),
- * îlot client minimal : les tableaux sont rendus par le serveur ; seul le choix de la famille
- * est ici. Sans JavaScript, la première famille (Smartphones) reste affichée.
+ * Familles du comparateur d'accueil (maquette : `.pills` « Choisir une catégorie »), sans
+ * JavaScript (refonte §4.7) : des pastilles radio (RadioPills) et un tableau par famille ; le CSS
+ * n'affiche que celui de la famille cochée (`[data-compare-families]:has(…)`, globals.css).
+ * Familles reconnues par le CSS : `phones`, `audio`, `wearables`. Smartphones d'abord.
  */
 export function CompareFamilies({ families }: { families: readonly CompareFamily[] }) {
-  const [value, setValue] = useState(families[0]?.value ?? "");
   return (
-    <>
-      <PillGroup
-        label="Choisir une catégorie"
-        defaultValue={value}
-        onChange={setValue}
-        options={families.map(({ value: v, label }) => ({ value: v, label }))}
+    <div data-compare-families>
+      <RadioPills
+        legend="Choisir une catégorie"
+        name="comparer-famille"
+        defaultValue={families[0]?.value ?? ""}
+        options={families.map(({ value, label }) => ({ value, label }))}
       />
       {families.map((family) => (
-        <div key={family.value} hidden={family.value !== value} className="mt-7">
+        <div key={family.value} data-family={family.value} className="mt-7">
           {family.panel}
         </div>
       ))}
-    </>
+    </div>
   );
 }

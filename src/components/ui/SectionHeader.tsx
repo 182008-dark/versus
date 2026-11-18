@@ -2,6 +2,11 @@ import type { ReactNode } from "react";
 import { Eyebrow } from "./Eyebrow";
 import { TextLink } from "./TextLink";
 
+/**
+ * En-tête de section : titre simple et informatif, sans point final (refonte, §3.1 et §4.6).
+ * Le surtitre (`eyebrow`, alias du lot 2 en petites capitales) est facultatif : l'accueil n'en
+ * met plus depuis le lot 4.
+ */
 export function SectionHeader({
   eyebrow,
   title,
@@ -11,8 +16,8 @@ export function SectionHeader({
   stacked = false,
   titleId,
 }: {
-  eyebrow: string;
-  title: string;
+  eyebrow?: string;
+  title: ReactNode;
   /** Identifiant du titre, pour `aria-labelledby` de la section. */
   titleId?: string;
   intro?: ReactNode;
@@ -24,8 +29,8 @@ export function SectionHeader({
   if (stacked) {
     return (
       <div>
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h2 id={titleId} className="mt-2 text-display-h2">
+        {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+        <h2 id={titleId} className={eyebrow ? "mt-2 text-display-h2" : "text-display-h2"}>
           {title}
         </h2>
         {intro ? (
@@ -37,8 +42,8 @@ export function SectionHeader({
   return (
     <div className="flex flex-wrap items-end justify-between gap-6">
       <div>
-        <Eyebrow>{eyebrow}</Eyebrow>
-        <h2 id={titleId} className="mt-2 text-display-h2">
+        {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+        <h2 id={titleId} className={eyebrow ? "mt-2 text-display-h2" : "text-display-h2"}>
           {title}
         </h2>
       </div>
