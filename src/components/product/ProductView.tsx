@@ -1,5 +1,6 @@
-import { Eyebrow } from "@/components/ui/Eyebrow";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { Price } from "@/components/ui/Price";
+import { brandHref } from "@/config/site";
 import type { ProductDetail } from "@/lib/catalog/types";
 import { compareRows } from "@/lib/compare/rows";
 import { ProductVisual } from "./ProductVisual";
@@ -8,7 +9,7 @@ import { ProductVisual } from "./ProductVisual";
  * Fiche produit minimale de l'étape 3 (§4.3) : visuel, nom, accroche, prix minimal, coloris et
  * prix des variantes, caractéristiques (lignes de `lib/compare/rows.ts`), garantie et mention
  * « Prix indicatifs, aucune vente réelle ». Toutes les données arrivent en props : la même vue
- * servira à l'aperçu admin (étape 8).
+ * servira à l'aperçu admin (étape 8). Le nom de la marque mène à sa page (refonte, lot 3).
  */
 export function ProductView({
   product,
@@ -35,9 +36,14 @@ export function ProductView({
           />
         </div>
         <div>
-          <Eyebrow>
-            {product.brand_name} · {categoryName}
-          </Eyebrow>
+          <p className="flex flex-wrap items-center gap-x-2 text-meta text-muted-strong">
+            <BrandMark
+              brand={product.brand_slug}
+              href={brandHref(product.brand_slug) ?? undefined}
+            />
+            <span aria-hidden="true">·</span>
+            <span>{categoryName}</span>
+          </p>
           <h1 className="mt-3 text-display-h2">{product.name}</h1>
           <p className="mt-4 text-xl leading-snug font-semibold">{product.tagline}</p>
           {product.description ? (
