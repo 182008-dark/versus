@@ -23,7 +23,9 @@ const products = (count: number) => `${count} produit${count > 1 ? "s" : ""}`;
  *   cartes des autres marques (`[data-rail]:has(input[value=…]:checked)`, globals.css). Chaque
  *   pastille annonce son nombre de produits (« Samsung, 3 produits ») ; une marque absente du
  *   rail affiche un état vide ;
- * - pastilles et flèches sur une seule ligne (les pastilles défilent sur un petit écran) ;
+ * - pastilles et flèches sur une seule ligne à partir de 641 px ; en dessous, pas de flèches (le
+ *   rail défile au doigt) et les quatre pastilles tiennent entières dès 360 px (sous 360 px,
+ *   elles défilent) ;
  * - `heading` (titre rendu par le serveur) et `links` : le lien d'en-tête suit le filtre, en CSS
  *   lui aussi. Comptes et adresses sont calculés par l'appelant.
  * Les valeurs de filtre reconnues par le CSS sont `all`, `apple`, `samsung` et `xiaomi`.

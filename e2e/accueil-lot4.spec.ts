@@ -157,8 +157,8 @@ test.describe("tuiles", () => {
 });
 
 test.describe("Nouveautés", () => {
-  test("pastilles et flèches sur une seule ligne à 390 px", async ({ page }) => {
-    await page.setViewportSize(PHONE);
+  test("pastilles et flèches sur une seule ligne à partir de 641 px", async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto("/");
     const group = (await page.getByRole("group", { name: "Filtrer par marque" }).boundingBox())!;
     const next = (await page.getByRole("button", { name: "Produits suivants" }).boundingBox())!;
@@ -167,6 +167,44 @@ test.describe("Nouveautés", () => {
       2,
     );
   });
+
+  for (const width of [360, 390]) {
+    test(`à ${width} px, défilement au doigt et quatre pastilles entières, sur une ligne`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto("/");
+      const section = page.locator("#nouveautes");
+      // Sur téléphone, les flèches ne masquent plus les pastilles : le rail défile au doigt.
+      await expect(section.getByRole("button", { name: "Produits suivants" })).toBeHidden();
+      await expect(section.getByRole("button", { name: "Produits précédents" })).toBeHidden();
+      const group = section.getByRole("group", { name: "Filtrer par marque" });
+      // Défilement vertical seulement (jamais celui de la rangée), sous l'en-tête collant.
+      const top = (await group.boundingBox())!.y;
+      await page.evaluate((y) => window.scrollTo(0, y - 300), top);
+      const pills = await group.locator("label").all();
+      expect(pills).toHaveLength(4);
+      const tops = new Set<number>();
+      for (const pill of pills) {
+        const box = (await pill.boundingBox())!;
+        tops.add(Math.round(box.y));
+        expect(box.height).toBeGreaterThanOrEqual(44);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(width);
+        // Entièrement visible : rien ne la recouvre en son centre ni à ses bords.
+        expect(
+          await pill.evaluate((label) => {
+            const rect = label.getBoundingClientRect();
+            const y = rect.top + rect.height / 2;
+            return [rect.left + 2, rect.left + rect.width / 2, rect.right - 2].every((x) =>
+              label.contains(document.elementFromPoint(x, y)),
+            );
+          }),
+        ).toBe(true);
+      }
+      expect(tops.size).toBe(1);
+    });
+  }
 
   test("le lien d'en-tête suit le filtre, avec des comptes calculés", async ({ page }) => {
     await page.goto("/");
@@ -233,9 +271,27 @@ test.describe("comparateur", () => {
     for (const amount of await price.locator("[data-price]").all()) {
       expect(await amount.evaluate((element) => element.getClientRects().length)).toBe(1);
     }
+    // Colonne de valeurs régulière : chaque valeur finit au bord droit de sa carte, même quand
+    // elle passe sous le nom du modèle.
+    for (const cell of await table.locator("tbody td").all()) {
+      const [value, right] = await cell.evaluate((element) => {
+        const child = element.firstElementChild!;
+        const box = element.getBoundingClientRect();
+        const rects = [...child.getClientRects()];
+        return [Math.max(...rects.map((rect) => rect.right)), box.right] as const;
+      });
+      expect(Math.abs(value - right)).toBeLessThanOrEqual(1);
+    }
+    // Un lien par modèle, le nom du modèle visible (règle 4 : le libellé dit où mène le lien).
     const links = page.locator("#comparer .compare-mobile-links:visible").getByRole("link");
     await expect(links).toHaveCount(3);
     await expect(links.first()).toHaveAttribute("href", productHref("iphone-18-pro"));
+    const names = ["iPhone 18 Pro", "Galaxy S26 Ultra", "Xiaomi 17 Ultra"];
+    for (const [index, name] of names.entries()) {
+      await expect(links.nth(index)).toHaveAccessibleName(`Voir le produit ${name}`);
+      await expect(links.nth(index).locator(".compare-link-name")).toBeVisible();
+      await expect(links.nth(index).locator(".compare-link-name")).toHaveText(name);
+    }
   });
 
   test("familles de la refonte : un produit de chaque marque", async ({ page }) => {

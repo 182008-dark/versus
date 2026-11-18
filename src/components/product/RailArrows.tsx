@@ -11,7 +11,9 @@ const arrow =
  *   bouton ; un clic sur une flèche inactive est ignoré ; sans carte visible (filtre vide), le
  *   rail ne défile plus et les deux flèches sont inactives ;
  * - défilement d'une carte, doux seulement sans mouvement réduit ;
- * - un changement de filtre (évènement `change` du conteneur `[data-rail]`) ramène au début.
+ * - un changement de filtre (évènement `change` du conteneur `[data-rail]`) ramène au début ;
+ * - masquées sous 641 px : sur téléphone, le rail défile au doigt (refonte §3.1) et les
+ *   pastilles du filtre gardent toute la largeur de la ligne.
  */
 export function RailArrows({ listId }: { listId: string }) {
   const [edges, setEdges] = useState({ back: false, forward: true });
@@ -56,7 +58,7 @@ export function RailArrows({ listId }: { listId: string }) {
   }
 
   return (
-    <div className="flex shrink-0 gap-2">
+    <div className="hidden shrink-0 gap-2 sm:flex">
       <button
         type="button"
         aria-label="Produits précédents"

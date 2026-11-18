@@ -29,9 +29,11 @@ function fullName(product: { brand_name: string; name: string }) {
  * famille, lignes clés de `lib/compare/rows.ts` (`home: true`, le prix en premier), produits
  * issus de `home_slots` (« compare ») : iPhone 18 Pro / Galaxy S26 Ultra / Xiaomi 17 Ultra, etc.
  * - à partir de 641 px : tableau, colonne de produit avec photo et « Voir le produit » ;
- * - en dessous : une carte par critère, les trois valeurs empilées (une ligne par produit), puis
- *   une rangée de liens vers les fiches : chaque colonne mène toujours à la fiche (D5). En CSS,
- *   sans JavaScript ; un montant n'est jamais coupé (`<Price>`, `white-space: nowrap`).
+ * - en dessous : une carte par critère, les trois valeurs empilées (une ligne par produit, valeur
+ *   toujours alignée à droite, même quand elle passe sous le nom), puis une liste de liens vers
+ *   les fiches, chacun nommant son modèle à l'écran (« Voir le produit Galaxy S26 Ultra ») :
+ *   chaque colonne mène toujours à la fiche (D5). En CSS, sans JavaScript ; un montant n'est
+ *   jamais coupé (`<Price>`, `white-space: nowrap`).
  * Médaillon « VS » dans l'en-tête. Onglets de famille : îlot client CompareFamilies.
  */
 export function CompareShowcase({
@@ -118,7 +120,9 @@ export function CompareShowcase({
                             ]}
                           />
                         ) : (
-                          (row.format(product) ?? "—")
+                          // Élément (et non texte nu) : sur téléphone, il reste aligné à droite
+                          // même quand il passe sous le nom du modèle.
+                          <span className="compare-value">{row.format(product) ?? "—"}</span>
                         )}
                       </td>
                     ))}
@@ -130,7 +134,9 @@ export function CompareShowcase({
               {products.map((product) => (
                 <li key={product.code}>
                   <a className="compare-link" href={productHref(product.slug)}>
-                    Voir le produit<span className="sr-only"> {product.name}</span>
+                    <span>
+                      Voir le produit <strong className="compare-link-name">{product.name}</strong>
+                    </span>
                   </a>
                 </li>
               ))}

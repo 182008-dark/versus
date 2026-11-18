@@ -27,17 +27,23 @@ export function RadioPills({
   name: string;
   options: readonly RadioPillOption[];
   defaultValue: string;
-  /** Une seule ligne (le parent fait défiler) plutôt qu'un retour à la ligne. */
+  /**
+   * Une seule ligne (le parent fait défiler) plutôt qu'un retour à la ligne ; sous 641 px, les
+   * pastilles sont plus serrées pour que quatre tiennent entières dès 360 px.
+   */
   nowrap?: boolean;
 }) {
   return (
-    <fieldset className={clsx("flex gap-2", nowrap ? "w-max flex-nowrap" : "flex-wrap")}>
+    <fieldset
+      className={clsx("flex", nowrap ? "w-max flex-nowrap gap-1.5 sm:gap-2" : "flex-wrap gap-2")}
+    >
       <legend className="sr-only">{legend}</legend>
       {options.map((option) => (
         <label
           key={option.value}
           className={clsx(
-            "relative inline-flex h-11 items-center rounded-full border px-5 text-sm font-medium whitespace-nowrap transition-colors",
+            "relative inline-flex h-11 items-center rounded-full border text-sm font-medium whitespace-nowrap transition-colors",
+            nowrap ? "px-3.5 sm:px-5" : "px-5",
             "border-line-control bg-bg text-ink state-hover:border-ink",
             "has-checked:border-ink has-checked:bg-ink has-checked:text-on-dark",
             "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-(--focus-ring)",

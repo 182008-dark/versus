@@ -1133,8 +1133,9 @@
       font-weight: 700;
     }
 
-    /* À 320 px (zoom de 400 %), un long nom et un montant ne tiennent pas sur une ligne : le
-       montant passe alors dessous, aligné à droite, sans jamais être coupé (WCAG 1.4.10). */
+    /* À 320 px (zoom de 400 %), un long nom et une valeur ne tiennent pas toujours sur une
+       ligne : la valeur passe alors dessous, toujours alignée à droite (colonne de valeurs
+       régulière), sans jamais être coupée (WCAG 1.4.10). */
     .compare-table tbody td {
       display: flex;
       flex-wrap: wrap;
@@ -1162,20 +1163,28 @@
 
     .compare-table tbody td > * {
       margin-inline-start: auto;
+      text-align: end;
     }
 
+    /* Un lien par modèle, empilés, le nom visible : on sait à l'œil où mène chacun. */
     .compare-mobile-links {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 10px;
     }
 
     .compare-mobile-links .compare-link {
+      display: flex;
       justify-content: center;
       border-radius: 999px;
       background: var(--bg);
+      padding-inline: 16px;
       font-size: 14px;
+      text-align: center;
+    }
+
+    .compare-link-name {
+      font-weight: 700;
     }
   }
 
