@@ -8,6 +8,7 @@ import {
   mainNav,
   mobileNav,
   productHref,
+  brandHref,
   routeFor,
 } from "./site";
 
@@ -23,6 +24,15 @@ describe("routeFor", () => {
     expect(routeFor("cgv")).toBe("/cgv");
     expect(routeFor("livraison")).toBe("/livraison");
     expect(routeFor("garantie")).toBe("/garantie");
+  });
+
+  it("livre les trois pages marque (lot 3 de la refonte)", () => {
+    expect(routeFor("marqueApple")).toBe("/marques/apple");
+    expect(routeFor("marqueSamsung")).toBe("/marques/samsung");
+    expect(routeFor("marqueXiaomi")).toBe("/marques/xiaomi");
+    expect(brandHref("apple")).toBe("/marques/apple");
+    expect(brandHref("samsung")).toBe("/marques/samsung");
+    expect(brandHref("xiaomi")).toBe("/marques/xiaomi");
   });
 
   it("renvoie null pour une route prévue mais pas encore livrée", () => {
@@ -60,19 +70,19 @@ describe("deliveredLinks et deliveredGroups", () => {
   });
 });
 
-describe("gabarit de l'étape 3", () => {
+describe("gabarit du lot 3 de la refonte", () => {
   it("masque toutes les icônes de l'en-tête (aucune route livrée)", () => {
     expect(headerActions).toEqual([]);
   });
 
-  it("redirige les marques et catégories livrées vers la boutique", () => {
+  it("mène chaque marque à sa page et les catégories aux ancres de la boutique", () => {
     expect(mainNav).toEqual([
       {
         label: "Marques",
         links: [
-          { label: "Apple", href: "/boutique" },
-          { label: "Samsung", href: "/boutique" },
-          { label: "Xiaomi", href: "/boutique" },
+          { label: "Apple", href: "/marques/apple" },
+          { label: "Samsung", href: "/marques/samsung" },
+          { label: "Xiaomi", href: "/marques/xiaomi" },
         ],
       },
       {
@@ -87,7 +97,7 @@ describe("gabarit de l'étape 3", () => {
     ]);
   });
 
-  it("le menu mobile propose la boutique et l'aide livrée", () => {
+  it("le menu mobile propose les marques, les catégories et l'aide livrée", () => {
     expect(mobileNav).toEqual([
       ...mainNav,
       {
@@ -102,11 +112,17 @@ describe("gabarit de l'étape 3", () => {
 
   it("le pied de page ne contient que des routes livrées", () => {
     expect(footerColumns.map((c) => c.label)).toEqual(["Boutique", "Aide", "VERSUS"]);
+    expect(footerColumns[0]?.links).toEqual([
+      { label: "Tout le catalogue", href: "/boutique" },
+      { label: "Apple", href: "/marques/apple" },
+      { label: "Samsung", href: "/marques/samsung" },
+      { label: "Xiaomi", href: "/marques/xiaomi" },
+    ]);
     expect(footerColumns.flatMap((c) => c.links.map((l) => l.href))).toEqual([
       "/boutique",
-      "/boutique",
-      "/boutique",
-      "/boutique",
+      "/marques/apple",
+      "/marques/samsung",
+      "/marques/xiaomi",
       "/livraison",
       "/garantie",
       "/mentions-legales",
