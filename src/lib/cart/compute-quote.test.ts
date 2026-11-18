@@ -30,6 +30,7 @@ describe("quoteCart : prix serveur", () => {
         name: "iPhone 18 Pro",
         slug: "iphone-18-pro",
         variant_label: "Bordeaux · 512 Go",
+        color_hex: IP18_512.color_hex,
         brand_slug: "apple",
         visual_kind: "phone",
         image_src: "/products/ip18.png",
@@ -165,7 +166,12 @@ describe("quoteCart : zones et frais de livraison (D6)", () => {
 
   it("sans zone : pas de frais ni de délai", () => {
     const quote = computeQuote([{ sku: "GW9-40-GRA", qty: 1 }], null, source);
-    expect(quote).toMatchObject({ delivery_fee_fcfa: 0, zone_code: null, eta_label: null });
+    expect(quote).toMatchObject({
+      delivery_fee_fcfa: 0,
+      zone_code: null,
+      zone_label: null,
+      eta_label: null,
+    });
   });
 
   it("applique les frais de la zone choisie et son délai", () => {
@@ -173,6 +179,7 @@ describe("quoteCart : zones et frais de livraison (D6)", () => {
       const quote = computeQuote([{ sku: "GW9-40-GRA", qty: 1 }], zone.code, source);
       expect(quote.delivery_fee_fcfa).toBe(zone.fee_fcfa);
       expect(quote.eta_label).toBe(zone.eta_label);
+      expect(quote.zone_label).toBe(zone.label);
       expect(quote.zone_code).toBe(zone.code);
     }
   });
@@ -221,6 +228,7 @@ describe("quoteCart : total", () => {
       delivery_fee_fcfa: 0,
       total_fcfa: 0,
       zone_code: null,
+      zone_label: null,
       eta_label: null,
       valid: true,
     });

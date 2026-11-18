@@ -122,7 +122,6 @@ export function CartPage({
               quote={state.quote}
               count={state.count}
               pending={state.pending}
-              zoneLabel={zone?.label}
               zoneOption={zone}
             />
             {orderHref ? (

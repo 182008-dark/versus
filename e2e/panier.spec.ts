@@ -1,6 +1,10 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { freeDeliveryLomeFromFcfa, maxQuantityPerLine } from "../src/config/policies";
+import {
+  deliveryZoneOptions,
+  freeDeliveryLomeFromFcfa,
+  maxQuantityPerLine,
+} from "../src/config/policies";
 import { CART_STORAGE_KEY } from "../src/lib/cart/storage";
 
 /**
@@ -32,6 +36,9 @@ test.describe("fiche produit : variante et ajout", () => {
     await expect(page.getByRole("radio", { name: /512 Go/ })).toBeChecked();
     await page.getByRole("radio", { name: /Argent/ }).check();
     await expect(page).toHaveURL(/\?couleur=argent&stockage=256$/);
+    // Bordeaux reste disponible en 512 Go : jamais « Indisponible » pour tout le coloris.
+    await expect(page.getByRole("radio", { name: "Bordeaux · 512 Go seulement" })).toHaveCount(1);
+    await expect(page.getByRole("group", { name: /^Coloris/ })).not.toContainText("Indisponible");
     const add = page.getByRole("button", { name: /^Ajouter au panier/ });
     await expect(add).toHaveAccessibleName("Ajouter au panier : iPhone 18 Pro (Argent · 256 Go)");
     expect((await add.boundingBox())!.height).toBeGreaterThanOrEqual(44);
@@ -123,6 +130,8 @@ test.describe("page panier", () => {
     await zone.selectOption("kara");
     await expectTotals(page);
     expect(plain(await page.getByTestId("livraison").textContent())).toBe("5 000 FCFA");
+    const kara = deliveryZoneOptions.find((option) => option.code === "kara")!;
+    await expect(page.getByTestId("totaux")).toContainText(`${kara.label} · ${kara.eta_label}`);
     // Au-delà du seuil, la livraison à Lomé est offerte.
     await page.getByRole("button", { name: /^Augmenter la quantité/ }).click();
     await page.getByRole("button", { name: /^Augmenter la quantité/ }).click();
@@ -131,6 +140,19 @@ test.describe("page panier", () => {
     await expectTotals(page);
     await expect(page.getByTestId("livraison")).toHaveText("Offerte");
     await expect(page.getByTestId("livraison-offerte")).toHaveCount(0);
+  });
+
+  test("l'icône de l'en-tête y est un lien vers la page courante, sans dialogue annoncé", async ({
+    page,
+  }) => {
+    await seed(page, [{ sku: "AP5-BLA", qty: 2 }]);
+    await page.goto("/panier");
+    const header = page.getByRole("banner");
+    const link = header.getByRole("link", { name: "Panier, 2 articles" });
+    await expect(link).toHaveAttribute("aria-current", "page");
+    await expect(link).not.toHaveAttribute("aria-haspopup", /.*/);
+    await expect(link).not.toHaveAttribute("aria-expanded", /.*/);
+    await expect(header.getByRole("button", { name: /^Panier/ })).toHaveCount(0);
   });
 
   test("n'offre ni commande ni paiement : la commande simulée arrive bientôt", async ({ page }) => {
@@ -181,7 +203,7 @@ test.describe("tiroir mini-panier", () => {
   test("s'ouvre depuis l'en-tête, garde le focus dedans après un retrait et le rend", async ({
     page,
   }) => {
-    await seed(page, [{ sku: "AP5-BLA", qty: 1 }]);
+    await seed(page, [{ sku: "AP5-BLA", qty: 1 }], "lome");
     await page.goto("/");
     const button = page.getByRole("button", { name: "Panier, 1 article" });
     await button.click();
@@ -189,6 +211,9 @@ test.describe("tiroir mini-panier", () => {
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText("AirPods 5")).toBeVisible();
     await expect(dialog.getByTestId("sous-total")).not.toHaveText("…");
+    // Même ligne que la page panier sous « Livraison » : zone et délai.
+    const lome = deliveryZoneOptions.find((option) => option.code === "lome")!;
+    await expect(dialog.getByTestId("totaux")).toContainText(`${lome.label} · ${lome.eta_label}`);
 
     const results = await new AxeBuilder({ page }).include("dialog").analyze();
     expect(

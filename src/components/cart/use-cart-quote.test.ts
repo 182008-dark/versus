@@ -15,6 +15,7 @@ function line(sku: string, qty: number, extra: Partial<CartQuoteLine> = {}): Car
     variant_label: null,
     brand_slug: null,
     visual_kind: null,
+    color_hex: null,
     image_src: null,
     image_width: null,
     image_height: null,
@@ -35,6 +36,7 @@ function quote(lines: CartQuoteLine[]): CartQuote {
     delivery_fee_fcfa: 0,
     total_fcfa: subtotal,
     zone_code: null,
+    zone_label: null,
     eta_label: null,
     valid: true,
   };

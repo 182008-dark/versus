@@ -16,6 +16,7 @@ export type QuoteVariant = Pick<
   | "name"
   | "slug"
   | "variant_label"
+  | "color_hex"
   | "brand_slug"
   | "visual_kind"
   | "image_src"
@@ -94,6 +95,7 @@ export function computeQuote(
       name: variant?.name ?? sku,
       slug: variant?.slug ?? null,
       variant_label: variant?.variant_label ?? null,
+      color_hex: variant?.color_hex ?? null,
       brand_slug: variant?.brand_slug ?? null,
       visual_kind: variant?.visual_kind ?? null,
       image_src: variant?.image_src ?? null,
@@ -136,6 +138,7 @@ export function computeQuote(
     delivery_fee_fcfa: fee,
     total_fcfa: subtotal + fee,
     zone_code: zone?.code ?? null,
+    zone_label: zone?.label ?? null,
     eta_label: zone?.eta_label ?? null,
     valid,
   };
@@ -154,6 +157,7 @@ export function quoteSourceFromCatalog(
         name: product.name,
         slug: product.slug,
         variant_label: variant.color_name,
+        color_hex: variant.color_hex,
         brand_slug: product.brand_slug,
         visual_kind: product.visual_kind,
         image_src: product.image_src,

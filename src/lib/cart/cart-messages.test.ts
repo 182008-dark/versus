@@ -18,6 +18,7 @@ function line(overrides: Partial<CartQuoteLine>): CartQuoteLine {
     variant_label: "Bordeaux · 512 Go",
     brand_slug: "apple",
     visual_kind: "phone",
+    color_hex: null,
     image_src: null,
     image_width: null,
     image_height: null,
@@ -37,6 +38,7 @@ function quote(lines: CartQuoteLine[]): CartQuote {
     delivery_fee_fcfa: 0,
     total_fcfa: 0,
     zone_code: null,
+    zone_label: null,
     eta_label: null,
     valid: false,
   };

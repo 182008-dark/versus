@@ -8,21 +8,20 @@ import { formatFCFA } from "@/lib/format/fcfa";
 /**
  * Totaux du panier, tous lus dans le devis du serveur : sous-total, livraison (frais de la zone,
  * « Offerte » au-delà du seuil, ou « À choisir ») et total. Pendant un recalcul, l'ancien devis
- * reste affiché, atténué, avec `aria-busy`. Avec `zoneOption` (page panier), le montant restant
- * avant la livraison offerte est indiqué (Lomé, 300 000 FCFA).
+ * reste affiché, atténué, avec `aria-busy`. Sous « Livraison », la même ligne dans le tiroir et
+ * sur la page : nom de la zone et délai, lus dans le devis (« Lomé et environs · 24 à 48 h »).
+ * Avec `zoneOption` (page panier), le montant restant avant la livraison offerte est indiqué
+ * (Lomé, 300 000 FCFA).
  */
 export function CartSummary({
   quote,
   count,
   pending,
-  zoneLabel,
   zoneOption,
 }: {
   quote: CartQuote | null;
   count: number;
   pending: boolean;
-  /** Nom de la zone choisie (page panier) ; le tiroir n'affiche que le délai. */
-  zoneLabel?: string;
   /** Zone choisie (seuil de gratuité), lue côté serveur par la page panier. */
   zoneOption?: DeliveryZoneOption;
 }) {
@@ -30,12 +29,16 @@ export function CartSummary({
     quote && zoneOption?.free_from_fcfa != null && quote.zone_code === zoneOption.code
       ? zoneOption.free_from_fcfa - quote.subtotal_fcfa
       : 0;
-  const zone = quote?.zone_code ? (zoneLabel ?? quote.eta_label) : null;
+  const zone = quote?.zone_code
+    ? [quote.zone_label, quote.eta_label].filter(Boolean).join(" · ")
+    : null;
   return (
     <div aria-busy={pending} data-testid="totaux">
       <dl className={clsx("space-y-2.5 transition-opacity", pending && "opacity-60")}>
         <div className="flex justify-between gap-4">
-          <dt>Sous-total ({articles(count)})</dt>
+          <dt>
+            Sous-total <span className="whitespace-nowrap">({articles(count)})</span>
+          </dt>
           <dd data-testid="sous-total">{quote ? <Price amount={quote.subtotal_fcfa} /> : "…"}</dd>
         </div>
         <div className="flex justify-between gap-4">

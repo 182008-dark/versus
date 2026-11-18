@@ -37,6 +37,11 @@ export type CartQuoteLine = {
   slug: string | null;
   /** Coloris, capacité ou taille (`product_variants.color_name`). */
   variant_label: string | null;
+  /**
+   * Teinte du coloris (`product_variants.color_hex`) : la vignette la montre en pastille, car la
+   * photo (`image_src`, celle du produit) n'est pas forcément celle de ce coloris.
+   */
+  color_hex: string | null;
   brand_slug: Brand | null;
   visual_kind: DeviceKind | null;
   image_src: string | null;
@@ -59,6 +64,9 @@ export type CartQuote = {
   delivery_fee_fcfa: number;
   total_fcfa: number;
   zone_code: string | null;
+  /** Nom de la zone (`delivery_zones.label`) : « Lomé et environs ». */
+  zone_label: string | null;
+  /** Délai de la zone (`delivery_zones.eta_label`) : « 24 à 48 h ». */
   eta_label: string | null;
   /** Faux dès qu'une ligne est `unavailable` ou `insufficient_stock`. */
   valid: boolean;

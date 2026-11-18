@@ -12,7 +12,8 @@ const sampleQuote: CartQuote = {
   delivery_fee_fcfa: 1_500,
   total_fcfa: 197_500,
   zone_code: "lome",
-  eta_label: "24 à 48 h",
+  zone_label: deliveryZoneOptions[0]!.label,
+  eta_label: deliveryZoneOptions[0]!.eta_label,
   valid: true,
 };
 
@@ -53,7 +54,6 @@ export function CartSection() {
             quote={sampleQuote}
             count={2}
             pending={false}
-            zoneLabel={deliveryZoneOptions[0]!.label}
             zoneOption={deliveryZoneOptions[0]}
           />
         </div>

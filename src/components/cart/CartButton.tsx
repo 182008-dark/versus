@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useRef, useState, type ComponentType, type ReactNode } from "react";
 import { CountBadge } from "@/components/ui/CountBadge";
 import { countLabel } from "@/components/ui/count-label";
@@ -17,8 +18,9 @@ const loadDrawer = () => import("./CartDrawer").then((module) => module.CartDraw
  * - Ensuite : un bouton « Panier, 3 articles » (`countLabel`, `aria-haspopup="dialog"`) qui ouvre
  *   le tiroir ; le compteur est annoncé poliment et la pastille (CountBadge, « 99+ » au-delà)
  *   rejoue `bump` à chaque changement (`key`).
- * - Sur la page panier, le bouton n'ouvre pas le tiroir (deux devis concurrents) : il ramène au
- *   titre de la page.
+ * - Sur la page panier, pas de tiroir (deux devis concurrents) : l'icône reste un lien vers
+ *   `/panier` marqué `aria-current="page"`, avec son compteur, sans `aria-haspopup` ni
+ *   `aria-expanded` (le rôle annoncé correspond à l'action, WCAG 4.1.2).
  * L'icône est rendue par le serveur et reçue en props (pas de tracés SVG dans le JavaScript).
  */
 export function CartButton({
@@ -31,6 +33,7 @@ export function CartButton({
   icon: ReactNode;
 }) {
   const cart = useCart();
+  const onCartPage = usePathname() === href;
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [Drawer, setDrawer] = useState<ComponentType<CartDrawerProps> | null>(null);
   const [open, setOpen] = useState(false);
@@ -44,11 +47,26 @@ export function CartButton({
   }
 
   const name = countLabel("Panier", cart.count);
+  const badge = cart.count > 0 ? <CountBadge key={cart.count} value={cart.count} /> : null;
+  const live = (
+    <span className="sr-only" aria-live="polite">
+      {name}
+    </span>
+  );
+
+  if (onCartPage) {
+    return (
+      <>
+        <a href={href} aria-label={name} aria-current="page" className={iconButtonClasses}>
+          {icon}
+          {badge}
+        </a>
+        {live}
+      </>
+    );
+  }
+
   const openDrawer = () => {
-    if (window.location.pathname === href) {
-      document.querySelector<HTMLElement>("main h1")?.focus();
-      return;
-    }
     loadDrawer().then(
       (component) => {
         setDrawer(() => component);
@@ -73,11 +91,9 @@ export function CartButton({
         onFocus={loadDrawer}
       >
         {icon}
-        {cart.count > 0 ? <CountBadge key={cart.count} value={cart.count} /> : null}
+        {badge}
       </button>
-      <span className="sr-only" aria-live="polite">
-        {name}
-      </span>
+      {live}
       {Drawer ? (
         <Drawer
           open={open}

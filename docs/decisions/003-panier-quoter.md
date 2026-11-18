@@ -35,6 +35,11 @@ montants `_fcfa` entiers, `issues` par ligne : `unavailable`, `insufficient_stoc
   composants restent identiques.
 - `computeQuote()` reste la référence testée du calcul ; les tests de la RPC (pgTAP) reprendront
   ses cas.
+- Champs d'affichage du contrat, lus par la même requête : `zone_label` et `eta_label`
+  (`delivery_zones`), pour que le tiroir et la page disent la même chose sous « Livraison »
+  (« Lomé et environs · 24 à 48 h ») ; `color_hex` par ligne (`product_variants`), montré en
+  pastille sur la vignette tant que la photo est celle du produit et non celle du coloris (une
+  photo par variante viendra de `product_images.variant_id`).
 
 ### 2. Le serveur fait foi
 
