@@ -5,6 +5,33 @@ du plan (`v0.N.0`), puis `v1.0.0`.
 
 ## [Non publié]
 
+### Refonte, lot 3 : pages marque et liens (branche `refonte-lot-3-marques`)
+
+- Pages `/marques/apple`, `/marques/samsung`, `/marques/xiaomi` générées à l'avance
+  (`generateStaticParams` sur les marques, `ensureStatic = "navigation"`) : une marque inconnue
+  répond 404 dès la première visite ; métadonnées calculées ; écran d'attente sans animation.
+- Contenu : fil d'Ariane, bandeau de marque (résumé « 10 produits · de … à … FCFA » calculé,
+  paiements simulés, « Prix indicatifs, boutique fictive », trois vedettes, sélecteur « Apple vs
+  Samsung vs Xiaomi »), barre de catégories (catégorie vide masquée : Apple sans bracelets), une
+  section par catégorie du plus cher au moins cher, cartes en liste sous 400 px, « Comparer
+  avec » et « Voir aussi ». Une seule image prioritaire, aucun nouvel îlot client.
+- Tous les liens de marque passent par `brandHref()` et mènent à `/marques/<slug>` : en-tête, menu
+  mobile, pied de page (colonne « Tout le catalogue · Apple · Samsung · Xiaomi »), cartes de
+  marque de l'accueil, nom de marque de la fiche produit, nouveaux raccourcis de la boutique.
+- « Page courante » : adresse exacte seulement, jamais une ancre (`isCurrentLink`) ; le pied de
+  page ne double plus la navigation principale (un seul `aria-current="page"` exposé par page).
+- Phrases de gamme Samsung et Xiaomi mises à jour pour les 10 produits du lot 1.
+- Nouveaux composants : `Breadcrumb`, `BrandBanner`, `BrandSwitcher`, `CategoryBar`,
+  `BrandCompare`, `BrandSeeAlso`, `ProductCard layout="adaptive"` ; section « Pages marque » du
+  styleguide.
+- Tests : `brand-page.test.ts` (sélection par marque, regroupement par catégorie, fourchette,
+  vedettes, raccourcis), `nav-current.test.ts`, `site.test.ts` (routes de marque) ;
+  `e2e/marques.spec.ts` (10 produits tous de la marque par `data-product` et par nom, comptes
+  calculés, chaque lien « Samsung » du site, 404, un seul `aria-current`, axe à 375 et 1440 px,
+  pas de défilement horizontal à 320, 360 et 390 px, une image prioritaire) ; budgets JS et poids
+  étendus aux pages marque ; références visuelles de l'accueil régénérées. Captures dans
+  `docs/refonte/lot-3/`.
+
 ### Refonte, lot 2 : fondations du design (branche `refonte-lot-2-fondations`)
 
 - Gris « pierre » légèrement verdis (`--gray-950` `#1A1D1B` … `--gray-25` `#FAFBFA`, nuit
