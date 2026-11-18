@@ -4,7 +4,8 @@ import { ProductCard } from "@/components/product/ProductCard";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { routeFor } from "@/config/site";
 import { brands, categories, products } from "@/data/catalog";
-import { groupByCategory, productsOfBrand } from "@/lib/catalog/brand-page";
+import { colorSwatches, groupByCategory, productsOfBrand } from "@/lib/catalog/brand-page";
+import { categoryLabel } from "@/lib/format/category";
 import { StyleguideSection } from "./StyleguideSection";
 
 const PREFIX = "exemple-";
@@ -70,12 +71,19 @@ export function BrandPageSection() {
 
       <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
         <div className="max-w-[300px]">
-          <ProductCard product={{ ...sample, is_new: false }} layout="adaptive" />
+          <ProductCard
+            product={{ ...sample, is_new: false }}
+            layout="adaptive"
+            category={categoryLabel(sample.category_slug)}
+            swatches={colorSwatches(sample.variants)}
+          />
         </div>
         <p className="text-sm leading-relaxed text-muted">
           <code>ProductCard layout=&quot;adaptive&quot;</code> : dans <code>grid-products</code>, la
-          carte passe en liste (photo à gauche, marque, nom, prix et action à droite) sous 400 px de
-          large, verticale au-delà. Voir les captures à 390 px de <code>docs/refonte/lot-3/</code>.
+          carte passe en liste sous 400 px (photo à gauche ; marque, nom, catégorie, coloris, prix
+          et « Voir le produit » à droite), compacte de 400 à 640 px (accroche masquée), verticale
+          au-delà. Avec <code>featured</code>, le produit phare de chaque section occupe 2 colonnes
+          dès 901 px. Voir les captures de <code>docs/refonte/lot-3/</code>.
         </p>
       </div>
     </StyleguideSection>
