@@ -1,7 +1,7 @@
 import type { Brand } from "@/lib/brand-themes";
 import { formatFCFA, formatFCFAParts } from "@/lib/format/fcfa";
 import { productCount } from "./summary";
-import type { CatalogBrand, CatalogCategory, CatalogProductRow } from "./types";
+import type { CatalogBrand, CatalogCategory, CatalogProductRow, ProductVariant } from "./types";
 
 /**
  * Données des pages marque (`/marques/[marque]`, refonte, lot 3) : fonctions pures, testées, qui
@@ -107,4 +107,40 @@ export function compareShortcuts<T extends Comparable>(
     }
     return [];
   });
+}
+
+export type ColorSwatch = { slug: string; name: string; hex: string | null };
+
+type Colored = Pick<
+  ProductVariant,
+  "color_slug" | "color_name" | "color_hex" | "storage_gb" | "size_mm" | "is_active" | "position"
+>;
+
+/**
+ * Nom du coloris seul, sans la capacité ni la taille que porte le libellé de la variante
+ * (« Noir · 256 Go » → « Noir », « 46 mm · Argent » → « Argent »).
+ */
+function colorOnly(variant: Colored): string {
+  const parts = variant.color_name.split(" · ");
+  if (variant.storage_gb !== null && parts.length > 1) parts.pop();
+  if (variant.size_mm !== null && parts.length > 1) parts.shift();
+  return parts.join(" · ");
+}
+
+/**
+ * Coloris d'un produit pour les pastilles des cartes (§3.2 : liste mobile « nom, catégorie,
+ * coloris et prix ») : un par `color_slug`, variantes actives seulement, dans l'ordre des
+ * variantes.
+ */
+export function colorSwatches(variants: readonly Colored[]): ColorSwatch[] {
+  const seen = new Map<string, ColorSwatch>();
+  for (const variant of variants.toSorted((a, b) => a.position - b.position)) {
+    if (!variant.is_active || seen.has(variant.color_slug)) continue;
+    seen.set(variant.color_slug, {
+      slug: variant.color_slug,
+      name: colorOnly(variant),
+      hex: variant.color_hex,
+    });
+  }
+  return [...seen.values()];
 }

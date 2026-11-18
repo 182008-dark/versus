@@ -3,6 +3,7 @@ import { brands, categories, homeSlots, products } from "@/data/catalog";
 import type { Brand } from "@/lib/brand-themes";
 import {
   brandRangeLabel,
+  colorSwatches,
   compareShortcuts,
   featuredProducts,
   findBrand,
@@ -189,5 +190,61 @@ describe("compareShortcuts", () => {
   it("passe une marque absente du comparateur", () => {
     const appleOnly = compareEntries.filter((product) => product.brand_slug === "apple");
     expect(compareShortcuts(appleOnly, "apple", ["samsung", "xiaomi"])).toEqual([]);
+  });
+});
+
+describe("colorSwatches", () => {
+  it("donne un coloris par color_slug, sans capacité ni taille, dans l'ordre des variantes", () => {
+    for (const product of products) {
+      const swatches = colorSwatches(product.variants);
+      const slugs = new Set(product.variants.filter((v) => v.is_active).map((v) => v.color_slug));
+      expect(swatches.map((swatch) => swatch.slug)).toEqual([...slugs]);
+      for (const swatch of swatches) {
+        expect(swatch.name, product.code).not.toMatch(/\d+ (Go|To|mm)/);
+        expect(swatch.name.length, product.code).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("retire la capacité (« Noir · 256 Go ») et la taille (« 46 mm · Argent »)", () => {
+    const base = { is_active: true, color_hex: null };
+    expect(
+      colorSwatches([
+        {
+          ...base,
+          color_slug: "noir",
+          color_name: "Noir · 256 Go",
+          storage_gb: 256,
+          size_mm: null,
+          position: 1,
+        },
+        {
+          ...base,
+          color_slug: "noir",
+          color_name: "Noir · 512 Go",
+          storage_gb: 512,
+          size_mm: null,
+          position: 2,
+        },
+        {
+          ...base,
+          color_slug: "argent",
+          color_name: "46 mm · Argent",
+          storage_gb: null,
+          size_mm: 46,
+          position: 0,
+        },
+      ]).map((swatch) => swatch.name),
+    ).toEqual(["Argent", "Noir"]);
+  });
+
+  it("ignore les variantes inactives", () => {
+    const variant = { color_hex: null, storage_gb: null, size_mm: null };
+    expect(
+      colorSwatches([
+        { ...variant, color_slug: "a", color_name: "A", is_active: false, position: 0 },
+        { ...variant, color_slug: "b", color_name: "B", is_active: true, position: 1 },
+      ]).map((swatch) => swatch.slug),
+    ).toEqual(["b"]);
   });
 });
