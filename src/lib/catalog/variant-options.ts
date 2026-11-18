@@ -26,7 +26,17 @@ export type VariantOption = {
   /** Variante sélectionnée quand on choisit cette option. */
   sku: string;
   selected: boolean;
-  soldOut: boolean;
+  /**
+   * Option indisponible (refonte §3.4 : gris barré, « Indisponible ») : pour un coloris, toutes
+   * ses variantes sont épuisées ; pour une capacité ou une taille, la combinaison avec le coloris
+   * choisi l'est.
+   */
+  unavailable: boolean;
+  /**
+   * Coloris disponible seulement dans d'autres capacités ou tailles que celle choisie :
+   * « 512 Go seulement ». `null` sinon.
+   */
+  note: string | null;
   /** Couleur d'aperçu (coloris seulement). */
   hex: string | null;
 };
@@ -68,6 +78,13 @@ function closest<T extends PickerVariant>(candidates: readonly T[], selected: Pi
   return candidates.reduce((best, variant) => (score(variant) > score(best) ? variant : best));
 }
 
+/** « 256 Go », « 40 mm » : capacité ou taille d'une variante, `null` pour un coloris seul. */
+function dimensionLabel(variant: PickerVariant): string | null {
+  if (variant.storage_gb !== null) return storageLabel(variant.storage_gb);
+  if (variant.size_mm !== null) return sizeLabel(variant.size_mm);
+  return null;
+}
+
 function group<T extends PickerVariant>(
   variants: readonly T[],
   selected: T,
@@ -83,16 +100,23 @@ function group<T extends PickerVariant>(
   if (values.length === 0) return null;
   if (key !== "color") values.sort((a, b) => Number(a) - Number(b));
   const options = values.map((value): VariantOption => {
-    const target = closest(
-      pool.filter((variant) => valueOf(variant) === value),
-      selected,
-    );
+    const candidates = pool.filter((variant) => valueOf(variant) === value);
+    const target = closest(candidates, selected);
+    // Coloris : indisponible seulement si toutes ses variantes sont épuisées ; si seule la
+    // capacité (ou la taille) gardée l'est, on dit laquelle reste disponible.
+    const inStock = key === "color" ? candidates.filter((variant) => variant.stock > 0) : [];
+    const unavailable = key === "color" ? inStock.length === 0 : target.stock === 0;
+    const others = [...new Set(inStock.map(dimensionLabel).filter((label) => label !== null))];
     return {
       value: String(value),
       label: labelOf(target),
       sku: target.sku,
       selected: valueOf(selected) === value,
-      soldOut: target.stock === 0,
+      unavailable,
+      note:
+        !unavailable && target.stock === 0 && others.length > 0
+          ? `${others.join(" ou ")} seulement`
+          : null,
       hex: key === "color" ? target.color_hex : null,
     };
   });

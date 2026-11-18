@@ -16,11 +16,15 @@ export type PickerView = VariantView & { price: ReactNode };
  * - un groupe de boutons radio natifs par critère (Coloris, Capacité, Taille du boîtier) : nom
  *   par `<legend>`, flèches du clavier, choix courant lu dans la légende ; le bouton radio couvre
  *   toute la pastille (cible de 44 px) ;
- * - une option dont la combinaison est épuisée reste choisissable, grisée et marquée
- *   « épuisé » ; le texte de stock et le bouton d'ajout l'expliquent ;
+ * - une option indisponible reste choisissable, en gris barré avec le mot « Indisponible »
+ *   (refonte §3.4) : un coloris l'est quand toutes ses variantes sont épuisées ; s'il ne manque
+ *   que dans la capacité choisie, la pastille dit laquelle reste (« 512 Go seulement ») ; le
+ *   texte de stock et le bouton d'ajout l'expliquent ;
  * - l'adresse suit le choix (`?couleur=bordeaux&stockage=512`, `replaceState`) et une adresse
  *   partagée est relue après l'hydratation (le premier rendu est celui du serveur) ;
- * - prix de la variante choisie, puis AddToCartButton.
+ * - prix et texte de stock de la variante choisie dans une région `role="status"` montée dès le
+ *   premier rendu : un changement de variante est annoncé poliment (WCAG 4.1.3) ; puis
+ *   AddToCartButton, jamais remonté (sa propre région d'annonce reste en place).
  */
 export function VariantPicker({
   views,
@@ -67,7 +71,7 @@ export function VariantPicker({
                   "relative inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium",
                   "has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-(--focus-ring)",
                   option.selected ? "border-ink ring-1 ring-ink" : "border-line-control",
-                  option.soldOut && "text-muted",
+                  option.unavailable && "text-muted",
                 )}
               >
                 {group.key === "color" ? (
@@ -77,8 +81,14 @@ export function VariantPicker({
                     style={option.hex ? { backgroundColor: option.hex } : undefined}
                   />
                 ) : null}
-                {option.label}
-                {option.soldOut ? <span className="text-xs"> · épuisé</span> : null}
+                <span className={option.unavailable ? "line-through" : undefined}>
+                  {option.label}
+                </span>
+                {option.unavailable ? (
+                  <span className="text-xs"> · Indisponible</span>
+                ) : option.note ? (
+                  <span className="text-xs text-muted"> · {option.note}</span>
+                ) : null}
                 <input
                   type="radio"
                   name={`${id}-${group.key}`}
@@ -92,12 +102,11 @@ export function VariantPicker({
           </div>
         </fieldset>
       ))}
-      <p className="mt-6" data-testid="prix-variante">
-        {selected.price}
-      </p>
-      <p className="mt-1 text-sm text-muted">{selected.status}</p>
+      <div role="status" className="mt-6">
+        <p data-testid="prix-variante">{selected.price}</p>
+        <p className="mt-1 text-sm text-muted">{selected.status}</p>
+      </div>
       <AddToCartButton
-        key={selected.sku}
         sku={selected.sku}
         name={selected.name}
         stock={selected.stock}

@@ -52,9 +52,9 @@ describe("variantGroups", () => {
       ["Glacier", false],
       ["Noir", false],
     ]);
-    expect(storages?.options.map((o) => [o.label, o.sku, o.soldOut])).toEqual([
-      ["256 Go", "IP18-BOR-256", true],
-      ["512 Go", "IP18-BOR-512", false],
+    expect(storages?.options.map((o) => [o.label, o.sku, o.unavailable, o.note])).toEqual([
+      ["256 Go", "IP18-BOR-256", true, null],
+      ["512 Go", "IP18-BOR-512", false, null],
     ]);
     expect(colors?.selectedLabel).toBe("Bordeaux");
     expect(storages?.selectedLabel).toBe("512 Go");
@@ -65,10 +65,27 @@ describe("variantGroups", () => {
     // L'argent n'existe qu'en 256 Go.
     expect(colors?.options.find((o) => o.label === "Argent")?.sku).toBe("IP18-ARG-256");
     const [fromSilver] = variantGroups(ip18, bySku(ip18, "IP18-ARG-256"));
-    // Retour au bordeaux en 256 Go (épuisé) : la même capacité est gardée, et signalée.
+    // Retour au bordeaux en 256 Go (épuisé) : la même capacité est gardée ; le coloris n'est pas
+    // indisponible pour autant (512 Go en stock), la pastille dit ce qui reste.
     expect(fromSilver?.options.find((o) => o.label === "Bordeaux")).toMatchObject({
       sku: "IP18-BOR-256",
-      soldOut: true,
+      unavailable: false,
+      note: "512 Go seulement",
+    });
+    expect(fromSilver?.options.find((o) => o.label === "Noir")).toMatchObject({
+      unavailable: false,
+      note: null,
+    });
+  });
+
+  it("marque un coloris indisponible seulement quand toutes ses variantes sont épuisées", () => {
+    const noBordeaux = ip18.map((variant) =>
+      variant.color_slug === "bordeaux" ? { ...variant, stock: 0 } : variant,
+    );
+    const [colors] = variantGroups(noBordeaux, bySku(noBordeaux, "IP18-ARG-256"));
+    expect(colors?.options.find((o) => o.label === "Bordeaux")).toMatchObject({
+      unavailable: true,
+      note: null,
     });
   });
 

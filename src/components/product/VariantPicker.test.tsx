@@ -41,8 +41,30 @@ describe("VariantPicker", () => {
     // Bordeaux 256 Go est épuisé : la fiche s'ouvre sur Bordeaux 512 Go.
     expect(within(color).getByRole("radio", { name: /Bordeaux/ })).toHaveProperty("checked", true);
     expect(within(storage).getByRole("radio", { name: /512 Go/ })).toHaveProperty("checked", true);
-    expect(within(storage).getByRole("radio", { name: /256 Go ?· épuisé/ })).toBeTruthy();
+    expect(within(storage).getByRole("radio", { name: /256 Go ?· Indisponible/ })).toBeTruthy();
     expect(screen.getByTestId("prix-variante").textContent).toMatch(/FCFA$/);
+  });
+
+  it("ne dit pas « Indisponible » d'un coloris disponible dans une autre capacité", async () => {
+    const user = userEvent.setup();
+    renderPicker();
+    await user.click(screen.getByRole("radio", { name: /Noir/ }));
+    const color = screen.getByRole("group", { name: /^Coloris/ });
+    // Bordeaux 256 Go est épuisé, Bordeaux 512 Go ne l'est pas.
+    const bordeaux = within(color).getByRole("radio", { name: /Bordeaux/ });
+    expect(bordeaux.closest("label")?.textContent).toBe("Bordeaux · 512 Go seulement");
+    expect(within(color).queryByText(/Indisponible/)).toBeNull();
+  });
+
+  it("annonce le prix et le stock de la variante choisie dans une région déjà montée", async () => {
+    const user = userEvent.setup();
+    renderPicker();
+    const region = screen.getByTestId("prix-variante").closest("[role=status]")!;
+    expect(region).toBeTruthy();
+    await user.click(screen.getByRole("radio", { name: /256 Go/ }));
+    // Même nœud : la région n'est pas recréée, son contenu change (annonce polie).
+    expect(screen.getByTestId("prix-variante").closest("[role=status]")).toBe(region);
+    expect(region.textContent).toMatch(/Cette version est épuisée/);
   });
 
   it("change le prix et le texte de stock avec la variante", async () => {
@@ -77,7 +99,9 @@ describe("AddToCartButton (dans VariantPicker)", () => {
   it("ajoute la variante choisie sans quitter la fiche et l'annonce", async () => {
     const user = userEvent.setup();
     renderPicker();
-    const status = screen.getByRole("status");
+    const status = screen
+      .getAllByRole("status")
+      .find((region) => !region.querySelector("[data-testid=prix-variante]"))!;
     expect(status.textContent).toBe("");
     await user.click(
       screen.getByRole("button", {
@@ -96,6 +120,6 @@ describe("AddToCartButton (dans VariantPicker)", () => {
     updateCart({ type: "add", sku: "IP18-BOR-512", qty: 5 });
     renderPicker();
     await user.click(screen.getByRole("button", { name: /^Ajouter au panier/ }));
-    expect(screen.getByRole("status").textContent).toMatch(/^Quantité maximale atteinte/);
+    expect(screen.getByText(/^Quantité maximale atteinte/)).toBeTruthy();
   });
 });

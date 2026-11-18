@@ -31,14 +31,22 @@ export function ProductView({
   return (
     <article className="product-view wrap section">
       <div className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
-        <div data-brand={product.brand_slug} className="rounded-tile bg-brand-ground p-8">
-          <ProductVisual
-            product={product}
-            priority
-            noUpscale
-            sizes="(max-width: 900px) 85vw, 46vw"
-            className={`mx-auto flex h-[min(70vw,520px)] max-h-[520px] w-full items-center justify-center ${product.visual_kind === "band" ? "max-w-[120px]" : "max-w-[460px]"}`}
-          />
+        <div>
+          <div data-brand={product.brand_slug} className="rounded-tile bg-brand-ground p-8">
+            <ProductVisual
+              product={product}
+              priority
+              noUpscale
+              sizes="(max-width: 900px) 85vw, 46vw"
+              className={`mx-auto flex h-[min(70vw,520px)] max-h-[520px] w-full items-center justify-center ${product.visual_kind === "band" ? "max-w-[120px]" : "max-w-[460px]"}`}
+            />
+          </div>
+          {/* Une seule photo par produit (une par variante à l'étape 4) : on le dit. */}
+          {new Set(variants.map((variant) => variant.color_slug)).size > 1 ? (
+            <p className="mt-3 text-center text-xs text-muted">
+              Photo d’un seul coloris : la pastille montre le coloris choisi.
+            </p>
+          ) : null}
         </div>
         <div>
           <p className="flex flex-wrap items-center gap-x-2 text-meta text-muted-strong">

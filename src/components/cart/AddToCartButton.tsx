@@ -28,14 +28,19 @@ export function AddToCartButton({
   cartHref: string | null;
   className: string;
 }) {
-  const [result, setResult] = useState<{ status: AddStatus; message: string } | null>(null);
+  // Le résultat est celui d'une variante : il s'efface quand la variante change (sans remonter
+  // le composant, pour garder la région d'annonce en place).
+  const [last, setLast] = useState<{ sku: string; status: AddStatus; message: string } | null>(
+    null,
+  );
+  const result = last?.sku === sku ? last : null;
   const soldOut = stock <= 0;
 
   function add() {
     if (soldOut) return;
     const before = getCartSnapshot().lines;
     const after = updateCart({ type: "add", sku, max: stock }).lines;
-    setResult(addOutcome(before, after, sku, name, stock));
+    setLast({ sku, ...addOutcome(before, after, sku, name, stock) });
   }
 
   return (
