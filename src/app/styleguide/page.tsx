@@ -12,6 +12,7 @@ import { LayoutSection } from "./_components/LayoutSection";
 import { LinksBadgesSection } from "./_components/LinksBadgesSection";
 import { TypographySection } from "./_components/TypographySection";
 import { CatalogSection } from "./_components/CatalogSection";
+import { BrandPageSection } from "./_components/BrandPageSection";
 
 export const metadata: Metadata = {
   title: "Design system",
@@ -26,6 +27,7 @@ const sections = [
   { id: "marques", label: "Marques et signature" },
   { id: "gabarit", label: "Gabarit" },
   { id: "catalogue", label: "Catalogue" },
+  { id: "pages-marque", label: "Pages marque" },
 ];
 
 /**
@@ -71,6 +73,7 @@ export default function StyleguidePage() {
         <BrandSection />
         <LayoutSection />
         <CatalogSection />
+        <BrandPageSection />
       </main>
       <SiteFooter />
     </>
