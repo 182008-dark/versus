@@ -2,6 +2,7 @@ import { BrandMark } from "@/components/ui/BrandMark";
 import { Price } from "@/components/ui/Price";
 import { ScrollRegion } from "@/components/ui/ScrollRegion";
 import { VsMark } from "@/components/ui/VsMark";
+import { brandHref } from "@/config/site";
 import { products } from "@/data/catalog";
 import { tokenHex } from "@/data/design-tokens";
 import { BRANDS, brandThemes, type Brand } from "@/lib/brand-themes";
@@ -123,7 +124,12 @@ export function BrandSection() {
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-6">
             {BRANDS.map((brand) => (
-              <BrandMark key={brand} brand={brand} size="lead" href="/boutique" />
+              <BrandMark
+                key={brand}
+                brand={brand}
+                size="lead"
+                href={brandHref(brand) ?? undefined}
+              />
             ))}
           </div>
           <p className="mt-2 text-xs text-muted">Taille « lead », en lien (cible de 44 px).</p>

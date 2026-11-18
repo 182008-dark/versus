@@ -199,27 +199,63 @@ Points de rupture déclarés dans `@theme` : `sm` 641, `md` 901, `lg` 1025, `xl`
 | `VsMark`            | S   | `size` (md 44 px, sm 32 px)                                                              | médaillon « VS » à l'encre VERSUS, anneau blanc de 3 px ; `aria-hidden`, jamais focalisable                                                                                                                                                                                                                                  |
 | `Eyebrow`           | S   | `as`, `tone`                                                                             | alias temporaire : casse normale, pastille accent de 8 px ; remplacé par `BrandMark` aux lots 3 à 5                                                                                                                                                                                                                          |
 | `Dialog`            | C   | `open`, `onClose`, `labelledBy`/`label`, `variant` (modal, fullscreen), `returnFocusRef` | `<dialog>` natif, Échap, focus piégé (`lib/a11y/focus-trap.ts`), focus rendu ; `onClose` une fois par demande de l'utilisateur ; fermée si `<Activity>` masque la page                                                                                                                                                       |
+| `Breadcrumb`        | S   | `items` (`label`, `href?`)                                                               | « Accueil › Samsung » ; étapes en liens de 44 px, dernière en texte sans lien ni `aria-current` (un seul par page, porté par l'en-tête) ; « › » décoratif                                                                                                                                                                    |
 | `VisuallyHidden`    | S   | —                                                                                        | `sr-only`                                                                                                                                                                                                                                                                                                                    |
 | `SkipLink`          | S   | `targetId`                                                                               | hors écran tant qu'il n'a pas le focus (pas `sr-only`) ; capsule claire de 44 px, au-dessus de l'en-tête collant                                                                                                                                                                                                             |
 | `ScrollRegion`      | S   | `label`, `className`                                                                     | conteneur à défilement horizontal : `role="region"`, nom, `tabIndex={0}` (défilement au clavier)                                                                                                                                                                                                                             |
 
 ### `src/components/layout/`
 
-| Composant         | S/C | Rôle                                                                                                                                                                  |
-| ----------------- | --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AnnouncementBar` | S   | bandeau « Projet pédagogique » (ancien `FictiveNotice`), région « Avertissement »                                                                                     |
-| `Logo`            | S   | monogramme « V/S » et nom ; lien « VERSUS, accueil » ; zone cliquable de 44 px de haut (pseudo-élément, sans changer la mise en page) ; `onClick` pour le menu mobile |
-| `SiteHeader`      | S   | `banner` collant de 56 px ; translucide ≥ 901 px, opaque en dessous                                                                                                   |
-| `MainNav`         | S   | groupes de `mainNav` séparés par un filet ; `preview` pour le styleguide                                                                                              |
-| `NavLink`         | C   | `aria-current="page"` (`usePathname`)                                                                                                                                 |
-| `MobileMenu`      | C   | bouton `aria-expanded` + `Dialog` plein écran (≤ 900 px) ; se ferme au clic sur un lien ou le logo, au changement de chemin et quand `<Activity>` masque la page      |
-| `SiteFooter`      | S   | `contentinfo` : colonnes, moyens de paiement, liens légaux, mentions du bas ; liens `NavLink` (`aria-current`, page courante soulignée) de 44 px sous 641 px          |
-| `PaymentBadges`   | S   | T-Money, Flooz, Carte bancaire, À la livraison (simulés)                                                                                                              |
-| `InfoPage`        | S   | gabarit des pages d'information                                                                                                                                       |
-| `ErrorState`      | S   | contenu des pages 404 et d'erreur                                                                                                                                     |
+| Composant         | S/C | Rôle                                                                                                                                                                                                       |
+| ----------------- | --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AnnouncementBar` | S   | bandeau « Projet pédagogique » (ancien `FictiveNotice`), région « Avertissement »                                                                                                                          |
+| `Logo`            | S   | monogramme « V/S » et nom ; lien « VERSUS, accueil » ; zone cliquable de 44 px de haut (pseudo-élément, sans changer la mise en page) ; `onClick` pour le menu mobile                                      |
+| `SiteHeader`      | S   | `banner` collant de 56 px ; translucide ≥ 901 px, opaque en dessous                                                                                                                                        |
+| `MainNav`         | S   | groupes de `mainNav` séparés par un filet ; `preview` pour le styleguide                                                                                                                                   |
+| `NavLink`         | C   | `aria-current="page"` (`usePathname`) si l'adresse est exactement celle de la page, jamais pour une ancre (`nav-current.ts`) ; `markCurrent={false}` pour un lien qui double la navigation principale      |
+| `MobileMenu`      | C   | bouton `aria-expanded` + `Dialog` plein écran (≤ 900 px) ; se ferme au clic sur un lien ou le logo, au changement de chemin et quand `<Activity>` masque la page                                           |
+| `SiteFooter`      | S   | `contentinfo` : colonnes, moyens de paiement, liens légaux, mentions du bas ; liens `NavLink` (`aria-current`, page courante soulignée, sauf les marques déjà marquées par l'en-tête) de 44 px sous 641 px |
+| `PaymentBadges`   | S   | T-Money, Flooz, Carte bancaire, À la livraison (simulés)                                                                                                                                                   |
+| `InfoPage`        | S   | gabarit des pages d'information                                                                                                                                                                            |
+| `ErrorState`      | S   | contenu des pages 404 et d'erreur                                                                                                                                                                          |
 
 Îlots client ajoutés à l'étape 2 : `MobileMenu` (prévu au §3.4), `Dialog` (utilisé par lui),
 `NavLink` (seul `usePathname` l'exige).
+
+### `src/components/brand/` (pages marque, refonte lot 3)
+
+Tous composants serveur, sans JavaScript ; données calculées par `src/lib/catalog/brand-page.ts`
+(`productsOfBrand`, `groupByCategory`, `priceSpan`, `brandRangeLabel`, `featuredProducts`,
+`otherBrands`, `compareShortcuts`, testés).
+
+| Composant       | Rôle                                                                                                                                                                                                                                                                                                                                |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BrandBanner`   | bandeau `rounded-tile` sur `--brand-ground`, filet de 3 px `--brand-mark` (décoratif), nom en `text-display-brand` à l'encre de la marque, phrase de gamme, résumé calculé, paiements simulés, « Prix indicatifs, boutique fictive », 3 vedettes en éventail (la première est la **seule image prioritaire** de la page), sélecteur |
+| `BrandSwitcher` | « Apple vs Samsung vs Xiaomi » : `BrandMark` en lien pour les autres marques, marque affichée encadrée sans lien ni `aria-current`, `VsMark` de 32 px décoratifs                                                                                                                                                                    |
+| `CategoryBar`   | « Tout » puis une pastille par catégorie non vide, compte calculé (« 5 produits » pour les lecteurs d'écran) ; liens d'ancre, jamais « page courante » ; collante sous l'en-tête dès 901 px, défilement horizontal sur téléphone ; `anchorPrefix` (styleguide)                                                                      |
+| `BrandCompare`  | « Comparer avec » : deux raccourcis vers le comparateur (accueil `#comparer` tant que `/comparer` n'existe pas), nom lu « Samsung Galaxy A57 5G contre Apple iPhone 18 Pro »                                                                                                                                                        |
+| `BrandSeeAlso`  | « Voir aussi » : les deux autres marques sur leur fond pastel, avec leur nombre de produits calculé                                                                                                                                                                                                                                 |
+
+`ProductCard` prend `layout="adaptive"` dans `grid-products` (pages marque) : **liste sous 400 px**
+(photo de 88 px à gauche ; marque, nom, catégorie, pastilles de coloris, prix et action à droite),
+**compacte de 400 à 640 px** (2 colonnes étroites : accroche masquée, photo de 120 px, nom en
+17 px sur 2 lignes au plus, environ 330 px de haut à 412 px), verticale au-delà. `category`
+(`categoryLabel()`) et `swatches` (`colorSwatches()` : un coloris par `color_slug`, 4 pastilles au
+plus puis « +N », noms lus par les lecteurs d'écran) sont optionnels. `featured` : produit phare
+de la section, grande carte horizontale sur 2 colonnes dès 901 px (`md:col-span-2` posé par la
+page). Le bouton dit « Voir le produit » (règle 4 de la direction) ; la disposition par défaut
+(`stack`) reste celle du rail et de la boutique, avec « Acheter » jusqu'aux lots 4 et 5 (E27).
+
+`BrandSwitcher` se resserre sous 420 px (noms en 14 px, « VS » de 28 px, espacements de 4 px) pour
+tenir sur une ligne dès 360 px : un « VS » ne commence jamais une ligne. `CategoryBar` collante
+(dès 901 px, environ 69 px sous l'en-tête de 56 px) : les liens des grilles de la page marque ont
+`scroll-mt-[76px]`, qui s'ajoute au `scroll-padding-top` de `<html>`, pour qu'un lien atteint au
+clavier ne passe jamais sous la barre (WCAG 2.4.11, test Maj+Tab).
+
+Pièges de mise en page : un `sr-only` (position absolue) dans un conteneur à défilement horizontal
+doit avoir un ancêtre positionné **dans** ce conteneur (`relative` sur le lien), sinon il déborde
+du document. Un conteneur `wrap` enfant direct de `<main>` (flex) prend `w-full` : ses marges
+automatiques empêchent l'étirement, et le contenu le plus large imposerait sa largeur.
 
 ### Formats français (`src/lib/format/`)
 
@@ -241,5 +277,8 @@ Reportées à l'étape de leur premier usage (ADR 002, décision 9) : `Skeleton`
 ### Pilotage par `src/config/site.ts`
 
 `mainNav`, `mobileNav`, `headerActions`, `footerColumns`, `legalLinks` ne contiennent que des
-routes livrées (`routeFor()`). À l'étape 2 : aucune icône ni lien de navigation principale dans
+routes livrées (`routeFor()`). `brandHref(brand)` est la seule source des liens de marque
+(`/marques/<slug>`, lot 3) : en-tête, menu mobile, pied de page, cartes de l'accueil, fiche
+produit, boutique, sélecteur et « Voir aussi ». `mainNavHrefs` liste les adresses de la navigation
+principale, que le pied de page ne marque pas comme « page courante ». À l'étape 2 : aucune icône ni lien de navigation principale dans
 l'en-tête, menu mobile limité à l'aide (livraison, garantie), pied de page Aide + VERSUS.

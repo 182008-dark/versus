@@ -8,18 +8,11 @@ import { QuizTeaser } from "@/components/home/QuizTeaser";
 import { ProductCard } from "@/components/product/ProductCard";
 import { ProductRail } from "@/components/product/ProductRail";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { routeFor, type RouteKey } from "@/config/site";
-import { brandCardThemes, type Brand } from "@/lib/brand-themes";
+import { brandHref, routeFor } from "@/config/site";
+import { brandCardThemes } from "@/lib/brand-themes";
 import { getBrands, getCatalog, getCategories, getHome } from "@/lib/catalog/queries";
 import { isNew } from "@/lib/catalog/is-new";
 import { getToday } from "@/lib/catalog/today";
-
-/** Cible des cartes de marque : `/marques/[marque]` dès l'étape 4, la boutique avant. */
-const brandRoutes: Record<Brand, RouteKey> = {
-  apple: "marqueApple",
-  samsung: "marqueSamsung",
-  xiaomi: "marqueXiaomi",
-};
 
 /** Accueil (§4.5, ordre final) : tout vient de `home_slots`, des marques et des catégories. */
 export default async function HomePage() {
@@ -91,7 +84,7 @@ export default async function HomePage() {
               <BrandCard
                 key={brand.slug}
                 brand={brand}
-                href={routeFor(brandRoutes[brand.slug]) ?? shop}
+                href={brandHref(brand.slug) ?? shop}
                 visual={byCode.get(brandCardThemes[brand.slug].visual)}
               />
             ))}

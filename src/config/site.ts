@@ -6,6 +6,7 @@
  * pour une route prévue mais pas encore livrée : le lien est alors retiré du DOM.
  */
 
+import type { Brand } from "@/lib/brand-themes";
 import { notice } from "./notice";
 
 export const site = {
@@ -59,11 +60,14 @@ const plannedRoutes = {
 
 export type RouteKey = keyof typeof plannedRoutes;
 
-/** Routes livrées à ce jour (étape 3). À compléter à chaque étape. */
+/** Routes livrées à ce jour (étape 3, puis lot 3 de la refonte). À compléter à chaque étape. */
 const deliveredRoutes: ReadonlySet<RouteKey> = new Set<RouteKey>([
   "accueil",
   "boutique",
   "produit",
+  "marqueApple",
+  "marqueSamsung",
+  "marqueXiaomi",
   "smartphones",
   "ecouteurs",
   "montres",
@@ -100,6 +104,21 @@ export function productHref(slug: string): string {
   return `${route}/${encodeURIComponent(slug)}`;
 }
 
+/** Clé de route de la page de chaque marque (`/marques/<slug>`). */
+const brandRouteKeys = {
+  apple: "marqueApple",
+  samsung: "marqueSamsung",
+  xiaomi: "marqueXiaomi",
+} as const satisfies Record<Brand, RouteKey>;
+
+/**
+ * Page d'une marque (`/marques/apple`…) si elle est livrée, sinon `null`. Seule source des liens
+ * de marque : en-tête, menu mobile, pied de page, cartes de l'accueil, fiche, boutique.
+ */
+export function brandHref(brand: Brand): string | null {
+  return routeFor(brandRouteKeys[brand]);
+}
+
 export type LinkSpec = { label: string; route: RouteKey };
 export type NavLink = { label: string; href: string };
 export type NavGroup = { label: string; links: NavLink[] };
@@ -121,10 +140,11 @@ export function deliveredGroups(groups: ReadonlyArray<GroupSpec>): NavGroup[] {
   });
 }
 
+/** Chaque marque mène à sa page (refonte, lot 3 ; règle 3 de la direction). */
 const brandLinks = [
-  { label: "Apple", route: "boutique" },
-  { label: "Samsung", route: "boutique" },
-  { label: "Xiaomi", route: "boutique" },
+  { label: "Apple", route: brandRouteKeys.apple },
+  { label: "Samsung", route: brandRouteKeys.samsung },
+  { label: "Xiaomi", route: brandRouteKeys.xiaomi },
 ] as const satisfies ReadonlyArray<LinkSpec>;
 
 const helpLinks = [
@@ -134,7 +154,7 @@ const helpLinks = [
   { label: "Contact", route: "contact" },
 ] as const satisfies ReadonlyArray<LinkSpec>;
 
-/** Navigation livrée; les routes à venir sont redirigées vers la boutique existante. */
+/** Navigation principale : marques vers leur page, catégories vers les ancres de la boutique. */
 const mainNavSpec: ReadonlyArray<GroupSpec> = [
   { label: "Marques", links: brandLinks },
   {
@@ -187,11 +207,14 @@ export const headerActions: HeaderAction[] = (
   return href ? [{ key, label, href }] : [];
 });
 
-/** Colonnes du pied de page (maquette : Boutique, Aide, VERSUS). */
+/**
+ * Colonnes du pied de page (maquette : Boutique, Aide, VERSUS). Colonne « Boutique » : quatre
+ * adresses distinctes (tout le catalogue, puis une page par marque).
+ */
 export const footerColumns: NavGroup[] = deliveredGroups([
   {
     label: "Boutique",
-    links: [{ label: "Nouveautés", route: "boutique" }, ...brandLinks],
+    links: [{ label: "Tout le catalogue", route: "boutique" }, ...brandLinks],
   },
   { label: "Aide", links: helpLinks },
   {
@@ -204,6 +227,14 @@ export const footerColumns: NavGroup[] = deliveredGroups([
     ],
   },
 ]);
+
+/**
+ * Adresses de la navigation principale. Le pied de page ne marque pas ces liens comme « page
+ * courante » : l'en-tête (ou le menu mobile) le fait déjà, et une page n'en expose qu'un.
+ */
+export const mainNavHrefs: ReadonlySet<string> = new Set(
+  mainNav.flatMap((group) => group.links.map((link) => link.href)),
+);
 
 /** Liens légaux du bas de page (ajout à la maquette, voir docs/ecarts-maquette.md). */
 export const legalLinks: NavLink[] = deliveredLinks([

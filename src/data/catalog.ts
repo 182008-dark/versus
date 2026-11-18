@@ -104,13 +104,13 @@ export const brands: readonly CatalogBrand[] = [
   {
     slug: "samsung",
     name: "Samsung",
-    tagline: "Galaxy A, Galaxy Buds et Galaxy Watch.",
+    tagline: "Galaxy S, Z et A, Galaxy Buds, Galaxy Watch et Galaxy Fit.",
     position: 1,
   },
   {
     slug: "xiaomi",
     name: "Xiaomi",
-    tagline: "Redmi Note, Redmi Watch et Smart Band.",
+    tagline: "Xiaomi 17, Redmi Note, Buds, Watch et Smart Band.",
     position: 2,
   },
 ];

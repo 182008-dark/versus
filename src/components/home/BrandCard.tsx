@@ -5,8 +5,8 @@ import { brandCardStyle } from "@/lib/brand-themes";
 import type { CatalogBrand } from "@/lib/catalog/types";
 
 /**
- * Carte d'univers de marque (maquette : `.brand`), composant serveur. Lien vers `href`
- * (`/boutique` à l'étape 3, `/marques/[marque]` à l'étape 4). Nom accessible court : le visuel
+ * Carte d'univers de marque (maquette : `.brand`), composant serveur. Lien vers `href` : la page
+ * de la marque (`/marques/[marque]`, refonte, lot 3). Nom accessible court : le visuel
  * est décoratif, donc le lien se lit « Apple iPhone, AirPods et Apple Watch. Découvrir ».
  */
 export function BrandCard({

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { ProductCard } from "@/components/product/ProductCard";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { routeFor } from "@/config/site";
+import { brandHref, routeFor } from "@/config/site";
 import { getBrands, getCatalog, getCategories } from "@/lib/catalog/queries";
 import { isNew } from "@/lib/catalog/is-new";
 import { brandNames, productCount } from "@/lib/catalog/summary";
@@ -32,7 +33,19 @@ export default async function ShopPage() {
         {productCount(products.length)} pour découvrir les univers {brandNames(brands)}. Prix
         indicatifs en FCFA, projet pédagogique sans vente réelle.
       </p>
-      <nav aria-label="Catégories de la boutique" className="mt-7 flex flex-wrap gap-2">
+      <nav aria-label="Marques" className="mt-6">
+        <ul className="flex flex-wrap items-center gap-x-5">
+          {brands.map((brand) => {
+            const href = brandHref(brand.slug);
+            return href ? (
+              <li key={brand.slug}>
+                <BrandMark brand={brand.slug} size="lead" href={href} />
+              </li>
+            ) : null;
+          })}
+        </ul>
+      </nav>
+      <nav aria-label="Catégories de la boutique" className="mt-5 flex flex-wrap gap-2">
         {categories.map((category) => (
           <a
             key={category.slug}
