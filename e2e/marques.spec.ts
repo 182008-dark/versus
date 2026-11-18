@@ -140,6 +140,91 @@ for (const brand of brands) {
       });
     }
 
+    for (const width of [360, 390, 412]) {
+      test(`cartes lisibles à ${width} px : nom sur 2 lignes au plus, prix entier`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto(path);
+        // Mesures avec les polices du site, pas celles de repli.
+        await expect(page.locator("main [data-product-card]")).toHaveCount(expected.length);
+        await page.evaluate(() => document.fonts.ready);
+        const cards = await page.locator("main [data-product-card]").evaluateAll((els) =>
+          els.map((card) => {
+            const box = card.getBoundingClientRect();
+            const h3 = card.querySelector("h3")!;
+            const price = card.querySelector("[data-price]")!.getBoundingClientRect();
+            const style = getComputedStyle(card);
+            return {
+              code: card.getAttribute("data-product-card"),
+              height: box.height,
+              nameLines: Math.round(
+                h3.getBoundingClientRect().height / parseFloat(getComputedStyle(h3).lineHeight),
+              ),
+              priceInside:
+                price.left >= box.left + parseFloat(style.paddingLeft) - 0.5 &&
+                price.right <= box.right - parseFloat(style.paddingRight) + 0.5,
+            };
+          }),
+        );
+        expect(cards).toHaveLength(expected.length);
+        for (const card of cards) {
+          expect(card.nameLines, JSON.stringify(card)).toBeLessThanOrEqual(2);
+          expect(card.priceInside, JSON.stringify(card)).toBe(true);
+          // Liste (< 400 px) ou grille de 2 colonnes compacte (≥ 400 px) : une paire de cartes
+          // tient dans un écran de téléphone (avant : 635 px de haut par carte à 412 px).
+          expect(card.height, JSON.stringify(card)).toBeLessThanOrEqual(width < 400 ? 220 : 400);
+        }
+      });
+    }
+
+    test("liste à 375 px : catégorie et coloris de chaque carte", async ({ page }) => {
+      await page.setViewportSize({ width: 375, height: 812 });
+      await page.goto(path);
+      for (const product of expected) {
+        const card = page.locator(`main [data-product-card="${product.code}"]`);
+        const category = categories.find((c) => c.slug === product.category_slug)!;
+        await expect(card.locator("[data-card-category]")).toHaveText(category.name);
+        const colors = new Set(
+          product.variants.filter((v) => v.is_active).map((v) => v.color_slug),
+        );
+        const dots = card.locator("[data-card-swatches] > [aria-hidden]:not(.tabular-nums)");
+        await expect(dots).toHaveCount(Math.min(colors.size, 4));
+        await expect(card.locator("[data-card-swatches] .sr-only")).toContainText("coloris :");
+        await expect(dots.first()).toBeVisible();
+      }
+    });
+
+    test("« Voir le produit », jamais « Acheter » (pas de panier)", async ({ page }) => {
+      await page.goto(path);
+      const main = page.locator("main");
+      await expect(main.getByText("Acheter", { exact: true })).toHaveCount(0);
+      for (const product of expected) {
+        await expect(
+          main.getByRole("link", { name: `Voir le produit ${product.name}`, exact: true }),
+        ).toHaveAttribute("href", `/produit/${product.slug}`);
+      }
+    });
+
+    test("à 1440 px, le produit phare de chaque section occupe une grande carte", async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await page.goto(path);
+      for (const section of await page.locator("main section[id]").all()) {
+        const cards = section.locator("[data-product-card]");
+        if ((await cards.count()) === 0) continue;
+        const first = (await cards.first().boundingBox())!;
+        await expect(cards.first()).toHaveAttribute("data-featured", "");
+        await expect(section.locator("[data-featured]")).toHaveCount(1);
+        if ((await cards.count()) > 1) {
+          const second = (await cards.nth(1).boundingBox())!;
+          expect(first.width).toBeGreaterThan(second.width * 1.9);
+          expect(Math.abs(first.height - second.height)).toBeLessThanOrEqual(1);
+        }
+      }
+    });
+
     for (const width of [320, 360, 390]) {
       test(`pas de défilement horizontal à ${width} px`, async ({ page }) => {
         await page.setViewportSize({ width, height: 800 });
@@ -302,3 +387,76 @@ test("le styleguide montre les composants des pages marque", async ({ page }) =>
   await expect(bar.getByRole("link")).toHaveCount(4);
   await expect(bar.getByRole("link", { name: /Bracelets/ })).toHaveCount(0);
 });
+
+test.describe("sélecteur « Apple vs Samsung vs Xiaomi » sur téléphone", () => {
+  for (const width of [360, 390, 412]) {
+    for (const brand of brands) {
+      test(`${brand.slug} à ${width} px : une seule ligne, aucun « VS » en début de ligne`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 800 });
+        await page.goto(brandPath(brand.slug));
+        const nav = page.getByRole("navigation", { name: "Changer de marque" });
+        const items = nav.locator("li > *");
+        // Attente explicite (evaluateAll n'attend pas) et polices du site chargées.
+        await expect(items).toHaveCount(brands.length * 2 - 1);
+        await page.evaluate(() => document.fonts.ready);
+        const centers = await items.evaluateAll((els) =>
+          els.map((el) => {
+            const box = el.getBoundingClientRect();
+            return Math.round(box.top + box.height / 2);
+          }),
+        );
+        expect(centers).toHaveLength(brands.length * 2 - 1);
+        for (const center of centers) expect(Math.abs(center - centers[0]!)).toBeLessThanOrEqual(1);
+      });
+    }
+  }
+});
+
+/** Attend la fin d'un défilement (doux sans mouvement réduit) : 5 images sans mouvement. */
+async function scrollSettled(page: Page) {
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        let last = window.scrollY;
+        let still = 0;
+        const tick = () => {
+          still = window.scrollY === last ? still + 1 : 0;
+          last = window.scrollY;
+          if (still >= 5) resolve();
+          else requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }),
+  );
+}
+
+for (const reducedMotion of ["reduce", "no-preference"] as const) {
+  test(`Maj+Tab dans les sections : aucun lien sous la barre collante (WCAG 2.4.11, mouvement ${reducedMotion})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion });
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/marques/samsung");
+    const bar = page.getByRole("navigation", { name: "Catégories Samsung" });
+    // Départ : premier lien après les sections (« Comparer avec »), puis remontée au clavier.
+    await page.getByRole("region", { name: "Comparer avec" }).getByRole("link").first().focus();
+    await scrollSettled(page);
+    const cards = await page.locator("main [data-product-card]").count();
+    let checked = 0;
+    for (let step = 0; step < cards + 2; step += 1) {
+      await page.keyboard.press("Shift+Tab");
+      await scrollSettled(page);
+      const focused = page.locator(":focus");
+      const inGrid = await focused.evaluate((el) => Boolean(el.closest("[data-product-card]")));
+      if (!inGrid) continue;
+      const barBox = (await bar.boundingBox())!;
+      const box = (await focused.boundingBox())!;
+      expect(box.y, `lien ${step} sous la barre`).toBeGreaterThanOrEqual(barBox.y + barBox.height);
+      expect(box.y + box.height, `lien ${step} hors de l'écran`).toBeLessThanOrEqual(900);
+      checked += 1;
+    }
+    expect(checked).toBe(cards);
+  });
+}
