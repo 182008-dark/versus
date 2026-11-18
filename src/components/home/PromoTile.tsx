@@ -38,7 +38,7 @@ export function PromoTile({
     >
       <div className="promo-tile-copy reveal">
         {isNew ? (
-          <NewBadge tone={theme.tone === "dark" ? "onDark" : "accent"} />
+          <NewBadge tone={theme.tone === "dark" ? "onDark" : "new"} />
         ) : (
           <p className="promo-tile-eyebrow">{theme.eyebrow}</p>
         )}

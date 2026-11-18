@@ -5,7 +5,7 @@
  * littéral hexadécimal est permis. Les trois bleus Apple de la maquette (voir check-forbidden.mjs)
  * y restent interdits : l'accent Apple devient le noir de la marque (§4.2).
  *
- * - `brandThemes` : fond, encre et accent de chaque marque. Les mêmes valeurs sont exposées en
+ * - `brandThemes` : fond pastel, encre et pastille de chaque marque. Les mêmes valeurs sont exposées en
  *   CSS par `[data-brand="…"]` dans `globals.css` (un test vérifie qu'elles sont identiques).
  * - `heroThemes` : dégradés et couleurs des diapositives du hero, injectés en variables inline
  *   (`style={{ "--hero-from": … }}`) par HeroSlide (étape 3).
@@ -18,26 +18,21 @@ export type Brand = (typeof BRANDS)[number];
 
 export type BrandTheme = {
   label: string;
-  /** Fond des cartes et tuiles de la marque. */
+  /** Fond pastel des cartes, tuiles et bandeaux de la marque. */
   ground: string;
-  /** Encre (nom de marque, liens) sur `ground`. */
+  /** Encre du texte de la marque (nom, liens) : AA sur `ground`, sur blanc et sur la surface. */
   ink: string;
-  /** Couleur d'action de la marque (bouton « brand »). */
-  acc: string;
-  /** Texte posé sur `acc`. */
-  onAcc: string;
+  /**
+   * Pastille et filet de 3 px (décoratif, toujours accompagné du nom). Jamais en fond ni en
+   * texte, et jamais pour une action : l'action reste le vert VERSUS (refonte, lot 2).
+   */
+  mark: string;
 };
 
 export const brandThemes: Record<Brand, BrandTheme> = {
-  apple: { label: "Apple", ground: "#F5F5F7", ink: "#1D1D1F", acc: "#1D1D1F", onAcc: "#FFFFFF" },
-  samsung: {
-    label: "Samsung",
-    ground: "#EEF1FB",
-    ink: "#1428A0",
-    acc: "#1428A0",
-    onAcc: "#FFFFFF",
-  },
-  xiaomi: { label: "Xiaomi", ground: "#FFF1E6", ink: "#A84300", acc: "#FF6900", onAcc: "#1D1D1F" },
+  apple: { label: "Apple", ground: "#F1F2F0", ink: "#1A1D1B", mark: "#1A1D1B" },
+  samsung: { label: "Samsung", ground: "#EEF1FB", ink: "#1428A0", mark: "#1428A0" },
+  xiaomi: { label: "Xiaomi", ground: "#FFF4EC", ink: "#9A3D00", mark: "#FF6900" },
 };
 
 export type HeroTheme = {
@@ -148,7 +143,7 @@ export type TileTheme = {
   eyebrowInk: string;
   /** Lien « En savoir plus ». */
   link: string;
-  /** Bouton « Acheter » : variante de Button. */
+  /** Bouton « Acheter » : variante de Button (anciens noms : alias temporaires de `primary`). */
   button: "light" | "primary" | "brand";
   tone: "dark" | "light";
 };
@@ -164,23 +159,25 @@ export const tileThemes: Record<string, TileTheme> = {
     button: "light",
     tone: "dark",
   },
+  // Tuiles claires : fond pastel et encre de la marque (brandThemes, §4.3) ; le vert posé sur un
+  // gris clair est le vert foncé (#006B4B, §4.2).
   "apple-light": {
-    background: "#FBFBFD",
-    ink: "#1D1D1F",
-    sub: "#1D1D1F",
+    background: brandThemes.apple.ground,
+    ink: brandThemes.apple.ink,
+    sub: brandThemes.apple.ink,
     eyebrow: "Apple",
-    eyebrowInk: "#1D1D1F",
-    link: "#00805A",
+    eyebrowInk: brandThemes.apple.ink,
+    link: "#006B4B",
     button: "primary",
     tone: "light",
   },
   "samsung-light": {
-    background: "#EEF1FB",
+    background: brandThemes.samsung.ground,
     ink: "#0B1A57",
     sub: "#3A4775",
     eyebrow: "Samsung Galaxy",
-    eyebrowInk: "#1428A0",
-    link: "#1428A0",
+    eyebrowInk: brandThemes.samsung.ink,
+    link: brandThemes.samsung.ink,
     button: "brand",
     tone: "light",
   },
@@ -195,12 +192,12 @@ export const tileThemes: Record<string, TileTheme> = {
     tone: "dark",
   },
   "xiaomi-light": {
-    background: "#FFF1E6",
-    ink: "#1D1D1F",
+    background: brandThemes.xiaomi.ground,
+    ink: "#1A1D1B",
     sub: "#5C3A20",
     eyebrow: "Xiaomi",
-    eyebrowInk: "#A84300",
-    link: "#A84300",
+    eyebrowInk: brandThemes.xiaomi.ink,
+    link: brandThemes.xiaomi.ink,
     button: "brand",
     tone: "light",
   },
@@ -275,7 +272,7 @@ export const fallbackVisuals = {
 
 /** Accent par défaut du SVG de secours (la maquette utilisait le bleu Apple, désormais interdit). */
 export const fallbackAccent: Record<Brand, string> = {
-  apple: "#1D1D1F",
+  apple: "#1A1D1B",
   samsung: "#1428A0",
   xiaomi: "#FF6900",
 };

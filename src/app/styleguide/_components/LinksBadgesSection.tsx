@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { BRANDS, brandThemes } from "@/lib/brand-themes";
 import { Badge } from "@/components/ui/Badge";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { IconButton } from "@/components/ui/IconButton";
@@ -14,10 +15,11 @@ const linkStates = [
 ] as const;
 
 const linkTones = [
-  { tone: "accent", label: "accent", dark: false },
-  { tone: "ink", label: "ink", dark: false },
-  { tone: "light", label: "light (fond sombre)", dark: true },
-  { tone: "accentOnDark", label: "accentOnDark (fond sombre)", dark: true },
+  { tone: "accent", label: "accent (fond blanc)", dark: false, gray: false },
+  { tone: "accentInk", label: "accentInk (surface grise : vert foncé)", dark: false, gray: true },
+  { tone: "ink", label: "ink", dark: false, gray: false },
+  { tone: "light", label: "light (fond sombre)", dark: true, gray: false },
+  { tone: "accentOnDark", label: "accentOnDark (fond sombre)", dark: true, gray: false },
 ] as const;
 
 export function LinksBadgesSection() {
@@ -25,7 +27,7 @@ export function LinksBadgesSection() {
     <StyleguideSection
       id="liens-badges"
       eyebrow="4. Liens, badges, icônes"
-      title="Liens fléchés, badges, surtitres et boîte de dialogue"
+      title="Liens fléchés, badges et boîte de dialogue"
       intro={
         <p>
           Les liens fléchés utilisent « → » (au lieu du « › » de la maquette) ; la flèche se décale
@@ -34,13 +36,17 @@ export function LinksBadgesSection() {
       }
     >
       <div className="grid gap-4 md:grid-cols-2">
-        {linkTones.map(({ tone, label, dark }) => (
+        {linkTones.map(({ tone, label, dark, gray }) => (
           <div
             key={tone}
             data-tone={dark ? "dark" : undefined}
             className={clsx(
-              "rounded-box p-5",
-              dark ? "bg-surface-dark text-on-dark" : "bg-surface-2",
+              "rounded-card p-5",
+              dark
+                ? "bg-surface-dark text-on-dark"
+                : gray
+                  ? "bg-surface"
+                  : "bg-bg ring-1 ring-line-soft",
             )}
           >
             <h3 className="text-sm font-bold">TextLink {label}</h3>
@@ -61,15 +67,25 @@ export function LinksBadgesSection() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <NewBadge />
             <Badge tone="neutral">En stock</Badge>
+            <Badge tone="muted">Épuisé</Badge>
+            {BRANDS.map((brand) => (
+              <span key={brand} data-brand={brand}>
+                <Badge tone="brand">{brandThemes[brand].label}</Badge>
+              </span>
+            ))}
             <span data-tone="dark" className="rounded-full bg-surface-dark p-2">
               <Badge tone="onDark">Nouveau</Badge>
             </span>
           </div>
         </div>
         <div>
-          <h3 className="text-base font-bold">Surtitres</h3>
+          <h3 className="text-base font-bold">Surtitres (alias temporaire)</h3>
+          <p className="mt-1 text-sm text-muted">
+            Plus de petites capitales : casse normale, remplacé par la pastille de marque aux lots 3
+            à 5.
+          </p>
           <Eyebrow className="mt-3">Univers de marque</Eyebrow>
-          <div className="mt-3 rounded-box bg-surface-dark p-4">
+          <div className="mt-3 rounded-card bg-surface-dark p-4">
             <Eyebrow tone="dark">Aide au choix</Eyebrow>
           </div>
         </div>

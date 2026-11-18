@@ -21,7 +21,12 @@ référence par la plateforme :
 Les références Windows ont été prises le 17 novembre 2026, à la fin de l'étape 3, puis régénérées
 le même jour au lot 1 de la refonte (`--update-snapshots=changed`) : visuels recadrés avec une marge
 homogène, prix réalignés (iPhone 18 Pro « À partir de 970 000 FCFA ») et nom « Galaxy Buds4 ». La
-composition de l'accueil n'a pas changé. **Une plateforme
+composition de l'accueil n'a pas changé. Elles l'ont été de nouveau au lot 2 (fondations du design) : gris pierre, boutons
+toujours verts, surtitres en casse normale, trois arrondis, espacement de section de 64 / 96 px et
+gouttière mobile de 16 px ; puis, après revue du lot 2, titres de tuile sur `--text-tile`
+(700, −0,025 em), marques et surtitres en casse normale, pastels Apple et Xiaomi des tuiles
+alignés sur les thèmes de marque, « Dès » retiré des cartes à prix unique. Différences vérifiées sur une planche référence / nouveau : la
+structure de l'accueil est inchangée. **Une plateforme
 sans référence est ignorée** (test marqué `skipped`, avec le chemin attendu dans l'annotation) au
 lieu d'échouer : la CI Linux reste verte tant que ses références n'existent pas.
 

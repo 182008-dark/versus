@@ -163,7 +163,7 @@
 
     /* Rejouée par changement de `key` (compteurs du panier et du comparateur) */
     .anim-bump {
-      animation: bump 0.45s var(--ease-bounce);
+      animation: bump 0.45s var(--ease-out);
     }
 
     /* Flèche des liens fléchés : décalée au survol et au focus clavier (Arrow.tsx) */

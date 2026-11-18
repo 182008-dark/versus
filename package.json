@@ -24,7 +24,9 @@
     "capture:accueil": "tsx scripts/capture-accueil.ts",
     "capture:planche": "tsx scripts/planche-produits.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "capture:refonte": "tsx scripts/capture-refonte.ts",
+    "capture:comparaison": "tsx scripts/planche-avant-apres.ts"
   },
   "dependencies": {
     "clsx": "2.1.1",

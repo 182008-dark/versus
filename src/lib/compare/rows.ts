@@ -46,7 +46,11 @@ const rows = {
   price: {
     key: "price",
     label: "Prix indicatif",
-    format: (p) => (p.min_price_fcfa === null ? null : `Dès ${formatFCFA(p.min_price_fcfa)}`),
+    // Même formule que `Price` (§4.7) : « Dès » seulement si les variantes ont plusieurs prix.
+    format: (p) =>
+      p.min_price_fcfa === null
+        ? null
+        : `${p.max_price_fcfa !== p.min_price_fcfa ? "Dès " : ""}${formatFCFA(p.min_price_fcfa)}`,
     better: "lower",
   },
   screen: {

@@ -23,7 +23,7 @@ export function CatalogSection() {
   return (
     <StyleguideSection
       id="catalogue"
-      eyebrow="6. Catalogue"
+      eyebrow="7. Catalogue"
       title="Composants de l’accueil et des produits"
       intro="Primitives livrées avec leur premier usage à l’étape 3."
     >
@@ -55,19 +55,15 @@ export function CatalogSection() {
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">Price · montant FCFA</h3>
-            <Price
-              amount={sample.variants[0]?.price_fcfa ?? 0}
-              prefix="Dès"
-              className="font-semibold"
-            />
+            <Price amount={sample.variants.map((variant) => variant.price_fcfa)} size="card" />
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">SectionHeader · en-tête de section</h3>
-            <SectionHeader eyebrow="Nouveautés" title="Les derniers arrivés." />
+            <SectionHeader eyebrow="Nouveautés" title="Les derniers arrivés" />
           </div>
           <div>
             <h3 className="mb-3 text-base font-bold">Reveal · mouvement progressif</h3>
-            <Reveal className="rounded-option bg-surface p-5">Contenu visible par défaut.</Reveal>
+            <Reveal className="rounded-control bg-surface p-5">Contenu visible par défaut.</Reveal>
           </div>
         </div>
         <div>
@@ -81,7 +77,7 @@ export function CatalogSection() {
         <h3 className="mb-3 text-base font-bold">
           QuizTeaser · aperçu non soumis (affiché sur l’accueil à l’étape 5)
         </h3>
-        <div className="overflow-hidden rounded-box">
+        <div className="overflow-hidden rounded-tile">
           <QuizTeaser preview />
         </div>
       </div>

@@ -22,7 +22,10 @@ export function StyleguideSection({
       className="wrap border-t border-line-soft py-14"
     >
       <Eyebrow>{eyebrow}</Eyebrow>
-      <h2 id={`${id}-titre`} className="mt-2 text-[32px] leading-tight font-extrabold">
+      <h2
+        id={`${id}-titre`}
+        className="mt-2 text-[32px] leading-tight font-bold tracking-[-0.025em] text-balance"
+      >
         {title}
       </h2>
       {intro ? <div className="mt-3 max-w-3xl leading-relaxed text-muted">{intro}</div> : null}

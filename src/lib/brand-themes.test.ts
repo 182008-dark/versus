@@ -2,8 +2,15 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { primitives } from "@/data/design-tokens";
-import { BRANDS, brandThemes, fallbackAccent, heroStyle, heroThemes } from "./brand-themes";
+import { primitives, tokenHex } from "@/data/design-tokens";
+import {
+  BRANDS,
+  brandThemes,
+  fallbackAccent,
+  heroStyle,
+  heroThemes,
+  tileThemes,
+} from "./brand-themes";
 import { contrastRatio } from "./color/contrast";
 
 const css = readFileSync(join(process.cwd(), "src/app/globals.css"), "utf8");
@@ -22,24 +29,45 @@ function brandBlock(brand: string): Record<string, string> {
 describe("thèmes de marque", () => {
   it.each(BRANDS)("[data-brand=%s] de globals.css reprend brand-themes.ts", (brand) => {
     const t = brandThemes[brand];
-    expect(brandBlock(brand)).toEqual({
-      ground: t.ground,
-      ink: t.ink,
-      acc: t.acc,
-      "on-acc": t.onAcc,
-    });
+    expect(brandBlock(brand)).toEqual({ ground: t.ground, ink: t.ink, mark: t.mark });
   });
 
-  it.each(BRANDS)("le texte de la marque %s est lisible (AA)", (brand) => {
+  it.each(BRANDS)("l'encre de la marque %s est lisible (AA) partout où elle se pose", (brand) => {
     const t = brandThemes[brand];
-    expect(contrastRatio(t.ink, t.ground)).toBeGreaterThanOrEqual(4.5);
-    expect(contrastRatio(t.onAcc, t.acc)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(t.ink, t.ground), "sur le fond pastel").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(t.ink, tokenHex("bg")), "sur blanc").toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(t.ink, tokenHex("surface")), "sur la surface").toBeGreaterThanOrEqual(4.5);
   });
 
-  it("l'accent Apple est le noir de la marque, pas le bleu de la maquette (§4.2)", () => {
-    expect(brandThemes.apple.acc).toBe(primitives["gray-950"]);
+  it.each(BRANDS)("le texte secondaire et le prix restent lisibles sur le fond %s", (brand) => {
+    const ground = brandThemes[brand].ground;
+    for (const role of ["muted", "muted-strong", "ink", "price", "accent-ink"] as const) {
+      expect(contrastRatio(tokenHex(role), ground), role).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("la pastille orange de Xiaomi est décorative : jamais un texte (moins de 3:1 sur blanc)", () => {
+    expect(contrastRatio(brandThemes.xiaomi.mark, tokenHex("bg"))).toBeLessThan(3);
+  });
+
+  it("l'encre Apple est l'encre VERSUS, pas le bleu de la maquette (§4.2)", () => {
+    expect(brandThemes.apple.ink).toBe(primitives["gray-950"]);
+    expect(brandThemes.apple.mark).toBe(primitives["gray-950"]);
     expect(fallbackAccent.apple).toBe(primitives["gray-950"]);
     expect(source).not.toMatch(/#(?:0071e3|0066cc|2997ff)/i);
+  });
+
+  it.each(BRANDS)("la tuile claire %s reprend le fond pastel et l'encre de la marque", (brand) => {
+    const tile = tileThemes[`${brand}-light`];
+    expect(tile?.background).toBe(brandThemes[brand].ground);
+    expect(tile?.eyebrowInk).toBe(brandThemes[brand].ink);
+  });
+
+  it.each(Object.keys(tileThemes))("les textes de la tuile %s sont lisibles (AA)", (key) => {
+    const tile = tileThemes[key]!;
+    for (const role of ["ink", "sub", "eyebrowInk", "link"] as const) {
+      expect(contrastRatio(tile[role], tile.background), role).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   it("heroStyle expose le dégradé en variables CSS", () => {

@@ -1,7 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Button } from "./Button";
-import { BUTTON_VARIANTS, buttonClasses } from "./button-styles";
+import {
+  BUTTON_VARIANTS,
+  LEGACY_BUTTON_VARIANTS,
+  buttonClasses,
+  resolveButtonVariant,
+} from "./button-styles";
 
 describe("Button", () => {
   it("rend un <button type=button> par défaut (aucune soumission accidentelle)", () => {
@@ -45,13 +50,32 @@ describe("buttonClasses", () => {
     expect(buttonClasses({ size: "lg" })).toContain("h-12");
   });
 
-  it("n'agrandit le bouton au survol que sans mouvement réduit", () => {
+  it("trois variantes seulement : primary, secondary, onDark", () => {
+    expect([...BUTTON_VARIANTS]).toEqual(["primary", "secondary", "onDark"]);
+  });
+
+  it("aucun agrandissement au survol ; enfoncement à l'appui, seulement sans mouvement réduit", () => {
     for (const variant of BUTTON_VARIANTS) {
       const classes = buttonClasses({ variant }).split(/\s+/);
-      expect(classes.filter((c) => c.includes("scale-104"))).toEqual([
-        "motion-safe:state-hover:scale-104",
+      expect(classes.some((c) => /scale-1\d\d/.test(c))).toBe(false);
+      expect(classes.filter((c) => c.includes("scale-"))).toEqual([
+        "motion-safe:state-active:scale-97",
       ]);
     }
+  });
+
+  it("les anciens noms sont des alias temporaires (dark, light et brand donnent du vert)", () => {
+    for (const [legacy, target] of Object.entries(LEGACY_BUTTON_VARIANTS)) {
+      expect(resolveButtonVariant(legacy as keyof typeof LEGACY_BUTTON_VARIANTS)).toBe(target);
+      expect(buttonClasses({ variant: legacy as keyof typeof LEGACY_BUTTON_VARIANTS })).toBe(
+        buttonClasses({ variant: target }),
+      );
+    }
+    expect(buttonClasses({ variant: "brand" })).not.toMatch(/brand/);
+  });
+
+  it("le contour du bouton secondaire est le rôle des contrôles (≥ 3:1)", () => {
+    expect(buttonClasses({ variant: "secondary" })).toContain("border-line-control");
   });
 
   it("le bouton principal utilise l'accent VERSUS", () => {
