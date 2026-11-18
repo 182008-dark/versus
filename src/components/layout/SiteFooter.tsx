@@ -1,4 +1,4 @@
-import { footerColumns, legalLinks, site } from "@/config/site";
+import { footerColumns, legalLinks, mainNavHrefs, site } from "@/config/site";
 import { Logo } from "./Logo";
 import { NavLink } from "./NavLink";
 import { PaymentBadges } from "./PaymentBadges";
@@ -13,7 +13,9 @@ const linkClasses =
   "aria-[current=page]:text-ink aria-[current=page]:underline sm:block sm:min-h-0 sm:py-[5px]";
 
 /**
- * Pied de page (maquette : `.foot`), landmark `contentinfo` de premier niveau.
+ * Pied de page (maquette : `.foot`), landmark `contentinfo` de premier niveau. Un lien qui
+ * double la navigation principale (Apple, Samsung, Xiaomi) n'est pas marqué « page courante » :
+ * l'en-tête le fait déjà (un seul `aria-current` exposé par page).
  * Colonnes de la maquette (Boutique, Aide, VERSUS), liens issus de config/site.ts : une colonne
  * sans lien livré disparaît. Mobile d'abord : 1 colonne, 2 à partir de 641 px, 1,6 + 3 à
  * partir de 1025 px.
@@ -39,7 +41,11 @@ export function SiteFooter() {
               <ul>
                 {column.links.map((link) => (
                   <li key={link.href}>
-                    <NavLink href={link.href} className={linkClasses}>
+                    <NavLink
+                      href={link.href}
+                      markCurrent={!mainNavHrefs.has(link.href)}
+                      className={linkClasses}
+                    >
                       {link.label}
                     </NavLink>
                   </li>
